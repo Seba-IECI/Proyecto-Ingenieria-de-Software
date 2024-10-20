@@ -1,39 +1,33 @@
 "use strict";
 import { EntitySchema } from "typeorm";
 
-const UserSchema = new EntitySchema({
-  name: "User",
-  tableName: "users",
+const InventarioSchema = new EntitySchema({
+  name: "Inventario",
+  tableName: "inventario",
   columns: {
     id: {
       type: "int",
       primary: true,
       generated: true,
     },
-    nombreCompleto: {
+    descripcion: {
       type: "varchar",
       length: 255,
       nullable: false,
     },
-    rut: {
-      type: "varchar",
-      length: 12,
-      nullable: false,
-      unique: true,
-    },
-    email: {
+    cBarras: {
       type: "varchar",
       length: 255,
       nullable: false,
       unique: true,
     },
-    rol: {
+    categoria: {
       type: "varchar",
       length: 50,
       nullable: false,
     },
-    password: {
-      type: "varchar",
+    estado: {
+      type: "boolean",//en prestamo o disponible
       nullable: false,
     },
     createdAt: {
@@ -50,28 +44,28 @@ const UserSchema = new EntitySchema({
   },
   indices: [
     {
-      name: "IDX_USER",
+      name: "IDX_INVENTARIO_ID", 
       columns: ["id"],
-      unique: true,
+      unique: true, 
     },
     {
-      name: "IDX_USER_RUT",
-      columns: ["rut"],
-      unique: true,
+      name: "IDX_INVENTARIO_CBARRAS", 
+      columns: ["cBarras"],
+      unique: true, 
     },
     {
-      name: "IDX_USER_EMAIL",
-      columns: ["email"],
-      unique: true,
+      name: "IDX_INVENTARIO_CATEGORIA", 
+      columns: ["categoria"],
+      unique: false, 
     },
   ],
-  relations: { //relacion con tabla inventario
+  relations: { //relaciones con otras tablas
     prestamos: {
       type: "one-to-many",
       target: "Prestamos",
-      inverseSide: "usuario",
+      inverseSide: "inventario",
     },
   },
 });
 
-export default UserSchema;
+export default InventarioSchema;
