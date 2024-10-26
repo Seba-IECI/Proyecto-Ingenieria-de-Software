@@ -1,6 +1,6 @@
 "use strict";
 import { EntitySchema } from "typeorm";
-import User from "./user.entity.js"; //importante para las relaciones
+import User from "./user.entity.js";
 
 const DocumentosPracticaSchema = new EntitySchema({
     name: "DocumentosPractica",
@@ -29,11 +29,11 @@ const DocumentosPracticaSchema = new EntitySchema({
             default: () => "CURRENT_TIMESTAMP",
             nullable: false,
         },
-        fechaLimite: { //sujeto a cambios, fecha limite solo lo pone el profesor, se puede ocupar para otras cosas
+        fechaLimite: {
             type: "timestamp",
             nullable: true,
         },
-        tipoUsuario: { //sujeto a cambios también, se puede revisar el tipo de usario con solo la id del profesor
+        tipoUsuario: { 
             type: "varchar",
             length: 50,
             nullable: false,
@@ -45,8 +45,8 @@ const DocumentosPracticaSchema = new EntitySchema({
             nullable: false,
         },
     },
-    relations: { //definimos 2 relaciones
-        alumno: { //muchos documentos de practica pueden pertenecer a un alumno, puede ser posible cambio
+    relations: { 
+        alumno: { 
             type: "many-to-one",
             target: User,
             joinColumn: { name: "alumnoId" },
@@ -58,8 +58,5 @@ const DocumentosPracticaSchema = new EntitySchema({
         },
     },
 });
-
-//se ocupan las relaciones para conectar los doc de práctica con los usuarios mediante sus ids
-//ma eficiente, mantenimiento mas facil, permite obtener documentos y la info del user en una sola consulta
 
 export default DocumentosPracticaSchema;
