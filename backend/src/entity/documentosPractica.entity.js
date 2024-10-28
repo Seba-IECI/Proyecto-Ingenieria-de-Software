@@ -24,19 +24,9 @@ const DocumentosPracticaSchema = new EntitySchema({
             length: 255,
             nullable: false,
         },
-        fechaSubida: {
-            type: "timestamp",
-            default: () => "CURRENT_TIMESTAMP",
-            nullable: false,
-        },
         fechaLimite: {
             type: "timestamp",
             nullable: true,
-        },
-        tipoUsuario: {
-            type: "varchar",
-            length: 50,
-            nullable: false,
         },
         updatedAt: {
             type: "timestamp with time zone",
