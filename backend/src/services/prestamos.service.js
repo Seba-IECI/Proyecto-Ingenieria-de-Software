@@ -25,26 +25,26 @@ export async function createPrestamoService(data) {
 
 export async function getPrestamoService(query) {
   try {
-    // Obtén `id`, `cBarras`, y `nombreUsuario` de `req.query`
+    
     const { id, cBarras, rut } = req.query;
     
     const prestamoRepository = AppDataSource.getRepository(Prestamos);
 
-    // Construimos la condición de búsqueda dinámicamente según los parámetros disponibles
+    
     const whereCondition = {};
     if (id) whereCondition.id = id;
     if (cBarras) whereCondition["inventario.cBarras"] = cBarras;
     if (rut) whereCondition["usuario.rut"] = rut;
 
-    // Realizamos la consulta con las relaciones necesarias
+   
     const prestamo = await prestamoRepository.findOne({
       where: whereCondition,
-      relations: ["usuario", "inventario"], // Cargamos las relaciones
+      relations: ["usuario", "inventario"], 
     });
 
     if (!prestamo) return [null, "Préstamo no encontrado"];
 
-    // Extraemos los datos que queremos devolver
+    
     const prestamoData = {
       id: prestamo.id,
       fechaPrestamo: prestamo.fechaPrestamo,
@@ -62,13 +62,13 @@ export async function getPrestamoService(query) {
   }
 }
 
-///*en que circunstancia?
+
 export async function getPrestamosService() {
   try {
     const prestamoRepository = AppDataSource.getRepository(Prestamos);
 
     const prestamos = await prestamoRepository.find({
-      relations: ["inventario", "usuario"], // relaciones para incluir detalles
+      relations: ["inventario", "usuario"], 
     });
 
     if (!prestamos.length) return [null, "No hay préstamos registrados"];
@@ -103,7 +103,7 @@ export async function cerrarPrestamoService(id) {
     const prestamo = await prestamoRepository.findOne({ where: { id } });
     if (!prestamo) return [null, "Préstamo no encontrado"];
 
-    prestamo.estado = "cerrado"; // cambiar estado a "cerrado" al devolver
+    prestamo.estado = "cerrado"; 
     prestamo.fechaDevolucion = new Date();
     await prestamoRepository.save(prestamo);
 
@@ -118,19 +118,19 @@ export async function prestamoVencidoService(req, res) {
   try {
     const { id } = req.query;
 
-    // Busca el préstamo por id
+    
     const [prestamoData, errorGet] = await getPrestamoService({ id });
 
     if (errorGet) {
       return res.status(404).json({ message: errorGet });
     }
 
-    // Aquí puedes verificar si el préstamo está vencido
+    
     const fechaActual = new Date();
     const fechaDevolucion = new Date(prestamoData.fechaDevolucion);
 
     if (fechaDevolucion < fechaActual) {
-      // Llama a `addAmonestacionService` si el préstamo está vencido
+      
       const [amonestacion, errorAmonestacion] = await addAmonestacionService(prestamoData.usuario.id);
 
       if (errorAmonestacion) {

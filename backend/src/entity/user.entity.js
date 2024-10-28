@@ -47,11 +47,11 @@ const UserSchema = new EntitySchema({
       onUpdate: "CURRENT_TIMESTAMP",
       nullable: false,
     },
-    amonestacionesActivas: { // Amonestaciones activas
+    amonestacionesActivas: { 
       type: "int",
       default: 0,
     },
-    amonestacionesTotales: { // Total de amonestaciones
+    amonestacionesTotales: { 
       type: "int",
       default: 0,
       amonestacionesHistorical: []
@@ -74,16 +74,16 @@ const UserSchema = new EntitySchema({
       unique: true,
     },
   ],
-  relations: { //relacion con tabla inventario
+  relations: { 
     prestamos: {
       type: "one-to-many",
       target: "Prestamos",
       inverseSide: "usuario"
     },
-     amonestaciones: { // Relación con la entidad Amonestacion
+     amonestaciones: { 
       type: "one-to-many",
       target: "Amonestaciones",
-      inverseSide: "usuario", // Hace referencia al campo 'usuario' en Amonestacion
+      inverseSide: "usuario", 
     },
   }
 }

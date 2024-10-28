@@ -27,7 +27,7 @@ relations: {
     target: "User",
     joinColumn: { name: "userId" },
     inverseSide: "amonestaciones",
-    onDelete: "CASCADE", // Borra la amonestación si se elimina el usuario
+    onDelete: "CASCADE", 
     },
 }
 });

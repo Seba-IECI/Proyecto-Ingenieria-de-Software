@@ -12,13 +12,13 @@ const CodigoBarrasSchema = new EntitySchema({
     codigo: {
       type: "varchar",
       length: 255,
-      unique: true, // El código de barras debe ser único en la tabla
+      unique: true, 
       nullable: false,
     },
     lote: {
       type: "varchar",
       length: 100,
-      nullable: true, // Opcional: puedes agregar información adicional sobre el lote
+      nullable: true, 
     },
   },
   relations: {

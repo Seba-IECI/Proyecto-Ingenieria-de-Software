@@ -5,13 +5,13 @@ import {
     subirMaterialService,
     updateMateriaService
 } from "../services/materia.service.js";
-  import {
+    import {
     handleErrorClient,
     handleErrorServer,
     handleSuccess,
-  } from "../handlers/responseHandlers.js";
+    } from "../handlers/responseHandlers.js";
 
-  export async function subirMateria(req, res) {
+    export async function subirMateria(req, res) {
     try {
         
         const { titulo, descripcion, url } = req.body;

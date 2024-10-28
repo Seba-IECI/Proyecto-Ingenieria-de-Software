@@ -10,8 +10,6 @@ import {
   } from "../services/inventario.service.js";
   
   
-  
-  // Crear un inventario
   export async function createInventarioController(req, res) {
     try {
       const [nuevoInventario, error] = await createInventarioService(req.body);
@@ -28,13 +26,13 @@ import {
   }
   
     
-  // Obtener un inventario por id o nombre
+  
   export async function getInventarioByIdController(req, res) {
     try {
-      // Obtiene `id` o `nombre` de los parámetros de consulta
+      
       const { id, nombre } = req.query;
       
-      // Llama al servicio con el objeto de búsqueda
+      
       const [inventario, error] = await getInventarioByIdService({ id, nombre });
   
       if (error) {
@@ -49,7 +47,7 @@ import {
   }
   
   
-  // Actualizar el nombre principalmente o descripcion del inventario
+ 
   export async function updateInventarioController(req, res) {
     try {
       const { id } = req.params;
@@ -66,7 +64,7 @@ import {
     }
   }
   
-  // Eliminar un inventario 
+  
   export async function deleteInventarioController(req, res) {
     try {
       const { id } = req.params;
@@ -76,7 +74,7 @@ import {
         return res.status(404).json({ message: error });
       }
   
-      return res.status(200).json({ message: "Inventario eliminado exitosamente", inventarioEliminado});
+      return res.status(200).json({ message: "Inventario eliminado exitosamente", inventarioEliminado });
     } catch (error) {
       console.error("Error en el controlador al eliminar el inventario:", error);
       return res.status(500).json({ message: "Error interno del servidor" });
@@ -102,13 +100,13 @@ import {
 
 export async function getItemController(req, res) {
   try {
-    // Obtener los parámetros de la consulta (id, cBarras, nombre) desde req.query
+    
     const { id, cBarras, nombre } = req.query;
 
-    // Llamar al servicio para buscar el item
+  
     const [itemFound, error] = await getItemService({ id, cBarras, nombre });
 
-    // Manejo de errores o retorno del artículo encontrado
+    
     if (error) {
       return res.status(404).json({ message: error });
     }
@@ -126,13 +124,13 @@ export async function getItemController(req, res) {
 
 export async function deleteItemController(req, res) {
   try {
-    // Obtener los parámetros de la consulta (id, cBarras, descripcion) desde req.query
+    
     const { id, cBarras } = req.query;
 
-    // Llamar al servicio para reducir la cantidad o eliminar el código de barras
+    
     const [updatedItem, error] = await deleteItemService({ id, cBarras });
 
-    // Manejo de errores o retorno del artículo actualizado
+    
     if (error) {
       return res.status(404).json({ message: error });
     }

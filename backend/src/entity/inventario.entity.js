@@ -43,7 +43,7 @@ const InventarioSchema = new EntitySchema({
       target: "Prestamos",
       inverseSide: "inventario",
       cascade: true,
-    },  // Relación con la tabla 'prestamos'
+    }, 
 
   },
 });

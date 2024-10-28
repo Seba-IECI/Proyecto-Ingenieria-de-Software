@@ -9,18 +9,18 @@ export async function getItemService(query) {
     const { id, cBarras, nombre } = query;
     const itemRepository = AppDataSource.getRepository(Item);
 
-    // Construir la condición de búsqueda dinámica
+   
     const whereCondition = {};
     if (id) whereCondition.id = id;
     if (cBarras) whereCondition.cBarras = cBarras;
     if (nombre) whereCondition.nombre = nombre;
 
-    console.log("Condición de búsqueda:", whereCondition); // Para depuración
+    console.log("Condición de búsqueda:", whereCondition); 
 
-    // Incluye la relación `codigosBarras` en la consulta
+   
     const itemFound = await itemRepository.findOne({
       where: whereCondition,
-      relations: ["codigosBarras"], // Asegura que se incluyan los códigos de barras asociados
+      relations: ["codigosBarras"], 
     });
 
     if (!itemFound) return [null, "Artículo no encontrado"];
