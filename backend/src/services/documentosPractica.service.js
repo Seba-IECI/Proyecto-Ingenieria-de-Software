@@ -1,7 +1,7 @@
 "use strict";
 
-import { AppDataSource } from "../config/configDb";
-import DocumentosPractica from "../entity/documentosPractica.entity";
+import { AppDataSource } from "../config/configDb.js";
+import DocumentosPractica from "../entity/documentosPractica.entity.js";
 
 export async function subirDocumentoService(user, documento, fechaLimite) {
     try {

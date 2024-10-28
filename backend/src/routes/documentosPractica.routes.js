@@ -6,7 +6,6 @@ import { subirDocumentoPractica } from "../controllers/documentosPractica.contro
 const router = Router();
 
 router
-    .post("/subir", authenticateJwt, subirDocumentoPractica)
-
+    .post("/subir", authenticateJwt, subirDocumentoPractica);
 
 export default router;
