@@ -1,34 +1,23 @@
-"use strict";
 import { EntitySchema } from "typeorm";
 
 const InventarioSchema = new EntitySchema({
   name: "Inventario",
-  tableName: "inventario",
+  tableName: "inventarios",
   columns: {
     id: {
       type: "int",
       primary: true,
       generated: true,
     },
+    nombre: {
+      type: "varchar",
+      length: 255,
+      nullable: false,
+    },
     descripcion: {
       type: "varchar",
-      length: 255,
-      nullable: false,
-    },
-    cBarras: {
-      type: "varchar",
-      length: 255,
-      nullable: false,
-      unique: true,
-    },
-    categoria: {
-      type: "varchar",
-      length: 50,
-      nullable: false,
-    },
-    estado: {
-      type: "boolean",//en prestamo o disponible
-      nullable: false,
+      length: 500,
+      nullable: true,
     },
     createdAt: {
       type: "timestamp with time zone",
@@ -42,29 +31,20 @@ const InventarioSchema = new EntitySchema({
       nullable: false,
     },
   },
-  indices: [
-    {
-      name: "IDX_INVENTARIO_ID", 
-      columns: ["id"],
-      unique: true, 
+  relations: {
+    items: {
+      type: "one-to-many",
+      target: "Item",
+      inverseSide: "inventario",
+      cascade: true,
     },
-    {
-      name: "IDX_INVENTARIO_CBARRAS", 
-      columns: ["cBarras"],
-      unique: true, 
-    },
-    {
-      name: "IDX_INVENTARIO_CATEGORIA", 
-      columns: ["categoria"],
-      unique: false, 
-    },
-  ],
-  relations: { //relaciones con otras tablas
     prestamos: {
       type: "one-to-many",
       target: "Prestamos",
       inverseSide: "inventario",
-    },
+      cascade: true,
+    },  // Relación con la tabla 'prestamos'
+
   },
 });
 

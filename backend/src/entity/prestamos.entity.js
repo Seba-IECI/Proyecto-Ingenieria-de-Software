@@ -19,6 +19,11 @@ const PrestamosSchema = new EntitySchema({
       type: "timestamp with time zone",
       nullable: true,  // Puede ser nulo hasta que se devuelva el artículo
     },
+    estado: {
+      type: "int",
+      default: 0,  // 0: pendiente, 1: devuelto
+      nullable: false,
+    },
   },
   relations: {
     usuario: {
