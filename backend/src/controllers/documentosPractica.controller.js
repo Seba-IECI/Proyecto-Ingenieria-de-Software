@@ -3,7 +3,8 @@
 /* El encargado de practica es un usuario solo que con otros roles*/
 
 import {
-    subirDocumentoService
+    eliminarDocumentoService,
+    subirDocumentoService,
 } from "../services/documentosPractica.service.js";
 
 import { handleErrorClient, handleErrorServer, handleSuccess } from "../handlers/responseHandlers.js";
@@ -40,3 +41,23 @@ export async function subirDocumentoPractica(req, res) {
     }
 }
 
+
+//documento el eliminar nose si alcance a hacer los demas tan pronto, Seba
+export async function eliminarDocumentoPractica(req, res) {
+    try {
+        const documentoId = req.params.id;
+        const user = req.user;
+
+        // Si es alumno, valida el nivel
+        if (user.rol === "usuario" && !["3ro", "4to"].includes(user.nivel)) {
+            return handleErrorClient(res, 403, "Solo los alumnos de 3ro o 4to año pueden realizar esta acción.");
+        }
+
+        const [resultado, error] = await eliminarDocumentoService(user, documentoId);
+
+        if (error) return handleErrorClient(res, 400, error);
+        handleSuccess(res, 200, "Documento eliminado correctamente.");
+    } catch (error) {
+        handleErrorServer(res, 500, "Error eliminando el documento.");
+    }
+}
