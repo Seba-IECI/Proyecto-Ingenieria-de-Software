@@ -6,13 +6,14 @@ import DocumentosPractica from "../entity/documentosPractica.entity.js";
 export async function subirDocumentoService(user, archivoPath, fechaLimite) {
     try {
         const documentoRepository = AppDataSource.getRepository(DocumentosPractica);
+
+        //creamos los nuevos documento con los datos correspondientes a cada rol
         const nuevoDocumento = documentoRepository.create({
             documento: archivoPath,
-            fechaLimite,
+            fechaLimite: user.rol === "administrador" ? fechaLimite : null,//Solo el profesor define fechaLimite
             alumnoId: user.rol === "usuario" ? user.id : null,
             profesorId: user.rol === "administrador" ? user.id : null,
         });
-
 
         await documentoRepository.save(nuevoDocumento);
         return [nuevoDocumento, null];
@@ -22,23 +23,3 @@ export async function subirDocumentoService(user, archivoPath, fechaLimite) {
     }
 }
 
-export async function eliminarDocumentoService(user, documentoId) {
-    try {
-        const documentoRepository = AppDataSource.getRepository(DocumentosPractica);
-        const documento = await documentoRepository.findOne({
-            where: { id: documentoId, profesorId: user.id }
-        });
-        if (!documento) {
-            return [null, "Documento no encontrado o el usuario no tiene permisos para eliminarlo"];
-        }
-
-        fs.unlink(documento.documento,(err) => {
-            if (err) console.error("Error al eliminar el archivo:", err);
-        });
-        await documentoRepository.remove(documento);
-
-        return [true, null];
-    } catch (error) {
-        return [null, "Error al eliminar el documento"];
-    }
-}
