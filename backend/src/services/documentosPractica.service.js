@@ -58,3 +58,48 @@ export async function eliminarDocumentoService(user, documentoId) { //validar fe
         return [null, "Error al eliminar el documento"];
     }
 }
+
+export async function modificarDocumentoService(user, documentoId, fechaLimite, archivoNuevo) {
+    try {
+        const documentoRepository = AppDataSource.getRepository(DocumentosPractica);
+
+        //verifica si el documento pertenece al usuario o profesor que lo está modificando
+        const documento = await documentoRepository.findOne({
+            where: [
+                { id: documentoId, alumnoId: user.id },
+                { id: documentoId, profesorId: user.id }
+            ]
+        });
+
+        if (!documento) {
+            return [null, "Documento no encontrado o el usuario no tiene permisos para modificarlo"];
+        }
+
+        /* Verifica la fecha límite solo si es alumno ERROR
+        const fechaActual = new Date();
+        if (user.rol === "usuario" && fechaActual > new Date(documento.fechaLimite)) {
+            return [null, "No se puede modificar el documento porque ha pasado la fecha límite"];
+        }*/
+
+
+        if (archivoNuevo) {
+            fs.unlink(documento.documento, (err) => {
+                if (err) console.error("Error al eliminar el archivo anterior:", err);
+            });
+            documento.documento = archivoNuevo;
+        } //si hay un archivo nuevo, entonces eliminar el anterior y así actualizar el campo 'documento'
+
+
+        //actualizar la fecha límite si el usuario es profesor y proporciona una nueva fecha
+        if (user.rol === "administrador" && fechaLimite) {
+            documento.fechaLimite = fechaLimite;
+        }
+
+        await documentoRepository.save(documento);
+
+        return [documento, null];
+    } catch (error) {
+        console.error("Error en modificarDocumentoService:", error);
+        return [null, "Error al modificar el documento"];
+    }
+}
