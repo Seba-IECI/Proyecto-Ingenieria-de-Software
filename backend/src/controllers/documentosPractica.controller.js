@@ -5,7 +5,8 @@
 import {
     eliminarDocumentoService,
     modificarDocumentoService,
-    subirDocumentoService
+    subirDocumentoService,
+    verDocumentosService
 } from "../services/documentosPractica.service.js";
 
 import { handleErrorClient, handleErrorServer, handleSuccess } from "../handlers/responseHandlers.js";
@@ -93,3 +94,23 @@ export async function modificarDocumentoPractica(req, res) {
     }
 }
 
+
+export async function verDocumentos(req, res) {
+    try {
+        const user = req.user;
+        if (user.rol === "usuario" && !["3ro", "4to"].includes(user.nivel)) {
+            return handleErrorClient(res, 403, "Solo los alumnos de 3ro o 4to año pueden realizar esta acción.");
+        }
+
+
+
+        const [documentos, error] = await verDocumentosService(user);
+
+        if (error) return handleErrorClient(res, 404, error);
+
+        handleSuccess(res, 200, "Documentos obtenidos correctamente", documentos);
+    } catch (error) {
+        console.error("Error en verDocumentosProfesor:", error);
+        handleErrorServer(res, 500, "Error al obtener los documentos del profesor");
+    }
+}
