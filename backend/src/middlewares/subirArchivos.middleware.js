@@ -3,7 +3,6 @@ import multer from "multer";
 
 const uploadDir = "./src/upload/";
 
-
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -18,6 +17,13 @@ const storage = multer.diskStorage({
     }
 });
 
+
+const isValidPdf = (filePath) => {
+    const pdfSignature = Buffer.from([0x25, 0x50, 0x44, 0x46]);
+    const fileBuffer = fs.readFileSync(filePath);
+    return fileBuffer.slice(0, 4).equals(pdfSignature);
+};
+
 const fileFilter = (req, file, cb) => {
     if (file.mimetype === "application/pdf") {
         cb(null, true);
@@ -26,22 +32,30 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-const upload = multer({
-    storage: storage,
-    limits: {
-        fileSize: 5 * 1024 * 1024
-    },
-    fileFilter: fileFilter
-});
+const uploadMiddleware = (req, res, next) => {
+    const upload = multer({
+        storage: storage,
+        limits: { fileSize: 5 * 1024 * 1024 },
+        fileFilter: fileFilter
+    }).single("archivo");
 
-const handleFileSizeLimit = (err, req, res, next) => {
-    if (err instanceof multer.MulterError) {
-        res.status(400).json({ message: "El tamaño del archivo excede el límite de 5 MB" });
-    } else if (err) {
-        res.status(400).json({ message: err.message });
-    } else {
+    upload(req, res, function (err) {
+        if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
+            return res.status(400).json({ message: "El tamaño del archivo excede el límite de 5 MB" });
+        }
+
+        if (err) {
+            return res.status(400).json({ message: err.message });
+        }
+
+        if (req.file && !isValidPdf(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+            return res.status(400).json({ message: "El archivo no es un PDF válido." });
+        }
+
+        console.log("Archivo subido:", req.file);
         next();
-    }
+    });
 };
 
-export { upload, handleFileSizeLimit };
+export { uploadMiddleware };
