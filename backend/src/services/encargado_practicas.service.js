@@ -128,8 +128,3 @@ export async function getEncargadoPracticasService(query) {
     }
   }
 
-  
-
-
-
-  

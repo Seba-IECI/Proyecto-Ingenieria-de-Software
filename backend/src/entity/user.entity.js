@@ -47,6 +47,15 @@ const UserSchema = new EntitySchema({
       onUpdate: "CURRENT_TIMESTAMP",
       nullable: false,
     },
+    amonestacionesActivas: { 
+      type: "int",
+      default: 0,
+    },
+    amonestacionesTotales: { 
+      type: "int",
+      default: 0,
+      amonestacionesHistorical: []
+    },
   },
   indices: [
     {
@@ -65,6 +74,19 @@ const UserSchema = new EntitySchema({
       unique: true,
     },
   ],
-});
+  relations: { 
+    prestamos: {
+      type: "one-to-many",
+      target: "Prestamos",
+      inverseSide: "usuario"
+    },
+     amonestaciones: { 
+      type: "one-to-many",
+      target: "Amonestaciones",
+      inverseSide: "usuario", 
+    },
+  }
+}
+);
 
 export default UserSchema;

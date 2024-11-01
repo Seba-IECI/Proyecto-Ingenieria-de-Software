@@ -68,3 +68,4 @@ const EncargadoSchema = new EntitySchema({
 });
 
 export default EncargadoSchema;
+
