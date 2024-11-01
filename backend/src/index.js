@@ -10,6 +10,8 @@ import { cookieKey, HOST, PORT } from "./config/configEnv.js";
 import { connectDB } from "./config/configDb.js";
 import { createUsers } from "./config/initialSetup.js";
 import { passportJwtSetup } from "./auth/passport.auth.js";
+// de aqui para abajo agregar las rutas de lo que cree 
+
 
 async function setupServer() {
   try {
