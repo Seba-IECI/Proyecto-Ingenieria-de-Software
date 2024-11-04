@@ -1,6 +1,6 @@
 "use strict";
 import { Router } from "express";
-import { isProfesor } from "../middlewares/authorization.middleware.js";
+import { isProfesor, isProfesorOrEstudiante } from "../middlewares/authorization.middleware.js";
 import { authenticateJwt } from "../middlewares/authentication.middleware.js";
 import {
     deleteMateria,
@@ -14,13 +14,12 @@ import {
 const router = Router();
 
 router
-    .use(authenticateJwt)
-    .use(isProfesor);
+    .use(authenticateJwt);
 
 router
-    .post("/sub", subirMateria)
-    .get("/mos/:id", getMateria)
-    .patch("/up/:id", updateMateria)
-    .delete("/del/:id", deleteMateria);
+    .post("/sub", isProfesor,subirMateria)
+    .get("/mos/:id",isProfesorOrEstudiante, getMateria)
+    .patch("/up/:id", isProfesor,updateMateria)
+    .delete("/del/:id",isProfesor, deleteMateria);
     
 export default router;
