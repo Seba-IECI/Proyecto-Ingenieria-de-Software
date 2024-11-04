@@ -1,7 +1,7 @@
 "use strict";
 import Prestamos from "../entity/prestamos.entity.js";
 import { AppDataSource } from "../config/configDb.js";
-import User from "../entity/user.entity.js"; // Asegúrate de que la ruta sea correcta
+import User from "../entity/user.entity.js"; 
 import CodigoBarras from "../entity/CBarras.entity.js";
 import Item from "../entity/item.entity.js";
 
@@ -21,14 +21,14 @@ export async function createPrestamoService(data) {
     const itemRepository = AppDataSource.getRepository(Item);
     const prestamoRepository = AppDataSource.getRepository(Prestamos);
 
-    // Buscar al usuario por rut
+   
     const usuario = await usuarioRepository.findOne({ where: { rut } });
     if (!usuario) {
       return [null, "Usuario no encontrado"];
     }
     
 
-    // Buscar el código de barras y obtener el item relacionado
+    
     const codigoBarrasEntity = await codigoBarrasRepository.findOne({
       where: { codigo: codigoBarras },
       relations: ["item"],
@@ -43,29 +43,28 @@ export async function createPrestamoService(data) {
       return [null, "Este código de barras ya está prestado"];
     }
 
-    // Verificar disponibilidad del item
+    
     if (item.cantidad <= 0) {
       return [null, "No hay unidades disponibles para prestar este item"];
     }
 
-    // Calcular la fecha de vencimiento sumando los días al préstamo
+    
     const fechaPrestamo = new Date();
     const fechaVencimiento = new Date(fechaPrestamo);
     fechaVencimiento.setDate(fechaPrestamo.getDate() + diasPrestamo);
 
-    // Crear el nuevo préstamo
+   
     const nuevoPrestamo = prestamoRepository.create({
       usuario: usuario,
       item: item,
-      estado: 1, // Estado inicial del préstamo
+      estado: 1, 
       fechaPrestamo: fechaPrestamo,
       fechaVencimiento: fechaVencimiento,
     });
 
-    // Disminuir la cantidad del item
+   
     item.cantidad -= 1;
 
-    // Guardar los cambios en el item y el préstamo
     await itemRepository.save(item);
     await prestamoRepository.save(nuevoPrestamo);
     const prestamoData = {
@@ -103,12 +102,12 @@ export async function getPrestamoService(query) {
 
     const prestamo = await prestamoRepository.findOne({
       where: whereCondition,
-      relations: ["usuario", "item", "item.codigosBarras"], // Añadimos la relación 'item.codigosBarras'
+      relations: ["usuario", "item", "item.codigosBarras"], 
     });
 
     if (!prestamo) return [null, "Préstamo no encontrado"];
 
-    // Verificamos que el código de barras coincida
+  
     const tieneCodigoBarras = cBarras
       ? prestamo.item?.codigosBarras.some(cb => cb.codigo === cBarras)
       : true;
@@ -134,16 +133,16 @@ export async function getPrestamoService(query) {
 }
 
 
-//busco los prestamos activos o pasados, dependiendo del valor que paso en el estado
+
 export async function getPrestamosPorEstadoService(estado) {
   try {
     const prestamoRepository = AppDataSource.getRepository(Prestamos);
 
-    const whereCondition = { estado }; // Filtra los préstamos según el estado proporcionado
+    const whereCondition = { estado }; 
 
     const prestamos = await prestamoRepository.find({
       where: whereCondition,
-      relations: ["usuario", "item", "item.codigosBarras"], // Incluye las relaciones necesarias
+      relations: ["usuario", "item", "item.codigosBarras"], 
     });
 
     if (prestamos.length === 0) return [null, `No se encontraron préstamos con estado ${estado}`];
@@ -188,26 +187,26 @@ export async function cerrarPrestamoService(id) {
     const prestamoRepository = AppDataSource.getRepository(Prestamos);
     const itemRepository = AppDataSource.getRepository(Item);
 
-    // Buscar el préstamo por ID
+
     const prestamo = await prestamoRepository.findOne({
       where: { id },
-      relations: ["item"], // Incluye la relación con el item
+      relations: ["item"], 
     });
     
     if (!prestamo) return [null, "Préstamo no encontrado"];
 
-    // Verificar si el préstamo ya está cerrado
+    
     if (prestamo.estado === 0) return [null, "El préstamo ya está cerrado"];
 
-    // Actualizar el estado del préstamo a cerrado y establecer fecha de devolución
+    
     prestamo.estado = 0;
     prestamo.fechaDevolucion = new Date();
 
-    // Cambiar el estado del item a disponible (0)
+    
     const item = prestamo.item;
     item.estado = 0;
 
-    // Guardar los cambios en el préstamo y el item
+    
     await prestamoRepository.save(prestamo);
     await itemRepository.save(item);
 

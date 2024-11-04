@@ -29,7 +29,7 @@ export async function createPrestamoController(req, res) {
   try {
     const { rut, codigoBarras, diasPrestamo } = req.body;
 
-    // Llama a createPrestamoService directamente
+    
     const [nuevoPrestamo, error] = await createPrestamoService({ rut, codigoBarras, diasPrestamo });
     if (error) {
       return res.status(500).json({ message: error });
