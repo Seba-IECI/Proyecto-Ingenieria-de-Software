@@ -15,6 +15,11 @@ const CodigoBarrasSchema = new EntitySchema({
       unique: true, 
       nullable: false,
     },
+    disponible: { 
+      type: "boolean", 
+      nullable: false, 
+      default: true,
+    },
     lote: {
       type: "varchar",
       length: 100,
