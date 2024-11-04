@@ -10,13 +10,13 @@ export async function revisarPrestamos() {
     const usuarioRepository = AppDataSource.getRepository(User);
 
     const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0); // Fecha de hoy a las 00:00
+    hoy.setHours(0, 0, 0, 0); 
     const ayer = new Date(hoy);
-    ayer.setDate(hoy.getDate() - 1); // Fecha de ayer
+    ayer.setDate(hoy.getDate() - 1); 
     const mañana = new Date(hoy);
-    mañana.setDate(hoy.getDate() + 1); // Fecha de mañana
+    mañana.setDate(hoy.getDate() + 1); 
 
-    // **1. Amonestar préstamos vencidos (ayer)**
+   
     const prestamosVencidosAyer = await prestamoRepository.find({
       where: {
         fechaVencimiento: ayer,
@@ -27,7 +27,7 @@ export async function revisarPrestamos() {
 
  
 
-    // **2. Notificar a usuarios con préstamos que vencen mañana**
+   
     const prestamosQueVencenMañana = await prestamoRepository.find({
       where: {
         fechaVencimiento: mañana,
@@ -48,8 +48,8 @@ export async function revisarPrestamos() {
 
     for (let prestamo of prestamosQueVencenMañana) {
       const usuario = prestamo.usuario;
-      // Aquí puedes implementar una función para enviar notificaciones
-      // Por ejemplo: enviarNotificacion(usuario, `Tu préstamo vence mañana`);
+      // implementar  enviar notificaciones
+      
       console.log(`Notificación: El préstamo de ${usuario.nombre} vence mañana`);
     }
 
@@ -60,7 +60,7 @@ export async function revisarPrestamos() {
   }
 }
 
-// Configurar el cron job para que se ejecute a las 00:00 todos los días
+
 cron.schedule("0 0 * * *", () => {
   revisarPrestamos()
     .then(console.log)
