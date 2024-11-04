@@ -1,4 +1,3 @@
-"use strict";
 import { EntitySchema } from "typeorm";
 
 const PrestamosSchema = new EntitySchema({
@@ -17,28 +16,32 @@ const PrestamosSchema = new EntitySchema({
     },
     fechaDevolucion: {
       type: "timestamp with time zone",
-      nullable: true, 
+      nullable: true,
+    },
+    fechaVencimiento: {
+      type: "timestamp with time zone",
+      nullable: false,
     },
     estado: {
       type: "int",
-      default: 0,  
+      default: 0,
       nullable: false,
     },
   },
   relations: {
     usuario: {
       type: "many-to-one",
-      target: "User",  
-      joinColumn: { name: "user_id" },  
-      nullable: false, 
-      onDelete: "CASCADE", 
+      target: "User",
+      joinColumn: { name: "user_id" },
+      nullable: false,
+      onDelete: "CASCADE",
     },
-    inventario: {
+    item: {
       type: "many-to-one",
-      target: "Inventario",  
-      joinColumn: { name: "inventario_id" },  
-      nullable: false,  
-      onDelete: "CASCADE",  
+      target: "Item",
+      joinColumn: { name: "item_id" },
+      nullable: false,
+      onDelete: "CASCADE",
     },
   },
 });
