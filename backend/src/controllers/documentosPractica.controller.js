@@ -4,7 +4,6 @@ import { subirDocumentoService } from "../services/documentosPractica.service.js
 
 import { handleErrorClient, handleErrorServer, handleSuccess } from "../handlers/responseHandlers.js";
 
-
 export async function subirDocumentoPractica(req, res) {
     try {
         const user = req.user;
