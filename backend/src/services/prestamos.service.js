@@ -1,20 +1,88 @@
 "use strict";
 import Prestamos from "../entity/prestamos.entity.js";
 import { AppDataSource } from "../config/configDb.js";
+import User from "../entity/user.entity.js"; 
+import CodigoBarras from "../entity/CBarras.entity.js";
+import Item from "../entity/item.entity.js";
+
 
 export async function createPrestamoService(data) {
   try {
+    const { rut, codigoBarras, diasPrestamo } = data;
+
+    console.log("Datos recibidos:", data);
+    if (!rut || !codigoBarras || !diasPrestamo) {
+      return [null, "Faltan datos necesarios para crear el préstamo"];
+    }
+    
+
+    const usuarioRepository = AppDataSource.getRepository(User);
+    const codigoBarrasRepository = AppDataSource.getRepository(CodigoBarras);
+    const itemRepository = AppDataSource.getRepository(Item);
     const prestamoRepository = AppDataSource.getRepository(Prestamos);
 
+   
+    const usuario = await usuarioRepository.findOne({ where: { rut } });
+    if (!usuario) {
+      return [null, "Usuario no encontrado"];
+    }
+    
+
+    
+    const codigoBarrasEntity = await codigoBarrasRepository.findOne({
+      where: { codigo: codigoBarras },
+      relations: ["item"],
+    });
+    if (!codigoBarrasEntity) {
+      return [null, "Código de barras no encontrado"];
+    }
+
+    const item = codigoBarrasEntity.item;
+
+    if (!codigoBarrasEntity.disponible) {
+      return [null, "Este código de barras ya está prestado"];
+    }
+
+    
+    if (item.cantidad <= 0) {
+      return [null, "No hay unidades disponibles para prestar este item"];
+    }
+
+    
+    const fechaPrestamo = new Date();
+    const fechaVencimiento = new Date(fechaPrestamo);
+    fechaVencimiento.setDate(fechaPrestamo.getDate() + diasPrestamo);
+
+   
     const nuevoPrestamo = prestamoRepository.create({
-      ...data,
-      estado: "pendiente",
-      fechaSolicitud: new Date(),
+      usuario: usuario,
+      item: item,
+      estado: 1, 
+      fechaPrestamo: fechaPrestamo,
+      fechaVencimiento: fechaVencimiento,
     });
 
-    await prestamoRepository.save(nuevoPrestamo);
+   
+    item.cantidad -= 1;
 
-    return [nuevoPrestamo, null];
+    await itemRepository.save(item);
+    await prestamoRepository.save(nuevoPrestamo);
+    const prestamoData = {
+      id: nuevoPrestamo.id,
+      fechaPrestamo: nuevoPrestamo.fechaPrestamo,
+      fechaVencimiento: nuevoPrestamo.fechaVencimiento,
+      estado: nuevoPrestamo.estado,
+      usuario: {
+        nombreCompleto: usuario.nombreCompleto,
+        rut: usuario.rut,
+      },
+      item: {
+        descripcion: item.descripcion,
+        codigoBarras: codigoBarras,
+      },
+    };
+
+    return [prestamoData, null];
   } catch (error) {
     console.error("Error al crear el préstamo:", error);
     return [null, "Error interno del servidor"];
@@ -22,37 +90,39 @@ export async function createPrestamoService(data) {
 }
 
 
-
 export async function getPrestamoService(query) {
   try {
-    
-    const { id, cBarras, rut } = req.query;
-    
+    const { id, cBarras, rut } = query;
+
     const prestamoRepository = AppDataSource.getRepository(Prestamos);
 
-    
     const whereCondition = {};
     if (id) whereCondition.id = id;
-    if (cBarras) whereCondition["inventario.cBarras"] = cBarras;
     if (rut) whereCondition["usuario.rut"] = rut;
 
-   
     const prestamo = await prestamoRepository.findOne({
       where: whereCondition,
-      relations: ["usuario", "inventario"], 
+      relations: ["usuario", "item", "item.codigosBarras"], 
     });
 
     if (!prestamo) return [null, "Préstamo no encontrado"];
 
-    
+  
+    const tieneCodigoBarras = cBarras
+      ? prestamo.item?.codigosBarras.some(cb => cb.codigo === cBarras)
+      : true;
+
+    if (!tieneCodigoBarras) return [null, "Préstamo no encontrado para el código de barras especificado"];
+
     const prestamoData = {
       id: prestamo.id,
       fechaPrestamo: prestamo.fechaPrestamo,
       fechaDevolucion: prestamo.fechaDevolucion,
       nombreUsuario: prestamo.usuario?.nombreCompleto,
       rutUsuario: prestamo.usuario?.rut,
-      itemInventario: prestamo.inventario?.descripcion,
-      codigoBarras: prestamo.inventario?.cBarras,
+      fechaVencimiento: prestamo.fechaVencimiento,
+      itemDescripcion: prestamo.item?.descripcion,
+      codigoBarras: cBarras,
     };
 
     return [prestamoData, null];
@@ -63,23 +133,39 @@ export async function getPrestamoService(query) {
 }
 
 
-export async function getPrestamosService() {
+
+export async function getPrestamosPorEstadoService(estado) {
   try {
     const prestamoRepository = AppDataSource.getRepository(Prestamos);
 
+    const whereCondition = { estado }; 
+
     const prestamos = await prestamoRepository.find({
-      relations: ["inventario", "usuario"], 
+      where: whereCondition,
+      relations: ["usuario", "item", "item.codigosBarras"], 
     });
 
-    if (!prestamos.length) return [null, "No hay préstamos registrados"];
-    return [prestamos, null];
+    if (prestamos.length === 0) return [null, `No se encontraron préstamos con estado ${estado}`];
+
+    const prestamosData = prestamos.map(prestamo => ({
+      id: prestamo.id,
+      fechaPrestamo: prestamo.fechaPrestamo,
+      fechaDevolucion: prestamo.fechaDevolucion,
+      nombreUsuario: prestamo.usuario?.nombreCompleto,
+      rutUsuario: prestamo.usuario?.rut,
+      itemDescripcion: prestamo.item?.descripcion,
+      codigoBarras: prestamo.item?.codigosBarras.map(cb => cb.codigo),
+    }));
+
+    return [prestamosData, null];
   } catch (error) {
-    console.error("Error al obtener los préstamos:", error);
+    console.error("Error al obtener los préstamos por estado:", error);
     return [null, "Error interno del servidor"];
   }
 }
 
-export async function updatePrestamoService(id, nuevoEstado) {
+
+/*export async function updatePrestamoService(id, nuevoEstado) {
   try {
     const prestamoRepository = AppDataSource.getRepository(Prestamos);
 
@@ -94,18 +180,35 @@ export async function updatePrestamoService(id, nuevoEstado) {
     console.error("Error al actualizar el estado del préstamo:", error);
     return [null, "Error interno del servidor"];
   }
-}
+}*/
 
 export async function cerrarPrestamoService(id) {
   try {
     const prestamoRepository = AppDataSource.getRepository(Prestamos);
+    const itemRepository = AppDataSource.getRepository(Item);
 
-    const prestamo = await prestamoRepository.findOne({ where: { id } });
+
+    const prestamo = await prestamoRepository.findOne({
+      where: { id },
+      relations: ["item"], 
+    });
+    
     if (!prestamo) return [null, "Préstamo no encontrado"];
 
-    prestamo.estado = "cerrado"; 
+    
+    if (prestamo.estado === 0) return [null, "El préstamo ya está cerrado"];
+
+    
+    prestamo.estado = 0;
     prestamo.fechaDevolucion = new Date();
+
+    
+    const item = prestamo.item;
+    item.estado = 0;
+
+    
     await prestamoRepository.save(prestamo);
+    await itemRepository.save(item);
 
     return [prestamo, null];
   } catch (error) {

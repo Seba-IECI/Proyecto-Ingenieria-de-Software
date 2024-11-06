@@ -76,7 +76,7 @@ export async function getInventarioByIdService(query) {
     if (id) whereCondition.id = id;
     if (nombre) whereCondition.nombre = nombre;
 
-    // Busca el inventario usando la condición dinámica
+   
     const inventario = await inventarioRepository.findOne({
       where: whereCondition,
       relations: ["items"], 
