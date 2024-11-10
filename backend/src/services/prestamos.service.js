@@ -14,22 +14,18 @@ export async function createPrestamoService(data) {
     if (!rut || !codigoBarras || !diasPrestamo) {
       return [null, "Faltan datos necesarios para crear el préstamo"];
     }
-    
 
     const usuarioRepository = AppDataSource.getRepository(User);
     const codigoBarrasRepository = AppDataSource.getRepository(CodigoBarras);
     const itemRepository = AppDataSource.getRepository(Item);
     const prestamoRepository = AppDataSource.getRepository(Prestamos);
 
-   
-    const usuario = await usuarioRepository.findOne({ where: { rut } });
+        const usuario = await usuarioRepository.findOne({ where: { rut } });
     if (!usuario) {
       return [null, "Usuario no encontrado"];
     }
-    
 
-    
-    const codigoBarrasEntity = await codigoBarrasRepository.findOne({
+        const codigoBarrasEntity = await codigoBarrasRepository.findOne({
       where: { codigo: codigoBarras },
       relations: ["item"],
     });
@@ -48,12 +44,24 @@ export async function createPrestamoService(data) {
       return [null, "No hay unidades disponibles para prestar este item"];
     }
 
+   
+    const prestamoActivo = await prestamoRepository.findOne({
+      where: {
+        item: { id: item.id },
+        estado: 1, 
+      },
+    });
+
+    if (prestamoActivo) {
+      return [null, "Este código de barras ya tiene un préstamo activo"];
+    }
+
     
     const fechaPrestamo = new Date();
     const fechaVencimiento = new Date(fechaPrestamo);
     fechaVencimiento.setDate(fechaPrestamo.getDate() + diasPrestamo);
 
-   
+    
     const nuevoPrestamo = prestamoRepository.create({
       usuario: usuario,
       item: item,
@@ -62,11 +70,18 @@ export async function createPrestamoService(data) {
       fechaVencimiento: fechaVencimiento,
     });
 
-   
-    item.cantidad -= 1;
+    
+    codigoBarrasEntity.disponible = false;
+    await codigoBarrasRepository.save(codigoBarrasEntity);
 
+    
+    item.cantidad -= 1;
     await itemRepository.save(item);
+
+    
     await prestamoRepository.save(nuevoPrestamo);
+
+    
     const prestamoData = {
       id: nuevoPrestamo.id,
       fechaPrestamo: nuevoPrestamo.fechaPrestamo,
@@ -78,7 +93,7 @@ export async function createPrestamoService(data) {
       },
       item: {
         descripcion: item.descripcion,
-        codigoBarras: codigoBarras,
+        codigoBarras: codigoBarras, 
       },
     };
 
@@ -88,7 +103,6 @@ export async function createPrestamoService(data) {
     return [null, "Error interno del servidor"];
   }
 }
-
 
 export async function getPrestamoService(query) {
   try {
@@ -138,23 +152,29 @@ export async function getPrestamosPorEstadoService(estado) {
   try {
     const prestamoRepository = AppDataSource.getRepository(Prestamos);
 
-    const whereCondition = { estado }; 
+    const whereCondition = { estado };
 
     const prestamos = await prestamoRepository.find({
       where: whereCondition,
-      relations: ["usuario", "item", "item.codigosBarras"], 
+      relations: ["usuario", "item", "item.codigosBarras"],
     });
 
-    if (prestamos.length === 0) return [null, `No se encontraron préstamos con estado ${estado}`];
+    console.log("Préstamos encontrados:", prestamos);
+
+  if (prestamos.length === 0) {
+      return [null, `No se encontraron préstamos con estado ${estado}`];
+    }
 
     const prestamosData = prestamos.map(prestamo => ({
       id: prestamo.id,
       fechaPrestamo: prestamo.fechaPrestamo,
       fechaDevolucion: prestamo.fechaDevolucion,
-      nombreUsuario: prestamo.usuario?.nombreCompleto,
-      rutUsuario: prestamo.usuario?.rut,
-      itemDescripcion: prestamo.item?.descripcion,
-      codigoBarras: prestamo.item?.codigosBarras.map(cb => cb.codigo),
+      nombreUsuario: prestamo.usuario?.nombreCompleto || "Usuario no encontrado",
+      rutUsuario: prestamo.usuario?.rut || "RUT no disponible",
+      itemDescripcion: prestamo.item?.descripcion || "Descripción no disponible",
+      codigoBarras: prestamo.item?.codigosBarras
+        ? prestamo.item.codigosBarras.map(cb => cb.codigo)
+        : [],
     }));
 
     return [prestamosData, null];
