@@ -141,23 +141,19 @@ export async function addItemService(data) {
     const inventarioRepository = AppDataSource.getRepository(Inventario);
     const codigoBarrasRepository = AppDataSource.getRepository(CodigoBarras);
 
-    // Buscar el inventario específico
     const inventarioactual = await inventarioRepository.findOne({ where: { nombre: inventario } });
     if (!inventarioactual) {
       return [null, "Inventario no encontrado"];
     }
 
-    // Buscar si el item ya existe en el inventario específico
     let item = await itemRepository.findOne({
       where: { nombre, descripcion, categoria, inventario: { id: inventarioactual.id } },
       relations: ["codigosBarras"],
     });
 
     if (item) {
-      // Incrementa la cantidad del item existente
       item.cantidad += 1;
 
-      // Verificar si el código de barras ya existe
       const codigoExistente = item.codigosBarras.find(cb => cb.codigo === cBarras);
       if (codigoExistente) {
         return [null, "El código de barras ya está asociado a este artículo"];
@@ -168,19 +164,17 @@ export async function addItemService(data) {
         item.codigosBarras.push(nuevoCodigoBarras);
       }
     } else {
-      // Crear un nuevo item si no existe, con estado predeterminado 0 y cantidad 1
       item = itemRepository.create({
         nombre,
         descripcion,
         categoria,
         estado: 0,
         cantidad: 1,
-        inventario: inventarioactual, // Asociar usando el objeto `inventarioactual`
+        inventario: inventarioactual,
         codigosBarras: [{ codigo: cBarras }],
       });
     }
 
-    // Guardar el item (ya sea nuevo o actualizado)
     await itemRepository.save(item);
 
     return [item, null];
