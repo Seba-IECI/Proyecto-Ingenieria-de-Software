@@ -7,22 +7,24 @@ import {
     
   } from "../controllers/prestamos.controller.js";
 import { authenticateJwt } from "../middlewares/authentication.middleware.js";
+import { isAdmin, isInventario } from "../middlewares/authorization.middleware.js";
 
 const router = Router();
 
 router
-    .use(authenticateJwt);
+    .use(authenticateJwt)
+    
 
 
 router.get("/", getPrestamoController);
 
-router.post("/", createPrestamoController);
+router.post("/",isInventario, createPrestamoController);
 
 
-router.get("/estado", getPrestamosPorEstadoController);
+router.get("/estado",isInventario, getPrestamosPorEstadoController);
 
 
 
-router.patch("/cerrar", cerrarPrestamoController);
+router.patch("/cerrar",isInventario, cerrarPrestamoController);
 
 export default router;
