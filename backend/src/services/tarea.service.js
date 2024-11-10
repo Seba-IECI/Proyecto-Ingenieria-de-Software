@@ -1,5 +1,5 @@
 "use strict";
-import Tarea from "../entity/Tarea.entity.js";
+import Tarea from "../entity/tarea.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 
 export async function crearTareaService(query){
