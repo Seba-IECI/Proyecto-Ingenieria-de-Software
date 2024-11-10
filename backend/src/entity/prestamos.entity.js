@@ -43,6 +43,11 @@ const PrestamosSchema = new EntitySchema({
       nullable: false,
       onDelete: "CASCADE",
     },
+    codigoBarras: { 
+      type: "many-to-one",
+      target: "CodigoBarras",
+      onDelete: "CASCADE",
+    },
   },
 });
 

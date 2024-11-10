@@ -47,8 +47,8 @@ export async function createPrestamoService(data) {
    
     const prestamoActivo = await prestamoRepository.findOne({
       where: {
-        item: { id: item.id },
-        estado: 1, 
+        codigoBarras: codigoBarrasEntity,
+        estado: 1,
       },
     });
 
