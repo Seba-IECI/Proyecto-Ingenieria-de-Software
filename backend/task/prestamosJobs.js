@@ -1,8 +1,9 @@
 import cron from "node-cron";
-import { AppDataSource } from "../data-source";
-import Prestamos from "../entities/Prestamos";
-import User from "../entities/User";
-import { procesarPrestamoVencidoService } from "../services/prestamos.service.js";
+import { AppDataSource } from "../src/config/configDb.js";
+
+import Prestamos from "../src/entity/prestamos.entity.js";
+import User from "../src/entity/user.entity.js";
+import { prestamoVencidoService } from "../src/services/prestamos.service.js";
 
 export async function revisarPrestamos() {
   try {
@@ -37,7 +38,7 @@ export async function revisarPrestamos() {
     });
 
     for (let prestamo of prestamosVencidosAyer) {
-      const [resultado, error] = await procesarPrestamoVencidoService(prestamo.id);
+      const [resultado, error] = await prestamoVencidoService(prestamo.id);
       if (error) {
         console.error("Error al procesar el préstamo vencido con ID " + prestamo.id + ":", error);
       } else {
@@ -61,7 +62,8 @@ export async function revisarPrestamos() {
 }
 
 
-cron.schedule("0 0 * * *", () => {
+cron.schedule("* * * * *", () => {
+  console.log("Cron job ejecutado");  // Añade este log para verificar si el cron se ejecuta.
   revisarPrestamos()
     .then(console.log)
     .catch(console.error);
