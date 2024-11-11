@@ -4,7 +4,7 @@ import { AppDataSource } from "../config/configDb.js";
 import User from "../entity/user.entity.js"; 
 import CodigoBarras from "../entity/CBarras.entity.js";
 import Item from "../entity/item.entity.js";
-import { getAmonestacionesService } from "./amonestaciones.service.js";
+import { addAmonestacionService,getAmonestacionesService } from "./amonestaciones.service.js";
 
 export async function createPrestamoService(data) {
   try {
@@ -119,6 +119,42 @@ export async function createPrestamoService(data) {
 }
 
 
+export async function getPrestamoInterno(query) {
+  try {
+    const { id, cBarras, rut } = query;
+    const prestamoRepository = AppDataSource.getRepository(Prestamos);
+
+    const qb = prestamoRepository
+      .createQueryBuilder("prestamo")
+      .leftJoinAndSelect("prestamo.usuario", "usuario")
+      .leftJoinAndSelect("prestamo.item", "item")
+      .leftJoinAndSelect("item.codigosBarras", "codigoBarras");
+
+    if (id) {
+      qb.andWhere("prestamo.id = :id", { id });
+    }
+    if (rut) {
+      qb.andWhere("usuario.rut = :rut", { rut });
+    }
+    if (cBarras) {
+      qb.andWhere("codigoBarras.codigo = :cBarras", { cBarras });
+    }
+
+    const prestamo = await qb.getOne();
+
+    
+
+    if (!prestamo) {
+      return [null, "Préstamo no encontrado"];
+    }
+
+    return [prestamo, null];
+  } catch (error) {
+    console.error("Error al obtener el préstamo:", error);
+    return [null, "Error interno del servidor"];
+  }
+}
+
 export async function getPrestamoService(query) {
   try {
     const { id, cBarras, rut } = query;
@@ -165,6 +201,7 @@ export async function getPrestamoService(query) {
     return [null, "Error interno del servidor"];
   }
 }
+
 
 export async function getPrestamosPorEstadoService(estado) {
   try {
@@ -257,17 +294,21 @@ export async function cerrarPrestamoService(id) {
 
 export async function prestamoVencidoService(id) {
   try {
-    const [prestamoData, errorGet] = await getPrestamoService({ id });
+    const [prestamo, errorGet] = await getPrestamoInterno({ id });
 
     if (errorGet) {
       return [null, errorGet];
     }
 
+    if (!prestamo || !prestamo.usuario) {
+      return [null, "El préstamo o el usuario asociado no se encuentran disponibles"];
+    }
+
     const fechaActual = new Date();
-    const fechaDevolucion = new Date(prestamoData.fechaDevolucion);
+    const fechaDevolucion = new Date(prestamo.fechaDevolucion);
 
     if (fechaDevolucion < fechaActual) {
-      const [amonestacion, errorAmonestacion] = await addAmonestacionService(prestamoData.usuario.id);
+      const [amonestacion, errorAmonestacion] = await addAmonestacionService(prestamo.usuario.id);
 
       if (errorAmonestacion) {
         return [null, errorAmonestacion];
@@ -289,4 +330,3 @@ export async function prestamoVencidoService(id) {
     return [null, "Error interno del servidor"];
   }
 }
-

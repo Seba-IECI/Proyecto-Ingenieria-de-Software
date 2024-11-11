@@ -10,9 +10,11 @@ import { cookieKey, HOST, PORT } from "./config/configEnv.js";
 import { connectDB } from "./config/configDb.js";
 import { createUsers } from "./config/initialSetup.js";
 import { passportJwtSetup } from "./auth/passport.auth.js";
-// de aqui para abajo agregar las rutas de lo que cree 
+import { revisarPrestamos } from "../task/prestamosJobs.js";
+import cron from "node-cron";
 
 
+console.log("Configurando el servidor...");
 async function setupServer() {
   try {
     const app = express();
@@ -23,24 +25,23 @@ async function setupServer() {
       cors({
         credentials: true,
         origin: true,
-      }),
+      })
     );
 
     app.use(
       urlencoded({
         extended: true,
         limit: "1mb",
-      }),
+      })
     );
 
     app.use(
       json({
         limit: "1mb",
-      }),
+      })
     );
 
     app.use(cookieParser());
-
     app.use(morgan("dev"));
 
     app.use(
@@ -53,14 +54,13 @@ async function setupServer() {
           httpOnly: true,
           sameSite: "strict",
         },
-      }),
+      })
     );
 
     app.use(passport.initialize());
     app.use(passport.session());
 
     passportJwtSetup();
-
     app.use("/api", indexRoutes);
 
     app.listen(PORT, () => {
@@ -72,17 +72,30 @@ async function setupServer() {
 }
 
 async function setupAPI() {
+  console.log("Iniciando setupAPI...")
   try {
     await connectDB();
+    console.log("Conectando a la base de datos...");
     await setupServer();
     await createUsers();
+
+    
   } catch (error) {
     console.log("Error en index.js -> setupAPI(), el error es: ", error);
   }
+
+  // Programación del cron job
+  
 }
+cron.schedule("* * * * *", () => { // Cambia el intervalo según tus necesidades
+  console.log("Cron job ejecutado");
+  revisarPrestamos()
+    .then(console.log)
+    .catch(console.error);
+});
 
 setupAPI()
   .then(() => console.log("=> API Iniciada exitosamente"))
   .catch((error) =>
-    console.log("Error en index.js -> setupAPI(), el error es: ", error),
+    console.log("Error en index.js -> setupAPI(), el error es: ", error)
   );

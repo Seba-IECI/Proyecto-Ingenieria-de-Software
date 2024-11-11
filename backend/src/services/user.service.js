@@ -107,6 +107,8 @@ export async function updateUserService(query, body) {
       rut: body.rut,
       email: body.email,
       rol: body.rol,
+      nivel: body.nivel,
+      permisos: body.permisos,
       updatedAt: new Date(),
     };
 
