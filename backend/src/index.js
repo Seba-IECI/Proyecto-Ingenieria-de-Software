@@ -87,7 +87,7 @@ async function setupAPI() {
   // Programación del cron job
   
 }
-cron.schedule("* * * * *", () => { // Cambia el intervalo según tus necesidades
+cron.schedule("0 0 * * *", () => { // Cambia el intervalo según tus necesidades
   console.log("Cron job ejecutado");
   revisarPrestamos()
     .then(console.log)
