@@ -1,5 +1,8 @@
 import fs from "fs";
 import multer from "multer";
+import { v4 as uuidv4 } from "uuid";
+import { AppDataSource } from "../config/configDb.js";
+import DocumentosPractica from "../entity/documentosPractica.entity.js";
 
 const uploadDir = "./src/upload/";
 
@@ -12,11 +15,10 @@ const storage = multer.diskStorage({
         cb(null, uploadDir);
     },
     filename: function (req, file, cb) {
-        const fileName = file.originalname.replace(/\s+/g, "-");
-        cb(null, fileName);
+        const uniqueName = `${uuidv4()}-${file.originalname.replace(/\s+/g, "-")}`;
+        cb(null, uniqueName);
     }
 });
-
 
 const isValidPdf = (filePath) => {
     const pdfSignature = Buffer.from([0x25, 0x50, 0x44, 0x46]);
@@ -32,30 +34,62 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-const uploadMiddleware = (req, res, next) => {
+const verificarDocumentoMiddleware = async (req, res, next) => {
+    const documentoId = req.params.id;
+    const user = req.user;
+
+    try {
+        const documentoRepository = AppDataSource.getRepository(DocumentosPractica);
+        const documento = await documentoRepository.findOne({
+            where: [
+                { id: documentoId, alumnoId: user.id },
+                { id: documentoId, profesorId: user.id }
+            ]
+        });
+        if (!documento) {
+            return res.status(404).json({ message: "Documento no encontrado o permisos insuficientes" });
+        }
+        next();
+    } catch (error) {
+        console.error("Error al verificar documento:", error);
+        return res.status(500).json({ message: "Error al verificar documento" });
+    }
+};
+
+const handleFileUpload = (req, res, next) => {
     const upload = multer({
         storage: storage,
         limits: { fileSize: 5 * 1024 * 1024 },
         fileFilter: fileFilter
     }).single("archivo");
-
     upload(req, res, function (err) {
         if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
             return res.status(400).json({ message: "El tamaño del archivo excede el límite de 5 MB" });
         }
-
         if (err) {
             return res.status(400).json({ message: err.message });
         }
-
         if (req.file && !isValidPdf(req.file.path)) {
             fs.unlinkSync(req.file.path);
             return res.status(400).json({ message: "El archivo no es un PDF válido." });
         }
-
-        console.log("Archivo subido:", req.file);
+        if (req.file) {
+            req.file.path = `${req.protocol}://${req.get("host")}/${req.file.path.replace(/\\/g, "/")}`;
+        }
+        console.log("Archivo subido:", req.file.path);
         next();
     });
+};
+
+const uploadMiddleware = async (req, res, next) => {
+    if (req.method === "PUT" && req.path.includes("modificarDocumento")) {
+        await verificarDocumentoMiddleware(req, res, async (err) => {
+            if (err) return res.status(400).json({ message: "Error en la verificación del documento" });
+            handleFileUpload(req, res, next);
+        });
+    } else {
+        handleFileUpload(req, res, next);
+    }
 };
 
 export { uploadMiddleware };
