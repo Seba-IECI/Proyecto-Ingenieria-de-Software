@@ -3,38 +3,6 @@ import User from "../entity/user.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 import { comparePassword, encryptPassword } from "../helpers/bcrypt.helper.js";
 
-export async function createUserService(userData) {
-  try {
-    const userRepository = AppDataSource.getRepository(User);
-
-    const existingUser = await userRepository.findOne({
-      where: [{ email: userData.email }, { rut: userData.rut }],
-    });
-
-    if (existingUser) {
-      return [null, "Ya existe un usuario con el mismo email o RUT"];
-    }
-
-    const hashedPassword = await encryptPassword(userData.password);
-
-    const newUser = userRepository.create({
-      ...userData,
-      password: hashedPassword,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    const savedUser = await userRepository.save(newUser);
-
-    const { password, ...userWithoutPassword } = savedUser;
-    return [userWithoutPassword, null];
-
-  } catch (error) {
-    console.error("Error al crear el usuario:", error);
-    return [null, "Error interno del servidor"];
-  }
-}
-
 export async function getUserService(query) {
   try {
     const { rut, id, email } = query;
@@ -107,6 +75,8 @@ export async function updateUserService(query, body) {
       rut: body.rut,
       email: body.email,
       rol: body.rol,
+      nivel: body.nivel,
+      permisos: body.permisos,
       updatedAt: new Date(),
     };
 

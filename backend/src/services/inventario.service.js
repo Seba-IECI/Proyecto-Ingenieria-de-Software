@@ -141,48 +141,40 @@ export async function addItemService(data) {
     const inventarioRepository = AppDataSource.getRepository(Inventario);
     const codigoBarrasRepository = AppDataSource.getRepository(CodigoBarras);
 
-    
     const inventarioactual = await inventarioRepository.findOne({ where: { nombre: inventario } });
     if (!inventarioactual) {
       return [null, "Inventario no encontrado"];
     }
 
-   
     let item = await itemRepository.findOne({
-      where: { nombre, descripcion, categoria, inventario: { nombre: inventario } },
-      relations: ["codigosBarras"], 
+      where: { nombre, descripcion, categoria, inventario: { id: inventarioactual.id } },
+      relations: ["codigosBarras"],
     });
 
     if (item) {
-      
       item.cantidad += 1;
 
-      
       const codigoExistente = item.codigosBarras.find(cb => cb.codigo === cBarras);
       if (codigoExistente) {
-        
         return [null, "El código de barras ya está asociado a este artículo"];
       }
       if (!codigoExistente) {
-        
-        const nuevoCodigoBarras = codigoBarrasRepository.create({ codigo: cBarras, item : { id: item.id } });
-        await codigoBarrasRepository.save(nuevoCodigoBarras); 
-        item.codigosBarras.push(nuevoCodigoBarras); 
+        const nuevoCodigoBarras = codigoBarrasRepository.create({ codigo: cBarras, item: { id: item.id } });
+        await codigoBarrasRepository.save(nuevoCodigoBarras);
+        item.codigosBarras.push(nuevoCodigoBarras);
       }
     } else {
-      
       item = itemRepository.create({
         nombre,
         descripcion,
         categoria,
-        estado: 0, 
-        cantidad: 1, 
-        inventario, 
-        codigosBarras: [{ codigo: cBarras }], 
+        estado: 0,
+        cantidad: 1,
+        inventario: inventarioactual,
+        codigosBarras: [{ codigo: cBarras }],
       });
     }
 
-    
     await itemRepository.save(item);
 
     return [item, null];
@@ -191,6 +183,7 @@ export async function addItemService(data) {
     return [null, "Error interno del servidor"];
   }
 }
+
 
 
 

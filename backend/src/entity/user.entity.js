@@ -32,6 +32,16 @@ const UserSchema = new EntitySchema({
       length: 50,
       nullable: false,
     },
+    nivel: {
+      type: "varchar",
+      length: 3,
+      nullable: true,
+    },
+    permisos: {
+      type: "varchar", 
+      length: 50,
+      nullable: true
+  },
     password: {
       type: "varchar",
       nullable: false,

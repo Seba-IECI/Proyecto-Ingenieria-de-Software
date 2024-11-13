@@ -1,10 +1,10 @@
 "use strict";
-import Tarea from "../entity/Tarea.entity.js";
+import Tarea from "../entity/tarea.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 
 export async function crearTareaService(query){
     try{
-        const {titulo, descripcion, fecha_entrega} = query;
+        const { titulo, descripcion, fecha_entrega } = query;
         const tareaRepository = AppDataSource.getRepository(Tarea);
         const nuevaTarea = tareaRepository.create({
             titulo,
@@ -59,9 +59,9 @@ export async function deshabilitarTareaService(query) {
 
 export async function getTareaService(query){
     try{
-        const {id} = query;
+        const { id } = query;
         const tareaFound = await AppDataSource.getRepository(Tarea).findOne({
-            where: [{id: id}],
+            where: [{ id: id }],
         });
 
         if(!tareaFound) return [null, "Tarea no encontrada"];
@@ -74,10 +74,10 @@ export async function getTareaService(query){
 
 export async function updateTareaService(query){
     try{
-        const {id, titulo, descripcion, fecha_entrega} = query;
+        const { id, titulo, descripcion, fecha_entrega } = query;
         const tareaRepository = AppDataSource.getRepository(Tarea);
         const tareaFound = await tareaRepository.findOne({
-            where: [{id: id}],
+            where: [{ id: id }],
         });
 
         if(!tareaFound) return [null, "Tarea no encontrada"];
@@ -88,7 +88,7 @@ export async function updateTareaService(query){
             fecha_entrega,
         });
 
-        return [await tareaRepository.findOne({id}), null];
+        return [await tareaRepository.findOne({ id }), null];
     } catch (error){
         console.error("Error al actualizar la tarea:", error);
         return [null, "Error interno del servidor"];

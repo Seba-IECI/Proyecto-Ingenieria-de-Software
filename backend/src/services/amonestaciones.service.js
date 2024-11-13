@@ -3,6 +3,7 @@ import Amonestaciones from "../entity/amonestaciones.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 import { getPrestamoService } from "../services/prestamos.service.js";
 import Prestamos from "../entity/prestamos.entity.js";
+import User from "../entity/user.entity.js";
 
 
 export async function addAmonestacionService(userId) {
@@ -42,10 +43,10 @@ export async function getAmonestacionesService(userId) {
         relations: ["amonestaciones"],
       });
   
-      
       if (userWithAmonestaciones.amonestaciones.length === 0) {
-        return [null, "No hay amonestaciones"];
+        return [[], null]; 
       }
+      
   
      
       return [userWithAmonestaciones.amonestaciones, null];

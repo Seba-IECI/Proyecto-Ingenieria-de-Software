@@ -52,7 +52,7 @@ export async function registerService(user) {
   try {
     const userRepository = AppDataSource.getRepository(User);
 
-    const { nombreCompleto, rut, email } = user;
+    const { nombreCompleto, rut, email, nivel } = user;
 
     const createErrorMessage = (dataInfo, message) => ({
       dataInfo,
@@ -64,7 +64,7 @@ export async function registerService(user) {
         email,
       },
     });
-    
+
     if (existingEmailUser) return [null, createErrorMessage("email", "Correo electrónico en uso")];
 
     const existingRutUser = await userRepository.findOne({
@@ -81,6 +81,7 @@ export async function registerService(user) {
       rut,
       password: await encryptPassword(user.password),
       rol: "usuario",
+      nivel,
     });
 
     await userRepository.save(newUser);

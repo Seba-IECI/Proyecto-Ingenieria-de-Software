@@ -5,7 +5,7 @@ import {
     getTareaService,
     habilitarTareaService,
     updateTareaService
-} from "../services/Tarea.service.js";
+} from "../services/tarea.service.js";
 import {
     handleErrorClient,
     handleErrorServer,

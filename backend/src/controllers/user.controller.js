@@ -4,7 +4,6 @@ import {
   getUserService,
   getUsersService,
   updateUserService,
-  createUserService
 } from "../services/user.service.js";
 import {
   userBodyValidation,
@@ -15,18 +14,6 @@ import {
   handleErrorServer,
   handleSuccess,
 } from "../handlers/responseHandlers.js";
-
-export async function createUser(req, res) {
-  try {
-    const [newUser, error] = await createUserService(req.body);
-
-    if (error) return handleErrorClient(res, 400, error);
-
-    handleSuccess(res, 201, "Usuario creado exitosamente", newUser);
-  } catch (error) {
-    handleErrorServer(res, 500, "Error al crear el usuario");
-  }
-}
 
 export async function getUser(req, res) {
   try {

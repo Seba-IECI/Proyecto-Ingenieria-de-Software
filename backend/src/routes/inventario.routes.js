@@ -9,27 +9,29 @@ import {
  updateInventarioController
 } from "../controllers/inventario.controller.js";
 import { authenticateJwt } from "../middlewares/authentication.middleware.js";
+import { isAdmin ,isInventario } from "../middlewares/authorization.middleware.js";
 
 const router = Router();
 router
-    .use(authenticateJwt);
+    .use(authenticateJwt)
+    
 
 
 
-router.post("/",createInventarioController);
+router.post("/",isInventario,createInventarioController);
 
-router.get("/",getInventarioByIdController); 
+router.get("/",isInventario,getInventarioByIdController); 
 
-router.put("/update/:id", updateInventarioController);
+router.put("/update/:id",isInventario,updateInventarioController);
 
-router.delete("/borrar/:id", deleteInventarioController);
+router.delete("/borrar/:id",isInventario, deleteInventarioController);
 
-router.post("/add-item", addItemController);
+router.post("/add-item",isInventario, addItemController);
 
 
 router.get("/item/", getItemController); 
 
-router.delete("/item/", deleteItemController);
+router.delete("/item/",isInventario,deleteItemController);
 
 export default router;
 
@@ -37,4 +39,4 @@ export default router;
 
 
 
-//falta añadir middle ware de control de roles
+//falta añadir middle ware de control de roles  usuario aparte para manejar invetarios

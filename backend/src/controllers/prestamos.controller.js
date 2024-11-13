@@ -97,7 +97,7 @@ export async function cerrarPrestamoController(req, res) {
 
 export async function getPrestamosPorEstadoController(req, res) {
   try {
-    const { estado } = req.query;
+    const { estado } = req.body;
 
     if (estado === undefined) {
       return res.status(400).json({ message: "El parámetro 'estado' es requerido" });
