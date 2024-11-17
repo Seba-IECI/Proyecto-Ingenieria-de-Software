@@ -273,3 +273,30 @@ export async function deleteInventarioService(id) {
     return [null, "Error interno del servidor"];
   }
 }
+
+export async function getInventariosService() {
+  try {
+    const inventarioRepository = AppDataSource.getRepository(Inventario);
+
+    
+    const inventarios = await inventarioRepository
+      .createQueryBuilder("inventario")
+      .leftJoin("inventario.items", "item") 
+      .select([
+        "inventario.id", 
+        "inventario.nombre", 
+        "COUNT(item.id) AS itemCount" 
+      ])
+      .groupBy("inventario.id") 
+      .getRawMany(); 
+
+    if (!inventarios || inventarios.length === 0) {
+      return [null, "No se encontraron inventarios"];
+    }
+
+    return [inventarios, null];
+  } catch (error) {
+    console.error("Error al obtener nombres de inventarios y número de items:", error);
+    return [null, "Error interno del servidor"];
+  }
+}

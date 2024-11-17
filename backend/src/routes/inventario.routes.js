@@ -5,6 +5,7 @@ import {
   deleteInventarioController,
   deleteItemController,
   getInventarioByIdController,
+  getInventariosController ,
   getItemController,
  updateInventarioController
 } from "../controllers/inventario.controller.js";
@@ -22,6 +23,7 @@ router.post("/",isInventario,createInventarioController);
 
 router.get("/",isInventario,getInventarioByIdController); 
 
+router.get("/names",isInventario,getInventariosController);
 router.put("/update/:id",isInventario,updateInventarioController);
 
 router.delete("/borrar/:id",isInventario, deleteInventarioController);

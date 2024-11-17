@@ -4,10 +4,29 @@ import {
     deleteInventarioService,
     deleteItemService,
     getInventarioByIdService,
+    getInventariosService ,
     getItemService,
     updateInventarioService,
     
   } from "../services/inventario.service.js";
+
+  export async function getInventariosController(req, res) {
+    try {
+      
+      const [inventarios, error] = await getInventariosService();
+  
+      
+      if (error) {
+        return res.status(404).json({ message: error });
+      }
+  
+      
+      return res.status(200).json(inventarios);
+    } catch (error) {
+      console.error("Error en el controlador al obtener nombres y conteo de items:", error);
+      return res.status(500).json({ message: "Error interno del servidor" });
+    }
+  }
   
   
   export async function createInventarioController(req, res) {
