@@ -129,6 +129,11 @@ export async function listarAsistenciasService(semestreId, alumnoId, startDate, 
     }
 }
 
+
+
+
+
+
 export async function obtenerAsistenciaPorIdService(id, user) {
     try {
         if (!id || isNaN(id)) {
@@ -185,5 +190,34 @@ export async function obtenerAsistenciaPorIdService(id, user) {
     } catch (error) {
         console.error("Error en obtenerAsistenciaPorIdService:", error);
         return [null, "Error al obtener la asistencia"];
+    }
+}
+
+
+export async function calcularPorcentajeAsistenciaService(alumnoId, semestreId) {
+    try {
+        const asistenciaRepository = AppDataSource.getRepository(AsistenciaSchema);
+
+        if (!alumnoId || !semestreId) {
+            return [null, "El alumnoId y semestreId son obligatorios"];
+        }
+
+        const asistencias = await asistenciaRepository.find({
+            where: { alumno: { id: alumnoId }, semestre: { id: semestreId } },
+        });
+
+        if (!asistencias.length) {
+            return [null, "No se encontraron registros de asistencia para este alumno en este semestre"];
+        }
+
+        const asistenciasTotales = asistencias.length;
+        const asistenciasPresentes = asistencias.filter((asistencia) => asistencia.presente).length;
+
+        const porcentaje = (asistenciasPresentes / asistenciasTotales) * 100;
+
+        return [porcentaje.toFixed(2), null];
+    } catch (error) {
+        console.error("Error en calcularPorcentajeAsistenciaService:", error);
+        return [null, "Error al calcular el porcentaje de asistencia"];
     }
 }

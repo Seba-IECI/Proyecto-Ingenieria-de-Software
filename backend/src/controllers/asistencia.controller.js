@@ -1,6 +1,7 @@
 "use strict";
 
 import {
+    calcularPorcentajeAsistenciaService,
     listarAsistenciasService,
     obtenerAsistenciaPorIdService,
     registrarAsistenciaService
@@ -48,6 +49,9 @@ export async function listarAsistencias(req, res) {
     }
 }
 
+
+
+
 export async function obtenerAsistenciaPorId(req, res) {
     try {
         const user = req.user;
@@ -77,7 +81,24 @@ export async function obtenerAsistenciaPorId(req, res) {
     }
 }
 
+export async function calcularPorcentajeAsistencia(req, res) {
+    try {
+        const { alumnoId, semestreId } = req.query;
 
+        if (!alumnoId || !semestreId) {
+            return handleErrorClient(res, 400, "El alumnoId y semestreId son obligatorios");
+        }
+
+        const [porcentaje, error] = await calcularPorcentajeAsistenciaService(alumnoId, semestreId);
+
+        if (error) return handleErrorClient(res, 404, error);
+
+        handleSuccess(res, 200, "Porcentaje de asistencia calculado correctamente", { porcentaje });
+    } catch (error) {
+        console.error("Error en calcularPorcentajeAsistencia:", error);
+        handleErrorServer(res, 500, "Error al calcular el porcentaje de asistencia");
+    }
+}
 
 
 
