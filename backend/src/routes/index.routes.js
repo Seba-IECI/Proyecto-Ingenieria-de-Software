@@ -23,9 +23,10 @@ router
     .use("/documentos", documentosPracticaRoutes)
     .use("/prestamos", prestamosRoutes)
     .use("/tarea", tareaRoutes)
-    .use("/email", emailRoutes)//uso interno por ahora
+    .use("/email", emailRoutes)
     .use("/semestres", semestreRoutes)
     .use("/asistencia", asistenciaRoutes)
-    .use("/documentosTarea", documentosTareaRoutes);
+    .use("/documentosTarea", documentosTareaRoutes)
+    .use("/periodoPractica", periodoPracticaRoutes);
     
 export default router;
