@@ -2,7 +2,7 @@
 import Prestamos from "../entity/prestamos.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 import User from "../entity/user.entity.js"; 
-import CodigoBarras from "../entity/CBarras.entity.js";
+import CodigoBarras from "../entity/cBarras.entity.js";
 import Item from "../entity/item.entity.js";
 import Inventario from "../entity/inventario.entity.js";
 import { addAmonestacionService,getAmonestacionesService } from "./amonestaciones.service.js";
