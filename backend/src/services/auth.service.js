@@ -34,6 +34,8 @@ export async function loginService(user) {
       email: userFound.email,
       rut: userFound.rut,
       rol: userFound.rol,
+      nivel: userFound.nivel,
+      especialidad: userFound.especialidad,
     };
 
     const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, {
@@ -47,10 +49,9 @@ export async function loginService(user) {
   }
 }
 
-export async function updateRol (email, newRole) {
+export async function updateRol(email, newRole) {
   try {
     const userRepository = AppDataSource.getRepository(User);
-    
     const userFound = await userRepository.findOne({
       where: { email },
     });
@@ -74,7 +75,7 @@ export async function registerService(user) {
   try {
     const userRepository = AppDataSource.getRepository(User);
 
-    const { nombreCompleto, rut, email, nivel } = user;
+    const { nombreCompleto, rut, email, nivel, especialidad } = user;
 
     const createErrorMessage = (dataInfo, message) => ({
       dataInfo,
@@ -104,6 +105,7 @@ export async function registerService(user) {
       password: await encryptPassword(user.password),
       rol: "usuario",
       nivel,
+      especialidad,
     });
 
     await userRepository.save(newUser);

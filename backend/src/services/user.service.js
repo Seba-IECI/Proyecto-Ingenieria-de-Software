@@ -76,6 +76,7 @@ export async function updateUserService(query, body) {
       email: body.email || userFound.email,
       rol: body.rol || userFound.rol,
       nivel: body.nivel || userFound.nivel,
+      especialidad: body.especialidad || userFound.especialidad,
       permisos: body.permisos || userFound.permisos,
       updatedAt: new Date(),
     };
