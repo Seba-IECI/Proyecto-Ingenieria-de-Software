@@ -2,14 +2,17 @@
 import fs from "fs";
 import { AppDataSource } from "../config/configDb.js";
 import DocumentosPractica from "../entity/documentosPractica.entity.js";
+import PeriodoPracticaSchema from "../entity/periodoPractica.entity.js";
 
-export async function subirDocumentoService(user, archivoPath) {
+export async function subirDocumentoService(user, archivoPath, periodoPracticaId, especialidad) {
     try {
         const documentoRepository = AppDataSource.getRepository(DocumentosPractica);
         const nuevoDocumento = documentoRepository.create({
             documento: archivoPath,
             alumnoId: user.rol === "usuario" ? user.id : null,
-            profesorId: user.rol === "administrador" ? user.id : null,
+            encargadoPracticasId: user.rol === "encargadoPracticas" ? user.id : null,
+            periodoPractica: { id: periodoPracticaId },
+            especialidad: especialidad,
         });
 
         await documentoRepository.save(nuevoDocumento);
@@ -20,57 +23,64 @@ export async function subirDocumentoService(user, archivoPath) {
     }
 }
 
+
 export async function eliminarDocumentoService(user, documentoId, req) {
     try {
         const documentoRepository = AppDataSource.getRepository(DocumentosPractica);
 
-        const whereClause = user.rol === "usuario"
-            ? { id: documentoId, alumnoId: user.id }
-            : { id: documentoId, profesorId: user.id };
+        if (user.rol === "usuario" || user.rol === "encargadoPracticas") {
+            const criteria = user.rol === "usuario"
+                ? { id: documentoId, alumnoId: user.id }
+                : { id: documentoId, encargadoPracticasId: user.id };
 
-        const documento = await documentoRepository.findOne({ where: whereClause });
+            const documento = await documentoRepository.findOne({ where: criteria });
 
-        if (!documento) {
-            return [null, "Documento no encontrado o el usuario no tiene permisos para eliminarlo"];
-        }
-        
-        const filePath = documento.documento.replace(`${req.protocol}://${req.get("host")}/`, "");
-
-        if (fs.existsSync(filePath)) {
-            try {
-                fs.unlinkSync(filePath);
-                console.log("Archivo eliminado:", filePath);
-            } catch (err) {
-                console.error("Error al eliminar el archivo:", err);
+            if (!documento) {
+                return [null, "Documento no encontrado o el usuario no tiene permisos para eliminarlo"];
             }
-        } else {
-            console.warn("El archivo no existe en el sistema:", filePath);
-        }
-        await documentoRepository.remove(documento);
 
-        return [true, null];
+            const filePath = documento.documento.replace(`${req.protocol}://${req.get("host")}/`, "");
+
+            if (fs.existsSync(filePath)) {
+                try {
+                    fs.unlinkSync(filePath);
+                    console.log("Archivo eliminado:", filePath);
+                } catch (err) {
+                    console.error("Error al eliminar el archivo:", err);
+                }
+            } else {
+                console.warn("El archivo no existe en el sistema:", filePath);
+            }
+
+            await documentoRepository.remove(documento);
+
+            return [true, null];
+        }
+
+        return [null, "No tienes permiso para realizar esta acción"];
     } catch (error) {
         console.error("Error al eliminar el documento:", error);
         return [null, "Error al eliminar el documento"];
     }
 }
 
-export async function modificarDocumentoService(user, documentoId, archivoNuevo, hostUrl) {
+export async function modificarDocumentoService(user, documentoId, archivoNuevo, hostUrl, periodoPracticaId) {
     try {
         const documentoRepository = AppDataSource.getRepository(DocumentosPractica);
 
-        // Buscar el documento en la base de datos
-        const documento = await documentoRepository.findOne({
-            where: [
-                { id: documentoId, alumnoId: user.id },
-                { id: documentoId, profesorId: user.id }
-            ]
-        });
-        // Si hay un nuevo archivo, eliminar el anterior y actualizar la ruta
+        const criteria = user.rol === "usuario"
+            ? { id: documentoId, alumnoId: user.id }
+            : { id: documentoId, encargadoPracticasId: user.id };
+
+        const documento = await documentoRepository.findOne({ where: criteria });
+
+        if (!documento) {
+            return [null, "Documento no encontrado o el usuario no tiene permisos para modificarlo"];
+        }
+
         if (archivoNuevo) {
             const previousFilePath = documento.documento.replace(`${hostUrl}/`, "");
 
-            // Verificar si el archivo anterior existe antes de eliminarlo
             if (fs.existsSync(previousFilePath)) {
                 try {
                     fs.unlinkSync(previousFilePath);
@@ -80,11 +90,13 @@ export async function modificarDocumentoService(user, documentoId, archivoNuevo,
                 }
             }
 
-            // Actualizar el campo documento con la nueva ruta
             documento.documento = archivoNuevo;
         }
 
-        // Guardar los cambios en la base de datos
+        if (!documento.periodoPractica) {
+            documento.periodoPractica = { id: periodoPracticaId };
+        }
+
         await documentoRepository.save(documento);
 
         return [documento, null];
@@ -94,39 +106,54 @@ export async function modificarDocumentoService(user, documentoId, archivoNuevo,
     }
 }
 
-export async function obtenerTodosDocumentosService() {
+
+export async function obtenerTodosDocumentosService(user) {
     try {
         const documentosRepository = AppDataSource.getRepository(DocumentosPractica);
 
-        const documentos = await documentosRepository.find();
+        if (user.rol === "usuario" || user.rol === "encargadoPracticas") {
+            const criteria = user.rol === "usuario"
+                ? { alumnoId: user.id }
+                : { encargadoPracticasId: user.id };
 
-        if (!documentos.length) {
-            return [null, "No se encontraron documentos."];
+            const documentos = await documentosRepository.find({ where: criteria });
+
+            if (!documentos.length) {
+                return [null, "No se encontraron documentos."];
+            }
+
+            return [documentos, null];
         }
 
-        return [documentos, null];
+        return [null, "No tienes permiso para realizar esta acción"];
     } catch (error) {
         console.error("Error al obtener documentos:", error);
         return [null, "Error interno del servidor"];
     }
 }
 
+
 export async function verDocumentosService(user) {
     try {
-        const documentoRepository = AppDataSource.getRepository(DocumentosPractica);  
-        const whereClause = user.rol === "administrador"
-            ? { profesorId: user.id }
-            : { alumnoId: user.id };
+        const documentoRepository = AppDataSource.getRepository(DocumentosPractica);
 
-        const documentos = await documentoRepository.find({ where: whereClause });
+        if (user.rol === "usuario" || user.rol === "encargadoPracticas") {
+            const criteria = user.rol === "usuario"
+                ? { alumnoId: user.id }
+                : { encargadoPracticasId: user.id };
 
+            const documentos = await documentoRepository.find({ where: criteria });
 
-        if (!documentos.length) {
-            return [null, "No se encontraron documentos subidos por el profesor"];
+            if (!documentos.length) {
+                return [null, "No se encontraron documentos relacionados con este usuario"];
+            }
+
+            return [documentos, null];
         }
-        return [documentos, null];
+
+        return [null, "No tienes permiso para realizar esta acción"];
     } catch (error) {
-        console.error("Error en verDocumentosProfesorService:", error);
-        return [null, "Error al obtener los documentos del profesor"];
+        console.error("Error en verDocumentosService:", error);
+        return [null, "Error al obtener los documentos"];
     }
 }

@@ -15,7 +15,7 @@ const DocumentosPracticaSchema = new EntitySchema({
             type: "int",
             nullable: true,
         },
-        profesorId: {
+        encargadoPracticasId: {
             type: "int",
             nullable: true,
         },
@@ -24,8 +24,9 @@ const DocumentosPracticaSchema = new EntitySchema({
             length: 255,
             nullable: false,
         },
-        fechaLimite: {
-            type: "timestamp",
+        especialidad: {
+            type: "varchar",
+            length: 50,
             nullable: true,
         },
         updatedAt: {
@@ -41,10 +42,16 @@ const DocumentosPracticaSchema = new EntitySchema({
             target: User,
             joinColumn: { name: "alumnoId" },
         },
-        profesor: {
+        encargadoPracticas: {
             type: "many-to-one",
             target: User,
-            joinColumn: { name: "profesorId" },
+            joinColumn: { name: "encargadoPracticasId" },
+        },
+        periodoPractica: {
+            type: "many-to-one",
+            target: "PeriodoPractica",
+            joinColumn: { name: "periodoPracticaId" },
+            nullable: true,
         },
     },
 });

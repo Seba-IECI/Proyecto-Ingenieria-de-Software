@@ -13,6 +13,8 @@ import { handleErrorClient, handleErrorServer, handleSuccess } from "../handlers
 export async function subirDocumentoPractica(req, res) {
     try {
         const user = req.user;
+        const periodoPracticaId = req.periodoPracticaId;
+
         if (user.rol === "usuario" && !["3ro", "4to"].includes(user.nivel)) {
             return handleErrorClient(res, 403, "Solo los alumnos de 3ro o 4to año pueden realizar esta acción.");
         }
@@ -21,8 +23,19 @@ export async function subirDocumentoPractica(req, res) {
             return handleErrorClient(res, 400, "No se ha subido ningún archivo");
         }
 
+        if (user.rol === "usuario") {
+            if (!user.especialidad
+                || !["Mecánica automotriz", "Electricidad", "Electrónica"].includes(user.especialidad)) {
+                return handleErrorClient(res, 400, "El alumno debe tener una especialidad válida asignada.");
+            }
+        } else if (user.rol === "encargadoPracticas" && !req.body.especialidad) {
+            return handleErrorClient(res, 400, "Debe especificar la especialidad del documento.");
+        }
+
+        const especialidad = user.rol === "usuario" ? user.especialidad : req.body.especialidad;
+
         const archivoPath = req.file.path;
-        const [nuevoDocumento, error] = await subirDocumentoService(user, archivoPath);
+        const [nuevoDocumento, error] = await subirDocumentoService(user, archivoPath, periodoPracticaId, especialidad);
 
         if (error) return handleErrorClient(res, 400, error);
 
@@ -38,14 +51,22 @@ export async function eliminarDocumentoPractica(req, res) {
         const documentoId = req.params.id;
         const user = req.user;
 
-        if (user.rol === "usuario" && !["3ro", "4to"].includes(user.nivel)) {
-            return handleErrorClient(res, 403, "Solo los alumnos de 3ro o 4to año pueden realizar esta acción.");
+        if (user.rol === "usuario") {
+            if (!["3ro", "4to"].includes(user.nivel)) {
+                return handleErrorClient(res, 403, "Solo los alumnos de 3ro o 4to año pueden realizar esta acción.");
+            }
+
+            if (!user.especialidad
+                || !["Mecánica automotriz", "Electricidad", "Electronica"].includes(user.especialidad)) {
+                return handleErrorClient(res, 403,
+                    "El usuario debe tener una especialidad válida para realizar esta acción.");
+            }
         }
+
         const [resultado, error] = await eliminarDocumentoService(user, documentoId, req);
         if (error) return handleErrorClient(res, 400, error);
         handleSuccess(res, 200, "Documento eliminado correctamente.");
     } catch (error) {
-        console.error("Error en eliminarDocumentoPractica:", error);
         handleErrorServer(res, 500, "Error eliminando el documento.");
     }
 }
@@ -54,14 +75,25 @@ export async function modificarDocumentoPractica(req, res) {
     try {
         const documentoId = req.params.id;
         const user = req.user;
+        const periodoPracticaId = req.periodoPracticaId;
 
-        if (user.rol === "usuario" && !["3ro", "4to"].includes(user.nivel)) {
-            return handleErrorClient(res, 403, "Solo los alumnos de 3ro o 4to año pueden realizar esta acción.");
+        if (user.rol === "usuario") {
+            if (!["3ro", "4to"].includes(user.nivel)) {
+                return handleErrorClient(res, 403, "Solo los alumnos de 3ro o 4to año pueden realizar esta acción.");
+            }
+            if (!user.especialidad
+                || !["Mecánica automotriz", "Electricidad", "Electronica"].includes(user.especialidad)) {
+                return handleErrorClient(res, 403,
+                    "El usuario debe tener una especialidad válida para realizar esta acción.");
+            }
         }
+
         const archivoNuevo = req.file ? req.file.path : null;
         const hostUrl = `${req.protocol}://${req.get("host")}`;
 
-        const [resultado, error] = await modificarDocumentoService(user, documentoId, archivoNuevo, hostUrl);
+        const [resultado, error] = await modificarDocumentoService(
+            user, documentoId, archivoNuevo, hostUrl, periodoPracticaId
+        );
 
         if (error) return handleErrorClient(res, 400, error);
 
@@ -75,8 +107,16 @@ export async function modificarDocumentoPractica(req, res) {
 export async function verDocumentos(req, res) {
     try {
         const user = req.user;
-        if (user.rol === "usuario" && !["3ro", "4to"].includes(user.nivel)) {
-            return handleErrorClient(res, 403, "Solo los alumnos de 3ro o 4to año pueden realizar esta acción.");
+
+        if (user.rol === "usuario") {
+            if (!["3ro", "4to"].includes(user.nivel)) {
+                return handleErrorClient(res, 403, "Solo los alumnos de 3ro o 4to año pueden realizar esta acción.");
+            }
+            if (!user.especialidad
+                || !["Mecánica automotriz", "Electricidad", "Electronica"].includes(user.especialidad)) {
+                return handleErrorClient(res, 403,
+                    "El usuario debe tener una especialidad válida para realizar esta acción.");
+            }
         }
 
         const [documentos, error] = await verDocumentosService(user);
@@ -85,7 +125,6 @@ export async function verDocumentos(req, res) {
 
         handleSuccess(res, 200, "Documentos obtenidos correctamente", documentos);
     } catch (error) {
-        console.error("Error en verDocumentosProfesor:", error);
         handleErrorServer(res, 500, "Error al obtener los documentos del profesor");
     }
 }
@@ -94,8 +133,15 @@ export async function obtenerTodosDocumentos(req, res) {
     try {
         const user = req.user;
 
-        if (user.rol === "usuario" && !["3ro", "4to"].includes(user.nivel)) {
-            return handleErrorClient(res, 403, "Solo los alumnos de 3ro o 4to año pueden realizar esta acción.");
+        if (user.rol === "usuario") {
+            if (!["3ro", "4to"].includes(user.nivel)) {
+                return handleErrorClient(res, 403, "Solo los alumnos de 3ro o 4to año pueden realizar esta acción.");
+            }
+            if (!user.especialidad
+                || !["Mecánica automotriz", "Electricidad", "Electronica"].includes(user.especialidad)) {
+                return handleErrorClient(res, 403,
+                    "El usuario debe tener una especialidad válida para realizar esta acción.");
+            }
         }
 
         const [documentos, error] = await obtenerTodosDocumentosService(user);
@@ -104,7 +150,6 @@ export async function obtenerTodosDocumentos(req, res) {
 
         handleSuccess(res, 200, "Documentos obtenidos correctamente.", documentos);
     } catch (error) {
-        console.error("Error en obtenerTodosDocumentos:", error);
         handleErrorServer(res, 500, "Error obteniendo los documentos.");
     }
 }
