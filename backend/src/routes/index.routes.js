@@ -10,6 +10,7 @@ import documentosPracticaRoutes from "./documentosPractica.routes.js";
 import tareaRoutes from "./tarea.routes.js";
 import semestreRoutes from "./semestre.routes.js";
 import asistenciaRoutes from "./asistencia.routes.js";
+import periodoPracticaRoutes from "./periodoPracticas.routes.js";
 import documentosTareaRoutes from "./documentosTarea.routes.js";
 
 const router = Router();
@@ -25,6 +26,7 @@ router
     .use("/email", emailRoutes)//uso interno por ahora
     .use("/semestres", semestreRoutes)
     .use("/asistencia", asistenciaRoutes)
+    .use("/periodosPractica", periodoPracticaRoutes)
     .use("/documentosTarea", documentosTareaRoutes);
     
 export default router;
