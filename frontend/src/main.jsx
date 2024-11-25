@@ -9,6 +9,7 @@ import Error404 from '@pages/Error404';
 import Root from '@pages/Root';
 import ProtectedRoute from '@components/ProtectedRoute';
 import '@styles/styles.css';
+import Materia from '@pages/Materia';
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,14 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      {
+        path: '/materia',
+        element: (
+          <ProtectedRoute allowedRoles={['profesor']}>
+            <Materia />
+          </ProtectedRoute>
+        )
+      }
     ],
   },
   {
