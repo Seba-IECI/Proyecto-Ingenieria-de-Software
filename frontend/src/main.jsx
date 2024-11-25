@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from '@pages/Login';
 import Home from '@pages/Home';
 import Users from '@pages/Users';
+import Inventario from '@pages/Inventario';
 import Register from '@pages/Register';
 import Error404 from '@pages/Error404';
 import Root from '@pages/Root';
@@ -12,33 +13,41 @@ import '@styles/styles.css';
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Root/>,
-    errorElement: <Error404/>,
+    element: <Root />,
+    errorElement: <Error404 />,
     children: [
       {
         path: '/home',
-        element: <Home/>
+        element: <Home />,
       },
       {
         path: '/users',
         element: (
-        <ProtectedRoute allowedRoles={['administrador']}>
-          <Users />
-        </ProtectedRoute>
+          <ProtectedRoute allowedRoles={['administrador', 'profesor']}>
+            <Users />
+          </ProtectedRoute>
         ),
-    }
-    ]
+      },
+      {
+        path: '/inventarios',
+        element: (
+          <ProtectedRoute allowedRoles={['administrador', 'profesor']}>
+            <Inventario />
+          </ProtectedRoute>
+        ),
+      },
+    ],
   },
   {
     path: '/auth',
-    element: <Login/>
+    element: <Login />,
   },
   {
     path: '/register',
-    element: <Register/>
-  }
-])
+    element: <Register />,
+  },
+]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <RouterProvider router={router}/>
-)
+  <RouterProvider router={router} />
+);

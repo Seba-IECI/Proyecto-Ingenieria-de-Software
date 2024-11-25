@@ -10,6 +10,8 @@ export default function Popup({ show, setShow, data, action }) {
         action(formData);
     };
 
+    
+
     const patternRut = new RegExp(/^(?:(?:[1-9]\d{0}|[1-2]\d{1})(\.\d{3}){2}|[1-9]\d{6}|[1-2]\d{7}|29\.999\.999|29999999)-[\dkK]$/);
     return (
         <div>
@@ -66,9 +68,20 @@ export default function Popup({ show, setShow, data, action }) {
                                 options: [
                                     { value: 'administrador', label: 'Administrador' },
                                     { value: 'usuario', label: 'Usuario' },
+                                    { value: 'profesor', label: 'Profesor' },
                                 ],
                                 required: true,
                                 defaultValue: userData.rol || "",
+                            },
+                            {
+                                label: "Permisos",
+                                name: "permisos",
+                                fieldType: 'select',
+                                options: [
+                                    { value: 'inventario', label: 'Inventario' }
+                                ],
+                                required: false,
+                                defaultValue: userData.permisos || "",
                             },
                             {
                                 label: (

@@ -165,7 +165,7 @@ export async function isEstudiante(req, res, next) { // aca pueod agregar mas ro
             }
         }
 
-
+/*
         export async function isInventario(req, res, next) {
             try {
                 const userRepository = AppDataSource.getRepository(User);
@@ -177,18 +177,21 @@ export async function isEstudiante(req, res, next) { // aca pueod agregar mas ro
         
                 const { rol, permisos } = userFound;
         
-                if (rol === "profesor" && permisos && permisos.includes("inventario")) {
-                    return next(); 
-                }
+                if (rol !== "encargado") {
+                    return handleErrorClient(
+                        res,
+                        403,
+                        "Error al acceder al recurso",
+                        "Se requiere un rol de encargado para realizar esta acción."
+                    );
+                    }
+                    
+                    return next();
         
-                return handleErrorClient(
-                    res,
-                    403,
-                    "Error al acceder al recurso",
-                    "Se requiere el rol de profesor con permiso de inventario para realizar esta acción."
-                );
+        
             } catch (error) {
                 handleErrorServer(res, 500, error.message);
             }
         }
+            */
         
