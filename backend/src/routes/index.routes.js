@@ -25,6 +25,7 @@ router
     .use("/tarea", tareaRoutes)
     .use("/email", emailRoutes)//uso interno por ahora
     .use("/semestres", semestreRoutes)
-    .use("/asistencia", asistenciaRoutes);
+    .use("/asistencia", asistenciaRoutes)
+    .use("/documentosTarea", documentosTareaRoutes);
     
 export default router;
