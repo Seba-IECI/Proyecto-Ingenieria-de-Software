@@ -17,7 +17,7 @@ const InventarioSchema = new EntitySchema({
     encargado: {
       type: "varchar",
       length: 12,
-      nullable: false,
+      nullable: true,
     },
     descripcion: {
       type: "varchar",
