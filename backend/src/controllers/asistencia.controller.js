@@ -1,19 +1,19 @@
 "use strict";
 
 import {
+    actualizarAsistenciaService,
     calcularPorcentajeAsistenciaService,
     listarAsistenciasService,
     obtenerAsistenciaPorIdService,
     registrarAsistenciaService
 } from "../services/asistencia.service.js";
-
 import { handleErrorClient, handleErrorServer, handleSuccess } from "../handlers/responseHandlers.js";
 
 export async function registrarAsistencia(req, res) {
     try {
         const { rol } = req.user;
-        if (rol !== "administrador") {
-            return handleErrorClient(res, 403, "Solo los administradores pueden registrar asistencia.");
+        if (rol !== "profesor") {
+            return handleErrorClient(res, 403, "Solo los profesores pueden registrar asistencia.");
         }
 
         const { alumnoId, semestreId, fecha, presente } = req.body;
@@ -32,7 +32,7 @@ export async function registrarAsistencia(req, res) {
 export async function listarAsistencias(req, res) {
     try {
         const user = req.user;
-        if (user.rol !== "administrador") {
+        if (user.rol !== "profesor") {
             return handleErrorClient(res, 403, "Acceso denegado");
         }
 
@@ -49,19 +49,15 @@ export async function listarAsistencias(req, res) {
     }
 }
 
-
-
-
 export async function obtenerAsistenciaPorId(req, res) {
     try {
         const user = req.user;
 
-        if (user.rol !== "administrador") {
+        if (user.rol !== "profesor") {
             return handleErrorClient(res, 403, "Acceso denegado");
         }
 
         const { id } = req.params;
-
         if (!id || isNaN(parseInt(id, 10))) {
             return handleErrorClient(res, 400, "ID de asistencia no válido");
         }
@@ -100,6 +96,23 @@ export async function calcularPorcentajeAsistencia(req, res) {
     }
 }
 
+export async function actualizarAsistencia(req, res) {
+    try {
+        const { id } = req.params;
+        const { presente } = req.body;
 
+        if (!id || isNaN(id)) {
+            return handleErrorClient(res, 400, "ID de asistencia no válido");
+        }
 
+        const asistenciaId = parseInt(id, 10);
+        const [asistenciaActualizada, error] = await actualizarAsistenciaService(asistenciaId, presente);
 
+        if (error) return handleErrorClient(res, 400, error);
+
+        handleSuccess(res, 200, "Asistencia actualizada correctamente", asistenciaActualizada);
+    } catch (error) {
+        console.error("Error en actualizarAsistencia:", error);
+        handleErrorServer(res, 500, "Error al actualizar la asistencia");
+    }
+}
