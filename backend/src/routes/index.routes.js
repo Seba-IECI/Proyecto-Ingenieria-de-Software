@@ -9,7 +9,8 @@ import materiaRoutes from "./materia.routes.js";
 import documentosPracticaRoutes from "./documentosPractica.routes.js";
 import tareaRoutes from "./tarea.routes.js";
 import semestreRoutes from "./semestre.routes.js";
-import asistenciaRoutes from "./asistencia.routes.js";
+import periodoPracticaRoutes from "./periodoPracticas.routes.js";
+//import asistenciaRoutes from "./asistencia.routes.js";
 
 const router = Router();
 
@@ -23,6 +24,7 @@ router
     .use("/tarea", tareaRoutes)
     .use("/email", emailRoutes)//uso interno por ahora
     .use("/semestres", semestreRoutes)
-    .use("/asistencia", asistenciaRoutes);
+    .use("/periodosPractica", periodoPracticaRoutes)
+    //.use("/asistencia", asistenciaRoutes);
     
 export default router;

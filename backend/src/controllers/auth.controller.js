@@ -1,5 +1,5 @@
 "use strict";
-import { loginService, registerService } from "../services/auth.service.js";
+import { loginService, registerService, updateRol } from "../services/auth.service.js";
 import {
   authValidation,
   registerValidation,
@@ -57,6 +57,26 @@ export async function logout(req, res) {
   try {
     res.clearCookie("jwt", { httpOnly: true });
     handleSuccess(res, 200, "Sesión cerrada exitosamente");
+  } catch (error) {
+    handleErrorServer(res, 500, error.message);
+  }
+}
+
+export async function update(req, res) {
+  try {
+    const { email, newRol } = req.body;
+
+    if (!email || !newRol) {
+      return handleErrorClient(res, 400, "Faltan datos", "Se requiere el correo electrónico y el nuevo rol.");
+    }
+
+    const [updatedUser , error] = await updateRol(email, newRol);
+
+    if (error) {
+      return handleErrorClient(res, 400, "Error al modificar el rol", error);
+    }
+
+    handleSuccess(res, 200, "Rol del usuario modificado con éxito", updatedUser );
   } catch (error) {
     handleErrorServer(res, 500, error.message);
   }
