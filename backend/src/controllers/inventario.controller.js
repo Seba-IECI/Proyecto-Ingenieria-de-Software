@@ -7,6 +7,7 @@ import {
     getInventariosService ,
     getItemService,
     updateInventarioService,
+    updateItemService
     
   } from "../services/inventario.service.js";
 
@@ -102,7 +103,8 @@ import {
   
   export async function addItemController(req, res) {
     try {
-      const [nuevoItem, error] = await addItemService(req.body);
+      const user = req.user;
+      const [nuevoItem, error] = await addItemService(req.body, user);
   
       if (error) {
         return res.status(400).json({ message: error });
@@ -146,8 +148,9 @@ export async function deleteItemController(req, res) {
     
     const { id, cBarras } = req.query;
 
-    
-    const [updatedItem, error] = await deleteItemService({ id, cBarras });
+    const user = req.user;
+      
+    const [updatedItem, error] = await deleteItemService({ id, cBarras } , user );
 
     
     if (error) {
@@ -165,4 +168,22 @@ export async function deleteItemController(req, res) {
 }
 
 
+export async function updateItemController(req, res) {
+  try {
+    const user = req.user; 
+    const [updatedItem, error] = await updateItemService(req.query, req.body, user);
+
+    if (error) {
+      return res.status(403).json({ message: error });
+    }
+
+    return res.status(200).json({
+      message: "Ítem actualizado exitosamente",
+      updatedItem,
+    });
+  } catch (error) {
+    console.error("Error en el controlador al actualizar un ítem de inventario:", error);
+    return res.status(500).json({ message: "Error interno del servidor" });
+  }
+}
 

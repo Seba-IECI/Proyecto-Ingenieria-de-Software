@@ -3,6 +3,7 @@ import Inventario from "../entity/inventario.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 import Item from "../entity/item.entity.js";
 import CodigoBarras from "../entity/cBarras.entity.js";
+import User from "../entity/user.entity.js";
 
 export async function getItemService(query) {
   try {
@@ -37,26 +38,52 @@ export async function getItemService(query) {
 export async function createInventarioService(body) {
   try {
     const inventarioRepository = AppDataSource.getRepository(Inventario);
+    const userRepository = AppDataSource.getRepository( User );
+
+    const { nombre, descripcion, encargadoRut } = body;
 
     
     const duplicateInventario = await inventarioRepository.findOne({
-      where: { nombre: body.nombre },
+      where: { nombre },
     });
 
     if (duplicateInventario) {
       return [null, "Ya existe un inventario con el mismo nombre"];
     }
 
+    const encargado = await userRepository.findOne({
+      where: { rut: encargadoRut },
+    });
+
+    if (!encargado) {
+      return [null, "Usuario encargado no encontrado"];
+    }
+
+    if (!encargadoRut || typeof encargadoRut !== "string" || encargadoRut.length > 20) {
+      return [null, "RUT del encargado no válido"];
+    }
+    
+
     
     const nuevoInventario = inventarioRepository.create({
-      nombre: body.nombre,
-      descripcion: body.descripcion,
+      nombre,
+      descripcion,
+      encargado: encargadoRut,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
    
     await inventarioRepository.save(nuevoInventario);
+
+    if (!encargado.permisos) {
+      encargado.permisos = [];
+    }
+
+    if (!encargado.permisos.includes(nombre)) {
+      encargado.permisos.push(nombre); 
+      await userRepository.save(encargado); 
+    }
 
     return [nuevoInventario, null];
   } catch (error) {
@@ -92,10 +119,14 @@ export async function getInventarioByIdService(query) {
 }
 
 
-export async function updateItemService(query, body) {
+export async function updateItemService(query, body, user) {
   try {
     const { id, cBarras, descripcion } = query;
     const itemRepository = AppDataSource.getRepository(Item); 
+
+    if (!user || !user.permisos.includes(inventario.nombre)) {
+      return [null, `No tienes permiso para modificar este ítem en el inventario: ${inventario.nombre}`];
+    }
 
     
     const itemFound = await itemRepository.findOne({
@@ -134,7 +165,7 @@ export async function updateItemService(query, body) {
   }
 }
 
-export async function addItemService(data) {
+export async function addItemService(data, user) {
   try {
     const { nombre, descripcion, categoria, cBarras, inventario } = data;
     const itemRepository = AppDataSource.getRepository(Item);
@@ -144,6 +175,10 @@ export async function addItemService(data) {
     const inventarioactual = await inventarioRepository.findOne({ where: { nombre: inventario } });
     if (!inventarioactual) {
       return [null, "Inventario no encontrado"];
+    }
+    
+    if (!user || !user.permisos.includes(inventarioactual.nombre)) {
+      return [null, `No tienes permiso para realizar esta acción en el inventario: ${inventario}`];
     }
 
     let item = await itemRepository.findOne({
@@ -187,16 +222,18 @@ export async function addItemService(data) {
 
 
 
-export async function deleteItemService(query) {
+export async function deleteItemService(query,user) {
   try {
     const { cBarras } = query;
     const itemRepository = AppDataSource.getRepository(Item);
     const codigoBarrasRepository = AppDataSource.getRepository(CodigoBarras);
 
     
+
+    
     const codigoBarras = await codigoBarrasRepository.findOne({
       where: { codigo: cBarras },
-      relations: ["item"], 
+      relations: ["item", "item.inventario"],
     });
 
     if (!codigoBarras || !codigoBarras.item) {
@@ -204,6 +241,11 @@ export async function deleteItemService(query) {
     }
 
     const item = codigoBarras.item;
+    const inventario = item.inventario;
+
+    if (!user || !user.permisos.includes(inventario.nombre)) {
+      return [null, `No tienes permiso para realizar esta acción en el inventario: ${inventario.nombre}`];
+    }
 
     
     await codigoBarrasRepository.remove(codigoBarras);

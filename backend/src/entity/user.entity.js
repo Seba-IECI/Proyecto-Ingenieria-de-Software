@@ -39,8 +39,7 @@ const UserSchema = new EntitySchema({
       default: null,
     },
     permisos: {
-      type: "varchar", 
-      length: 50,
+      type: "simple-array", 
       nullable: true,
       default: null,
   },
@@ -97,6 +96,7 @@ const UserSchema = new EntitySchema({
       target: "Amonestaciones",
       inverseSide: "usuario", 
     },
+    
   }
 }
 );

@@ -14,6 +14,11 @@ const InventarioSchema = new EntitySchema({
       length: 255,
       nullable: false,
     },
+    encargado: {
+      type: "varchar",
+      length: 12,
+      nullable: false,
+    },
     descripcion: {
       type: "varchar",
       length: 500,
@@ -43,7 +48,9 @@ const InventarioSchema = new EntitySchema({
       target: "Prestamos",
       inverseSide: "inventario",
       cascade: true,
-    }, 
+    },
+    
+  
 
   },
 });

@@ -71,12 +71,12 @@ export async function updateUserService(query, body) {
     }
 
     const dataUserUpdate = {
-      nombreCompleto: body.nombreCompleto,
-      rut: body.rut,
-      email: body.email,
-      rol: body.rol,
-      nivel: body.nivel,
-      permisos: body.permisos,
+      nombreCompleto: body.nombreCompleto || userFound.nombreCompleto,
+      rut: body.rut || userFound.rut,
+      email: body.email || userFound.email,
+      rol: body.rol || userFound.rol,
+      nivel: body.nivel || userFound.nivel,
+      permisos: body.permisos || userFound.permisos,
       updatedAt: new Date(),
     };
 

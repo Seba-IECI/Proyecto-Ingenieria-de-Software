@@ -10,6 +10,7 @@ import { getUserService } from "../services/user.service.js";
 
 export async function getPrestamoController(req, res) {
   try {
+    
    
     const [prestamoData, error] = await getPrestamoService(req.query);
 
@@ -28,9 +29,9 @@ export async function getPrestamoController(req, res) {
 export async function createPrestamoController(req, res) {
   try {
     const { rut, codigoBarras, diasPrestamo } = req.body;
-
-    
-    const [nuevoPrestamo, error] = await createPrestamoService({ rut, codigoBarras, diasPrestamo });
+    const user = req.user;
+   
+    const [nuevoPrestamo, error] = await createPrestamoService({ rut, codigoBarras, diasPrestamo,user });
     if (error) {
       return res.status(500).json({ message: error });
     }
