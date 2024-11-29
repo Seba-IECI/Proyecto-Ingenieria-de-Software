@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from '@pages/Login';
 import Home from '@pages/Home';
 import Users from '@pages/Users';
+import Inventarios from '@pages/Inventarios';
 import Inventario from '@pages/Inventario';
 import Register from '@pages/Register';
 import Error404 from '@pages/Error404';
@@ -32,7 +33,15 @@ const router = createBrowserRouter([
       {
         path: '/inventarios',
         element: (
-          <ProtectedRoute allowedRoles={['administrador', 'profesor']}>
+          <ProtectedRoute allowedRoles={['administrador']}>
+            <Inventarios />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/inventario',
+        element: (
+          <ProtectedRoute allowedRoles={['administrador','profesor']}>
             <Inventario />
           </ProtectedRoute>
         ),

@@ -1,76 +1,77 @@
 import { useEffect, useState } from "react";
-import { createInventario, getInventarios, getInventarioById } from "@services/inventario.service";
-
+import { getInventarioById } from "@services/inventario.service"; // Servicio ya importado
+import { getLoggedUser } from "@services/user.service"; // Función para obtener el usuario
+import "@styles/inventario.css";
 
 export default function Inventario() {
-  
   const [inventarios, setInventarios] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const fetchInventarios = async () => {
+  // Función para obtener inventarios por encargado
+  const fetchInventariosPorEncargado = async () => {
     try {
-      const response = await getInventarios();
-      console.log("Response from getInventarios:", response);
-      setInventarios(response);
+      // Obtener el usuario logueado desde el backend
+      const user = await getLoggedUser();
+      console.log("Usuario logueado:", user);
+
+      // Validar que exista el RUT
+      if (!user?.rut) {
+        throw new Error("No se encontró el RUT del usuario logueado.");
+      }
+
+      // Obtener inventarios asignados al RUT del encargado
+      const inventarios = await getInventarioById(user.rut);
+      console.log("Inventarios obtenidos:", inventarios);
+      setInventarios(Array.isArray(inventarios) ? inventarios : [inventarios]);
+
+      
     } catch (error) {
-      console.error( 'Error: ', error );
+      console.error("Error al cargar inventarios por encargado:", error);
+      setError("No se pudieron cargar los inventarios asignados.");
+    } finally {
+      setLoading(false);
     }
-  }
-
-
-    const fetchInventarioById = async (id) => {
-      try {
-        const response = await getInventarioById(id);
-      } catch (error) {
-        console.error( 'Error: ', error );
-      }
-
-    }
-
-    const postInventario = async (newInventario) => {
-      try {
-          const response = await createInventario(newInventario);
-          console.log("Response from createInventario:", response);
-          setInventarios((prevInventarios) => [...prevInventarios, response]); 
-      } catch (error) {
-          console.error('Error al crear inventario: ', error);
-      }
   };
-  
 
-    useEffect(() => {
-      fetchInventarios();
-    }, []);
+  // useEffect para cargar los inventarios al montar el componente
+  useEffect(() => {
+    fetchInventariosPorEncargado();
+  }, []);
 
-    const handleCreateInventario = () => {
-      const newInventario = {
-          nombre: 'Nuevo Inventario', // usar en el input
-          descripcion: 'Descripción del inventario',
-          encargadoRut: '18.234.545-5',
-          // Otros campos según tu modelo
-      };
-  
-      postInventario(newInventario);
-  };
-  
-  
-    return (
-    <div>
-      <h1>Inventario</h1>
-      {inventarios?.length > 0 ? (
-        <ul>
+  // useEffect para depuración, verifica los cambios en el estado de inventarios
+  useEffect(() => {
+    console.log("Estado de inventarios actualizado:", inventarios);
+  }, [inventarios]);
+
+  if (loading) return <p>Cargando inventarios...</p>;
+  if (error) return <p>Error: {error}</p>;
+
+  return (
+    <div className="inventario-container">
+      <h1 className="inventario-title">Inventario</h1>
+      {inventarios.length > 0 ? (
+        <ul className="inventario-list">
           {inventarios.map((inventario) => (
-            <li key={inventario.id}>
-              <p>Nombre del inventario: {inventario.inventario_nombre}</p>
-              <p>Cantidad de ítems: {inventario.itemcount}</p>
+            <li key={inventario.id} className="inventario-item">
+              <div>
+                <p>
+                  <strong>Nombre del inventario:</strong> {inventario.nombre}
+                </p>
+                <p>
+                  <strong>Descripción:</strong> {inventario.descripcion}
+                </p>
+                <p>
+                  <strong>Cantidad de ítems:</strong> {inventario.itemcount}
+                </p>
+                <p><strong>Rut Encargado:</strong> {inventario.encargado}</p>              </div>
+              
             </li>
           ))}
         </ul>
-      ) : ( 
-        <p>No hay inventarios</p>
+      ) : (
+        <p>No tienes inventarios asignados.</p>
       )}
-      <div>
-          <button onClick={handleCreateInventario}>Crear Inventario</button>
-      </div>
     </div>
   );
 }

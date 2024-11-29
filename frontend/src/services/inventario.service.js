@@ -12,9 +12,11 @@ export async function getInventarios() {
 }
 
 
-export async function getInventarioById(id){ ///uso interno
+export async function getInventarioById(rut){ ///uso interno
     try {
-        const { data } = await axios.get(`/names/${id}`);
+        console.log("Hola", rut);
+        const { data } = await axios.get(`inventario/${rut}`);
+        console.log("Hola, soy el inventario", data);
         return data;
     } catch (error) {
         return error.response.data;
@@ -30,6 +32,28 @@ export async function createInventario(data) {
         return error.response.data;
     }
 }
+
+export const updateInventario = async (id, inventario) => {
+    try {
+      const response = await axios.patch(`inventario/update/${id}`, inventario);
+      return response.data;
+    } catch (error) {
+      console.error("Error al actualizar inventario:", error);
+      throw error;
+    }
+  };
+
+  export const deleteInventario = async (id) => {
+    try {
+      const response = await axios.delete(`inventario/borrar/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error al eliminar inventario:", error);
+      throw error;
+    }
+  };
+
+
 
 /*
 export async function updateUser(data, rut) {
