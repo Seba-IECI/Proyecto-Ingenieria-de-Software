@@ -1,6 +1,7 @@
 "use strict";
 import {
   deleteUserService,
+  getMyUserService,
   getUserService,
   getUsersService,
   updateUserService,
@@ -123,3 +124,15 @@ export async function deleteUser(req, res) {
     handleErrorServer(res, 500, error.message);
   }
 }
+
+export const getMyUserController = async (req, res) => {
+  const [user, error] = await getMyUserService(req);
+
+  if (error) {
+    console.log("Error en getMyUserController:", error);
+    return handleErrorClient(res, 404, error);
+  }
+
+  return handleSuccess(res, 200, "Usuario encontrado", user);
+};
+

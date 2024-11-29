@@ -130,3 +130,25 @@ export async function deleteUserService(query) {
     return [null, "Error interno del servidor"];
   }
 }
+
+export async function getMyUserService(req) {
+  try {
+    // Obtén el ID del usuario logueado desde req.user
+    const userId = req.user.id;
+
+    const userRepository = AppDataSource.getRepository(User);
+    const userFound = await userRepository.findOne({ where: { id: userId } });
+
+    if (!userFound) {
+      return [null, "Usuario no encontrado"];
+    }
+
+    // Excluye la contraseña del resultado
+    const { password, ...userData } = userFound;
+
+    return [userData, null];
+  } catch (error) {
+    console.error("Error al obtener el usuario:", error);
+    return [null, "Error interno del servidor"];
+  }
+}
