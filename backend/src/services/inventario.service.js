@@ -95,19 +95,30 @@ export async function createInventarioService(body) {
 
 export async function getInventarioByIdService(query) {
   try {
-    const { id, nombre } = query;
+    const { id, nombre ,encargado } = query;
     const inventarioRepository = AppDataSource.getRepository(Inventario);
 
    
     const whereCondition = {};
     if (id) whereCondition.id = id;
     if (nombre) whereCondition.nombre = nombre;
+    if (encargado) whereCondition.encargado = encargado;
 
    
-    const inventario = await inventarioRepository.findOne({
-      where: whereCondition,
-      relations: ["items"], 
-    });
+    const inventario = await inventarioRepository.createQueryBuilder("inventario")
+    .leftJoin("inventario.items", "item") 
+    .select([
+      "inventario.id AS id",
+      "inventario.nombre AS nombre",
+      "inventario.descripcion AS descripcion", 
+      "COUNT(item.id) AS itemCount",
+      "inventario.encargado AS encargado" 
+    ])
+    .groupBy("inventario.id") 
+    .addGroupBy("inventario.nombre") 
+    .addGroupBy("inventario.descripcion") 
+    .addGroupBy("inventario.encargado") 
+    .getRawMany(); 
 
     if (!inventario) return [null, "Inventario no encontrado"];
 
@@ -326,20 +337,19 @@ export async function getInventariosService() {
     
     const inventarios = await inventarioRepository
     .createQueryBuilder("inventario")
-    .leftJoin("inventario.items", "item") // Realiza el LEFT JOIN con items
+    .leftJoin("inventario.items", "item") 
     .select([
-      "inventario.id AS id", // Alias para incluir en el resultado
+      "inventario.id AS id",
       "inventario.nombre AS nombre",
-      "inventario.descripcion AS descripcion", // Asegúrate de incluir descripcion en el SELECT
+      "inventario.descripcion AS descripcion", 
       "COUNT(item.id) AS itemCount",
-      "inventario.encargado AS encargado" // Cuenta los items relacionados
+      "inventario.encargado AS encargado" 
     ])
-    .groupBy("inventario.id") // Agrupa por el ID del inventario
-    .addGroupBy("inventario.nombre") // Asegúrate de agrupar por los campos seleccionados
-    .addGroupBy("inventario.descripcion") // Agrupa por descripcion
-    .addGroupBy("inventario.encargado") // Agrupa por encargado
-    .getRawMany(); // Obtén los datos sin transformar
-
+    .groupBy("inventario.id") 
+    .addGroupBy("inventario.nombre") 
+    .addGroupBy("inventario.descripcion") 
+    .addGroupBy("inventario.encargado") 
+    .getRawMany(); 
     if (!inventarios || inventarios.length === 0) {
       return [null, "No se encontraron inventarios"];
     }

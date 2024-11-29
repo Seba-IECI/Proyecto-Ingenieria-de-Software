@@ -50,10 +50,10 @@ import {
   export async function getInventarioByIdController(req, res) {
     try {
       
-      const { id, nombre } = req.query;
+      const { id, nombre , encargado } = req.query;
       
       
-      const [inventario, error] = await getInventarioByIdService({ id, nombre });
+      const [inventario, error] = await getInventarioByIdService({ id, nombre, encargado });
   
       if (error) {
         return res.status(404).json({ message: error });

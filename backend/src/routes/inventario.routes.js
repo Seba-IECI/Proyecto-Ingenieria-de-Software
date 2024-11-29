@@ -21,7 +21,7 @@ router
 
 router.post("/",isAdmin,createInventarioController);//solo admin
 
-router.get("/",getInventarioByIdController); //usuario
+router.get("/:id",getInventarioByIdController); //usuario
 
 router.get("/names",getInventariosController);//inventario o admin
 router.patch("/update/:id",isAdmin,updateInventarioController); //admin
