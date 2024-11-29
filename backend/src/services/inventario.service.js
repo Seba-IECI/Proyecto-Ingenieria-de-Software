@@ -273,6 +273,9 @@ export async function updateInventarioService(id, data) {
   try {
     const inventarioRepository = AppDataSource.getRepository(Inventario);
 
+    console.log("ID recibido para actualizar:", id); // Depuración
+    console.log("Datos recibidos para actualizar:", data); // Depuración
+
    
     const inventario = await inventarioRepository.findOne({ where: { id } });
 
@@ -322,15 +325,20 @@ export async function getInventariosService() {
 
     
     const inventarios = await inventarioRepository
-      .createQueryBuilder("inventario")
-      .leftJoin("inventario.items", "item") 
-      .select([
-        "inventario.id", 
-        "inventario.nombre", 
-        "COUNT(item.id) AS itemCount" 
-      ])
-      .groupBy("inventario.id") 
-      .getRawMany(); 
+    .createQueryBuilder("inventario")
+    .leftJoin("inventario.items", "item") // Realiza el LEFT JOIN con items
+    .select([
+      "inventario.id AS id", // Alias para incluir en el resultado
+      "inventario.nombre AS nombre",
+      "inventario.descripcion AS descripcion", // Asegúrate de incluir descripcion en el SELECT
+      "COUNT(item.id) AS itemCount",
+      "inventario.encargado AS encargado" // Cuenta los items relacionados
+    ])
+    .groupBy("inventario.id") // Agrupa por el ID del inventario
+    .addGroupBy("inventario.nombre") // Asegúrate de agrupar por los campos seleccionados
+    .addGroupBy("inventario.descripcion") // Agrupa por descripcion
+    .addGroupBy("inventario.encargado") // Agrupa por encargado
+    .getRawMany(); // Obtén los datos sin transformar
 
     if (!inventarios || inventarios.length === 0) {
       return [null, "No se encontraron inventarios"];
