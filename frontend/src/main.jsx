@@ -9,8 +9,9 @@ import Register from '@pages/Register';
 import Error404 from '@pages/Error404';
 import Root from '@pages/Root';
 import ProtectedRoute from '@components/ProtectedRoute';
-import '@styles/styles.css';
 import Materia from '@pages/Materia';
+import DocumentosPractica from '@pages/DocumentosPractica';
+import '@styles/styles.css';
 
 const router = createBrowserRouter([
   {
@@ -53,6 +54,14 @@ const router = createBrowserRouter([
             <Materia />
           </ProtectedRoute>
         )
+      },
+      {
+        path: '/documentos',
+        element: (
+          <ProtectedRoute allowedRoles={['usuario', 'encargadoPracticas']}>
+            <DocumentosPractica />
+          </ProtectedRoute>
+        ),
       }
     ],
   },

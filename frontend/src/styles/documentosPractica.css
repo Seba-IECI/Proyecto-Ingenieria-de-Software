@@ -1,0 +1,163 @@
+.documentos-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.documentos-title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.documentos-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.documentos-button {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.documentos-list {
+    list-style: none;
+    padding: 0;
+}
+
+.documento-item {
+    position: relative;
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.documento-link {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.documento-link:hover {
+    text-decoration: underline;
+}
+
+.documentos-empty {
+    text-align: center;
+    font-size: 16px;
+    color: #6c757d;
+}
+
+.documento-header {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.edit-button {
+    background-color: #007bff;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.delete-button {
+    background-color: #dc3545;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.edit-button:hover,
+.delete-button:hover {
+    opacity: 0.9;
+}
+
+.save-button {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.cancel-button {
+    background-color: #dc3545;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 10px;
+}
+
+.save-button:hover,
+.cancel-button:hover {
+    opacity: 0.9;
+}
+
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+    background-color: #eef7ff;
+    position: relative;
+}
+
+.popup-close-button {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: none;
+    border: none;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
+}
+
+.popup-close-button:hover {
+    color: red;
+}
+
+.popup-content {
+    position: relative;
+    width: 540px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.error-message {
+    color: #d32f2f;
+    background-color: #fdecea;
+    padding: 10px;
+    border: 1px solid #f44336;
+    border-radius: 5px;
+    margin-top: 10px;
+    font-size: 14px;
+}
