@@ -2,7 +2,6 @@
 import fs from "fs";
 import { AppDataSource } from "../config/configDb.js";
 import DocumentosPractica from "../entity/documentosPractica.entity.js";
-import PeriodoPracticaSchema from "../entity/periodoPractica.entity.js";
 
 export async function subirDocumentoService(user, archivoPath, periodoPracticaId, especialidad) {
     try {
@@ -64,7 +63,8 @@ export async function eliminarDocumentoService(user, documentoId, req) {
     }
 }
 
-export async function modificarDocumentoService(user, documentoId, archivoNuevo, hostUrl, periodoPracticaId) {
+export async function modificarDocumentoService(
+    user, documentoId, archivoNuevo, hostUrl, periodoPracticaId, especialidad) {
     try {
         const documentoRepository = AppDataSource.getRepository(DocumentosPractica);
 
@@ -97,6 +97,10 @@ export async function modificarDocumentoService(user, documentoId, archivoNuevo,
             documento.periodoPractica = { id: periodoPracticaId };
         }
 
+        if (user.rol === "encargadoPracticas" && especialidad) {
+            documento.especialidad = especialidad;
+        }
+        documento.updatedAt = new Date();
         await documentoRepository.save(documento);
 
         return [documento, null];

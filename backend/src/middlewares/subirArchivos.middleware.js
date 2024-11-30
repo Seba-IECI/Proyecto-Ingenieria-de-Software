@@ -88,7 +88,7 @@ const handleFileUpload = (req, res, next) => {
     const upload = multer({
         storage: storage,
         limits: { fileSize: 5 * 1024 * 1024 },
-        fileFilter: fileFilter
+        fileFilter: fileFilter,
     }).single("archivo");
     upload(req, res, function (err) {
         if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
@@ -103,11 +103,16 @@ const handleFileUpload = (req, res, next) => {
         }
         if (req.file) {
             req.file.path = `${req.protocol}://${req.get("host")}/${req.file.path.replace(/\\/g, "/")}`;
+            req.file.originalname = req.file.originalname;
+            req.originalname = req.file.originalname;
+            console.log("Nombre original del archivo en middleware:", req.originalname);
+            console.log("URL generada en el backend:", req.file.path);
         }
-        console.log("Archivo subido:", req.file.path);
+
         next();
     });
 };
+
 
 const uploadMiddleware = async (req, res, next) => {
     if (req.method === "PUT" && req.path.includes("modificarDocumento")) {
