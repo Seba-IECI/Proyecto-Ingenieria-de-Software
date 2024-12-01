@@ -11,6 +11,7 @@ import Root from '@pages/Root';
 import ProtectedRoute from '@components/ProtectedRoute';
 import Materia from '@pages/Materia';
 import DocumentosPractica from '@pages/DocumentosPractica';
+import Semestres from '@pages/Semestres';
 import '@styles/styles.css';
 
 const router = createBrowserRouter([
@@ -53,7 +54,7 @@ const router = createBrowserRouter([
           <ProtectedRoute allowedRoles={['profesor']}>
             <Materia />
           </ProtectedRoute>
-        )
+        ),
       },
       {
         path: '/documentos',
@@ -62,7 +63,15 @@ const router = createBrowserRouter([
             <DocumentosPractica />
           </ProtectedRoute>
         ),
-      }
+      },
+      {
+        path: '/semestres',
+        element: (
+          <ProtectedRoute allowedRoles={['administrador']}>
+            <Semestres />
+          </ProtectedRoute>
+        ),
+      },
     ],
   },
   {
