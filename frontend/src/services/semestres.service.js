@@ -19,3 +19,23 @@ export async function ListarSemestres() {
         throw new Error(error.response?.data?.message || "Error al listar semestres.");
     }
 }
+
+export async function crearSemestre(semestre) {
+    try {
+        const response = await axios.post("/semestres/crearSemestre", semestre, {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+            },
+        });
+
+        if (response.data && response.data.status === "Success") {
+            return response.data.data;
+        } else {
+            throw new Error(response.data.message || "Error al crear el semestre.");
+        }
+    } catch (error) {
+        console.error("Error en crearSemestre:", error);
+        throw new Error(error.response?.data?.message || "Error desconocido al crear el semestre.");
+    }
+}

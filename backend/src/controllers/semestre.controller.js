@@ -97,7 +97,6 @@ export async function actualizarSemestre(req, res) {
     }
 }
 
-
 export async function eliminarSemestre(req, res) {
     try {
         const user = req.user;

@@ -11,7 +11,9 @@ export default function useListarSemestres() {
         try {
             const data = await ListarSemestres();
             const activos = data.filter(semestre => semestre.estado);
-            const inactivos = data.filter(semestre => !semestre.estado);
+            const inactivos = data
+                .filter(semestre => !semestre.estado)
+                .sort((a, b) => new Date(a.fechaFin) - new Date(b.fechaFin));
             setSemestresActivos(activos);
             setSemestresInactivos(inactivos);
         } catch (error) {

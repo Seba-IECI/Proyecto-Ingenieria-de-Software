@@ -132,18 +132,6 @@ export async function actualizarSemestreService(id, nombre, fechaInicio, fechaFi
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 export async function eliminarSemestreService(id) {
     try {
         const semestreRepository = AppDataSource.getRepository(SemestreSchema);
