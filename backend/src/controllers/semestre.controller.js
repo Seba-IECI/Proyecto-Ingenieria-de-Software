@@ -68,7 +68,6 @@ export async function obtenerSemestrePorId(req, res) {
     }
 }
 
-
 export async function actualizarSemestre(req, res) {
     try {
         const user = req.user;

@@ -39,3 +39,22 @@ export async function crearSemestre(semestre) {
         throw new Error(error.response?.data?.message || "Error desconocido al crear el semestre.");
     }
 }
+
+export async function eliminarSemestre(id) {
+    try {
+        const response = await axios.delete(`/semestres/eliminarSemestre/${id}`, {
+            headers: {
+                Authorization: `Bearer ${sessionStorage.getItem('token')}`
+            },
+        });
+
+        if (response.data && response.data.status === "Success") {
+            return true;
+        } else {
+            throw new Error(response.data.message || "Error al eliminar el semestre.");
+        }
+    } catch (error) {
+        console.error("Error en eliminarSemestre:", error);
+        throw new Error(error.response?.data?.message || "Error desconocido al eliminar el semestre.");
+    }
+}

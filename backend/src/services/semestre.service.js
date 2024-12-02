@@ -150,5 +150,3 @@ export async function eliminarSemestreService(id) {
         return [null, "Error al eliminar el semestre"];
     }
 }
-
-

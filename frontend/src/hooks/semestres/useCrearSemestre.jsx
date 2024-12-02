@@ -26,7 +26,7 @@ export default function useCrearSemestre(refetchSemestres) {
         setError(null);
         try {
             await crearSemestre(formData);
-            refetchSemestres(); // Refrescar la lista de semestres
+            refetchSemestres();
             setFormData({
                 nombre: "",
                 fechaInicio: "",

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import useListarSemestres from "@hooks/semestres/useListarSemestres";
 import useCrearSemestre from "@hooks/semestres/useCrearSemestre";
+import useEliminarSemestre from "@hooks/semestres/useEliminarSemestre";
+import DeleteSemestresPopup from "@components/DeleteSemestresPopup";
 import "@styles/semestres.css";
 
 export default function Semestres() {
@@ -13,8 +15,12 @@ export default function Semestres() {
         handleSubmit,
     } = useCrearSemestre(fetchSemestres);
 
+    const { handleDelete } = useEliminarSemestre(fetchSemestres);
+
     const [isViewing, setIsViewing] = useState(false);
     const [isCreatingFormVisible, setIsCreatingFormVisible] = useState(false);
+    const [popupVisible, setPopupVisible] = useState(false);
+    const [semestreToDelete, setSemestreToDelete] = useState(null);
 
     const handleListarSemestres = async () => {
         if (isViewing) {
@@ -27,6 +33,23 @@ export default function Semestres() {
 
     const handleToggleCrearSemestre = () => {
         setIsCreatingFormVisible(!isCreatingFormVisible);
+    };
+
+    const handleShowPopup = (semestre) => {
+        setSemestreToDelete(semestre);
+        setPopupVisible(true);
+    };
+
+    const handleClosePopup = () => {
+        setPopupVisible(false);
+        setSemestreToDelete(null);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (semestreToDelete) {
+            await handleDelete(semestreToDelete.id);
+            handleClosePopup();
+        }
     };
 
     return (
@@ -105,6 +128,12 @@ export default function Semestres() {
                         <ul className="semestres-list">
                             {semestresActivos.map((semestre) => (
                                 <li key={semestre.id} className="semestre-item">
+                                    <button
+                                        className="delete-button"
+                                        onClick={() => handleShowPopup(semestre)}
+                                    >
+                                        X
+                                    </button>
                                     <p><strong>Nombre:</strong> {semestre.nombre}</p>
                                     <p><strong>Inicio:</strong> {semestre.fechaInicio}</p>
                                     <p><strong>Fin:</strong> {semestre.fechaFin}</p>
@@ -120,6 +149,12 @@ export default function Semestres() {
                         <ul className="semestres-list">
                             {semestresInactivos.map((semestre) => (
                                 <li key={semestre.id} className="semestre-item">
+                                    <button
+                                        className="delete-button"
+                                        onClick={() => handleShowPopup(semestre)}
+                                    >
+                                        X
+                                    </button>
                                     <p><strong>Nombre:</strong> {semestre.nombre}</p>
                                     <p><strong>Inicio:</strong> {semestre.fechaInicio}</p>
                                     <p><strong>Fin:</strong> {semestre.fechaFin}</p>
@@ -132,6 +167,12 @@ export default function Semestres() {
                     )}
                 </>
             )}
+            <DeleteSemestresPopup
+                show={popupVisible}
+                onClose={handleClosePopup}
+                onConfirm={handleConfirmDelete}
+                nombre={semestreToDelete?.nombre || ""}
+            />
         </div>
     );
 }
