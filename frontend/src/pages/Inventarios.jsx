@@ -14,7 +14,7 @@ export default function Inventarios() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedInventario, setSelectedInventario] = useState(null);
-  const [isCreatePopupOpen, setIsCreatePopupOpen] = useState(false); // Popup de creación
+  const [isCreatePopupOpen, setIsCreatePopupOpen] = useState(false); 
   const [isEditPopupOpen, setIsEditPopupOpen] = useState(false); 
   const [newInventario, setNewInventario] = useState({
     nombre: "",
@@ -36,7 +36,7 @@ export default function Inventarios() {
     }
   };
 
-  // Abrir el popup de edición con los datos del inventario seleccionado
+  
   const handleEditClick = (inventario) => {
     console.log("Inventario seleccionado para editar:", inventario);
     setSelectedInventario(inventario);
@@ -44,30 +44,30 @@ export default function Inventarios() {
   };
   
 
-  // Manejar cambios en el formulario del inventario seleccionado
+ 
   const handleSelectedInventarioChange = (e) => {
     const { name, value } = e.target;
     setSelectedInventario((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Actualizar el inventario seleccionado
+
   const handleUpdateInventario = async () => {
     try {
-      await updateInventario(selectedInventario.id, selectedInventario); // Llama al servicio con el ID y los datos
-      const response = await getInventarios(); // Actualiza la lista de inventarios
+      await updateInventario(selectedInventario.id, selectedInventario); 
+      const response = await getInventarios(); 
       setInventarios(response);
-      setIsEditPopupOpen(false); // Cierra el popup de edición
+      setIsEditPopupOpen(false); 
     } catch (error) {
       console.error("Error al actualizar el inventario:", error);
     }
   };
 
-  // Crear un nuevo inventario
+  
   const handleCreateInventario = async () => {
     try {
       await createInventario(newInventario);
       await fetchInventarios();
-      setIsCreatePopupOpen(false); // Cierra el popup de creación
+      setIsCreatePopupOpen(false); 
     } catch (error) {
       console.error("Error al crear inventario:", error);
       setError("No se pudo crear el inventario");
@@ -96,7 +96,7 @@ export default function Inventarios() {
         (inventario) => inventario.id !== id
       );
       setInventarios(updatedInventarios);
-      setIsEditPopupOpen(false); // Cierra el popup de edición después de eliminar
+      setIsEditPopupOpen(false); 
     } catch (error) {
       console.error("Error al eliminar el inventario:", error);
       setError("No se pudo eliminar el inventario.");
@@ -134,11 +134,12 @@ export default function Inventarios() {
                 <p>
                   <strong>Cantidad de ítems:</strong> {inventario.itemcount}
                 </p>
-                <p><strong>Rut Encargado:</strong> {inventario.encargado}</p>              </div>
+                <p><strong>Rut Encargado:</strong> {inventario.encargado}</p>             
+                 </div>
               <div className="inventario-actions">
-                {/* Botón para abrir el popup de edición */}
+                
                 <button className="edit-button"
-                  onClick={() => handleEditClick(inventario)} // Usa la función correcta
+                  onClick={() => handleEditClick(inventario)} 
                   >
                     Editar
                   </button>
@@ -150,7 +151,7 @@ export default function Inventarios() {
         <p className="inventario-empty">No hay inventarios</p>
       )}
 
-      {/* Botón para abrir el popup de creación */}
+      
       <div className= "menu-lateral mostrar">
         <div className="admin-section">
       <button
@@ -163,7 +164,7 @@ export default function Inventarios() {
       
       </div>
 
-      {/* Popup de creación */}
+      
       <CreateInventarioPopup
         show={isCreatePopupOpen}
         setShow={setIsCreatePopupOpen}
@@ -177,7 +178,7 @@ export default function Inventarios() {
         onCreate={handleCreateInventario}
       />
 
-      {/* Popup de edición */}
+      
       <EditInventarioPopup
         show={isEditPopupOpen}
         setShow={setIsEditPopupOpen}

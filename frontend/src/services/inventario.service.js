@@ -53,6 +53,25 @@ export const updateInventario = async (id, inventario) => {
     }
   };
 
+  export async function getInventarioCompleto(id) {
+    try {
+      const response = await axios.get(`inventario/full/${id}`);
+      console.log("Inventario completo:", response.data.data);
+      return response.data.data; // Devolver solo la parte relevante
+    } catch (error) {
+      console.error("Error al obtener inventario completo:", error);
+      throw error;
+    }
+  }
+
+  export async function addItem(data) {
+    try {
+        const response = await axios.post('inventario/add-item/', data);
+        return response.data;
+    } catch (error) {
+        return error.response.data;
+    }
+  }
 
 
 /*

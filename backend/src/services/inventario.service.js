@@ -183,35 +183,52 @@ export async function addItemService(data, user) {
     const inventarioRepository = AppDataSource.getRepository(Inventario);
     const codigoBarrasRepository = AppDataSource.getRepository(CodigoBarras);
 
+    // Busca el inventario por nombre
     const inventarioactual = await inventarioRepository.findOne({ where: { nombre: inventario } });
     if (!inventarioactual) {
       return [null, "Inventario no encontrado"];
     }
-    
+
+    // Verifica permisos del usuario
+    console.log("Permisos del usuario:", user.permisos);
     if (!user || !user.permisos.includes(inventarioactual.nombre)) {
       return [null, `No tienes permiso para realizar esta acción en el inventario: ${inventario}`];
     }
 
+    // Normaliza el nombre a minúsculas para comparación
+    const nombreNormalizado = nombre.toLowerCase();
+
+    // Busca el ítem por nombre normalizado y el inventario asociado
     let item = await itemRepository.findOne({
-      where: { nombre, descripcion, categoria, inventario: { id: inventarioactual.id } },
+      where: {
+        nombre: nombreNormalizado, // Normaliza el nombre en la búsqueda
+        inventario: { id: inventarioactual.id },
+      },
       relations: ["codigosBarras"],
     });
 
+    // Si el ítem existe, verifica el código de barras
     if (item) {
-      item.cantidad += 1;
-
-      const codigoExistente = item.codigosBarras.find(cb => cb.codigo === cBarras);
+      // Verifica si el código de barras ya existe en el ítem
+      const codigoExistente = item.codigosBarras.find((cb) => cb.codigo === cBarras);
       if (codigoExistente) {
         return [null, "El código de barras ya está asociado a este artículo"];
       }
-      if (!codigoExistente) {
-        const nuevoCodigoBarras = codigoBarrasRepository.create({ codigo: cBarras, item: { id: item.id } });
-        await codigoBarrasRepository.save(nuevoCodigoBarras);
-        item.codigosBarras.push(nuevoCodigoBarras);
-      }
+
+      // Si el código de barras no existe, agrégalo
+      const nuevoCodigoBarras = codigoBarrasRepository.create({ codigo: cBarras, item: { id: item.id } });
+      await codigoBarrasRepository.save(nuevoCodigoBarras);
+      item.codigosBarras.push(nuevoCodigoBarras);
+
+      // Aumenta la cantidad del ítem después de confirmar el código de barras
+      item.cantidad += 1;
+
+      // Devuelve un mensaje indicando que se añadió al ítem existente
+      return [item, `Ítem duplicado detectado. Se añadió como cantidad al ítem existente: ${item.nombre}`];
     } else {
+      // Si el ítem no existe, crea uno nuevo
       item = itemRepository.create({
-        nombre,
+        nombre: nombreNormalizado, // Guarda el nombre en minúsculas para consistencia
         descripcion,
         categoria,
         estado: 0,
@@ -219,11 +236,11 @@ export async function addItemService(data, user) {
         inventario: inventarioactual,
         codigosBarras: [{ codigo: cBarras }],
       });
+
+      // Guarda el nuevo ítem
+      await itemRepository.save(item);
+      return [item, "Nuevo ítem creado exitosamente"];
     }
-
-    await itemRepository.save(item);
-
-    return [item, null];
   } catch (error) {
     console.error("Error al añadir un artículo al inventario:", error);
     return [null, "Error interno del servidor"];
@@ -360,3 +377,49 @@ export async function getInventariosService() {
     return [null, "Error interno del servidor"];
   }
 }
+
+
+
+export async function getInventarioWithItemsService(query) {
+  try {
+    const { id } = query;
+    const inventarioRepository = AppDataSource.getRepository("Inventario");
+
+    
+    if (!id) {
+      return [null, "El ID del inventario es obligatorio"];
+    }
+
+    
+    const inventario = await inventarioRepository.findOne({
+      where: { id: parseInt(id, 10) }, 
+      relations: ["items", "items.codigosBarras"], 
+    });
+
+    
+    if (!inventario) {
+      return [null, "Inventario no encontrado"];
+    }
+
+    
+    const transformedInventario = {
+      id: inventario.id,
+      nombre: inventario.nombre,
+      descripcion: inventario.descripcion,
+      encargado: inventario.encargado,
+      cantidad: inventario.items.length,
+      items: inventario.items.map((item) => ({
+        id: item.id,
+        nombre: item.nombre,
+        descripcion: item.descripcion,
+        codigosBarras: item.codigosBarras.map((cb) => cb.codigo), 
+      })),
+    };
+
+    return [transformedInventario, null];
+  } catch (error) {
+    console.error("Error al obtener el inventario con ítems y códigos de barra:", error);
+    return [null, "Error interno del servidor"];
+  }
+}
+

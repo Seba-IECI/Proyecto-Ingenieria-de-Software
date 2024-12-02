@@ -6,8 +6,9 @@ import {
   deleteItemController,
   getInventarioByIdController,
   getInventariosController ,
+  getInventarioWithItemsController,
   getItemController,
- updateInventarioController
+  updateInventarioController
 } from "../controllers/inventario.controller.js";
 import { authenticateJwt } from "../middlewares/authentication.middleware.js";
 import { isAdmin ,isProfesor } from "../middlewares/authorization.middleware.js";
@@ -34,6 +35,8 @@ router.post("/add-item",isProfesor, addItemController);///inventario y pedir use
 router.get("/item/", getItemController); 
 
 router.delete("/item/",isProfesor,deleteItemController);//inventario y pedir user.permiso
+
+router.get("/full/:id",getInventarioWithItemsController); //usuario
 
 export default router;
 

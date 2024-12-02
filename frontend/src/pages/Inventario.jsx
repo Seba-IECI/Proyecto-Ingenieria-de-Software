@@ -1,48 +1,105 @@
 import { useEffect, useState } from "react";
-import { getInventarioById } from "@services/inventario.service"; // Servicio ya importado
-import { getLoggedUser } from "@services/user.service"; // Función para obtener el usuario
-import "@styles/inventario.css";
+import { getInventarioById, getInventarioCompleto } from "@services/inventario.service";
+import { getLoggedUser } from "@services/user.service";
+import "@styles/popup-item.css";
+import { useAddItemPopup } from "../hooks/inventario/add-item";
+
+
+function Popup({ inventario, onClose }) {
+  return (
+    <div className="popup-overlay">
+      <div className="popup-content">
+        <h2>Ítems de {inventario.nombre}</h2>
+        {inventario.items && inventario.items.length > 0 ? (
+          <div className="grid-container">
+            <div className="grid-header">
+              <div><strong>Nombre del Ítem</strong></div>
+              <div><strong>Cantidad</strong></div>
+              <div><strong>Códigos de Barra</strong></div>
+            </div>
+            {inventario.items.map((item, index) => (
+              <div className="grid-row" key={index}>
+                <div>{item.nombre}</div>
+                <div>{item.codigosBarras.length}</div>
+                <div>
+                  {item.codigosBarras && item.codigosBarras.length > 0 ? (
+                    item.codigosBarras.join(", ")
+                  ) : (
+                    "Sin códigos de barra"
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p>No hay ítems en este inventario.</p>
+        )}
+        <button onClick={onClose} className="close-button">Cerrar</button>
+      </div>
+    </div>
+  );
+}
 
 export default function Inventario() {
   const [inventarios, setInventarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedInventario, setSelectedInventario] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
 
-  // Función para obtener inventarios por encargado
+  const { AddItemPopup, openPopup, closePopup } = useAddItemPopup(inventarios, () => {
+    fetchInventariosPorEncargado();
+  });
+
   const fetchInventariosPorEncargado = async () => {
     try {
-      // Obtener el usuario logueado desde el backend
       const user = await getLoggedUser();
-      console.log("Usuario logueado:", user);
+      const inventarios = await getInventarioById(user.rut);
 
-      // Validar que exista el RUT
-      if (!user?.rut) {
-        throw new Error("No se encontró el RUT del usuario logueado.");
+      if (!Array.isArray(inventarios) || inventarios.length === 0) {
+        setInventarios([]);
+        return;
       }
 
-      // Obtener inventarios asignados al RUT del encargado
-      const inventarios = await getInventarioById(user.rut);
-      console.log("Inventarios obtenidos:", inventarios);
-      setInventarios(Array.isArray(inventarios) ? inventarios : [inventarios]);
+      const inventariosConUnidades = await Promise.all(
+        inventarios.map(async (inv) => {
+          const inventarioCompleto = await getInventarioCompleto(inv.id);
+          const totalUnidades = inventarioCompleto.items
+            ? inventarioCompleto.items.reduce(
+                (sum, item) => sum + (Array.isArray(item.codigosBarras) ? item.codigosBarras.length : 0),
+                0
+              )
+            : 0;
+          return { ...inv, totalUnidades };
+        })
+      );
 
-      
+      setInventarios(inventariosConUnidades);
     } catch (error) {
-      console.error("Error al cargar inventarios por encargado:", error);
+      console.error("Error al cargar inventarios:", error);
       setError("No se pudieron cargar los inventarios asignados.");
     } finally {
       setLoading(false);
     }
   };
 
-  // useEffect para cargar los inventarios al montar el componente
+  const handleInventarioClick = async (inventario) => {
+    try {
+      setLoading(true);
+      const inventarioCompleto = await getInventarioCompleto(inventario.id);
+      setSelectedInventario(inventarioCompleto);
+      setShowPopup(true);
+    } catch (error) {
+      console.error("Error al cargar el inventario completo:", error);
+      setError("No se pudo cargar el inventario completo.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchInventariosPorEncargado();
   }, []);
-
-  // useEffect para depuración, verifica los cambios en el estado de inventarios
-  useEffect(() => {
-    console.log("Estado de inventarios actualizado:", inventarios);
-  }, [inventarios]);
 
   if (loading) return <p>Cargando inventarios...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -64,14 +121,42 @@ export default function Inventario() {
                 <p>
                   <strong>Cantidad de ítems:</strong> {inventario.itemcount}
                 </p>
-                <p><strong>Rut Encargado:</strong> {inventario.encargado}</p>              </div>
-              
+                <p>
+                  <strong>Unidades totales:</strong> {inventario.totalUnidades}
+                </p>
+                <p>
+                  <strong>Rut Encargado:</strong> {inventario.encargado}
+                </p>
+              </div>
+              <div className="inventario-actions">
+                <button
+                  onClick={() => handleInventarioClick(inventario)}
+                  className="details-button"
+                >
+                  Ver Detalles
+                </button>
+                <button
+                  onClick={() => openPopup(inventario.id)}
+                  className="add-item-button"
+                >
+                  Añadir Ítem
+                </button>
+              </div>
             </li>
           ))}
         </ul>
       ) : (
         <p>No tienes inventarios asignados.</p>
       )}
+
+      {showPopup && selectedInventario && (
+        <Popup
+          inventario={selectedInventario}
+          onClose={() => setShowPopup(false)}
+        />
+      )}
+
+      <AddItemPopup />
     </div>
   );
 }

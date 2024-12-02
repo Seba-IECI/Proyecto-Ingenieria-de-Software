@@ -206,3 +206,35 @@
     color: white;
   }
   
+
+  
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr; /* Configuración de columnas */
+  gap: 10px;
+}
+
+.grid-header {
+  display: contents; /* Actúa como parte del grid */
+  font-weight: bold;
+  border-bottom: 2px solid #ccc;
+  margin-bottom: 10px;
+}
+
+.grid-row {
+  display: contents; /* Cada fila se adapta al diseño del grid */
+}
+
+.grid-row div,
+.grid-header div {
+  padding: 5px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.grid-row div:last-child,
+.grid-header div:last-child {
+  word-break: break-word; /* Evita que los códigos de barra largos rompan el diseño */
+}
+
+
+
