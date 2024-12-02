@@ -101,13 +101,13 @@ export default function DocumentosPractica() {
                             <div className="documento-header">
                                 <button
                                     onClick={() => handleClickEdit(documento)}
-                                    className="edit-button"
+                                    className="edit-button-documento"
                                 >
                                     Modificar
                                 </button>
                                 <button
                                     onClick={() => handleDelete(documento.id)}
-                                    className="delete-button"
+                                    className="delete-button-documento"
                                 >
                                     Eliminar
                                 </button>

@@ -3,7 +3,7 @@ import { subirDocumento } from "@services/documentosPractica.service";
 
 export default function useSubirDocumento(fetchDocumentos) {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
-    const [originalName, setOriginalName] = useState(""); // Estado para el nombre original
+    const [originalName, setOriginalName] = useState("");
 
     const handleClickCreate = () => {
         setIsPopupOpen(true);
@@ -11,20 +11,20 @@ export default function useSubirDocumento(fetchDocumentos) {
 
     const handleClosePopup = () => {
         setIsPopupOpen(false);
-        setOriginalName(""); // Resetea el nombre original al cerrar el popup
+        setOriginalName("");
     };
 
     const handleCreate = async (formData) => {
         try {
-            const response = await subirDocumento(formData); // Llama al servicio
-            console.log("Respuesta recibida en el hook:", response); // Depuración
+            const response = await subirDocumento(formData);
+            console.log("Respuesta recibida en el hook:", response);
             if (response.data && response.data.originalname) {
-                setOriginalName(response.data.originalname); // Guarda el nombre original
+                setOriginalName(response.data.originalname);
             } else {
                 console.error("No se recibió el nombre original del backend");
             }
-            await fetchDocumentos(); // Refresca la lista de documentos
-            handleClosePopup(); // Cierra el popup
+            await fetchDocumentos();
+            handleClosePopup();
         } catch (error) {
             console.error("Error al subir documento:", error);
         }
@@ -32,7 +32,7 @@ export default function useSubirDocumento(fetchDocumentos) {
 
     return {
         isPopupOpen,
-        originalName, // Expone el nombre original para usarlo en el componente
+        originalName, //NOMBRE ORIGINAL DEL COMPONENTE
         handleClickCreate,
         handleClosePopup,
         handleCreate,
