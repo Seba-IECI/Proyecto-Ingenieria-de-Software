@@ -58,3 +58,23 @@ export async function eliminarSemestre(id) {
         throw new Error(error.response?.data?.message || "Error desconocido al eliminar el semestre.");
     }
 }
+
+export async function actualizarSemestre(id, semestreData) {
+    try {
+        const response = await axios.put(`/semestres/actualizarSemestre/${id}`, semestreData, {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+            },
+        });
+
+        if (response.data && response.data.status === "Success") {
+            return response.data.data;
+        } else {
+            throw new Error(response.data.message || "Error al actualizar el semestre.");
+        }
+    } catch (error) {
+        console.error("Error en actualizarSemestre:", error);
+        throw new Error(error.response?.data?.message || "Error desconocido al actualizar el semestre.");
+    }
+}

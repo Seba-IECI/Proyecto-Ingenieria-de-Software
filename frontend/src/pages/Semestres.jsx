@@ -2,7 +2,9 @@ import { useState } from "react";
 import useListarSemestres from "@hooks/semestres/useListarSemestres";
 import useCrearSemestre from "@hooks/semestres/useCrearSemestre";
 import useEliminarSemestre from "@hooks/semestres/useEliminarSemestre";
+import useActualizarSemestre from "@hooks/semestres/useActualizarSemestre";
 import DeleteSemestresPopup from "@components/DeleteSemestresPopup";
+import UpdateSemestrePopup from "@components/UpdateSemestrePopup";
 import "@styles/semestres.css";
 
 export default function Semestres() {
@@ -17,10 +19,22 @@ export default function Semestres() {
 
     const { handleDelete } = useEliminarSemestre(fetchSemestres);
 
+    const {
+        semestreData,
+        isLoading: isUpdating,
+        error: updateError,
+        handleChange: handleUpdateChange,
+        handleUpdate,
+        setInitialData,
+    } = useActualizarSemestre(fetchSemestres);
+
     const [isViewing, setIsViewing] = useState(false);
     const [isCreatingFormVisible, setIsCreatingFormVisible] = useState(false);
     const [popupVisible, setPopupVisible] = useState(false);
-    const [semestreToDelete, setSemestreToDelete] = useState(null);
+    const [updatePopupVisible, setUpdatePopupVisible] = useState(false);
+    const [semestreToUpdate, setSemestreToUpdate] = useState(null);
+    const [existeOtroActivo, setExisteOtroActivo] = useState(false);
+    const [mostrarTooltip, setMostrarTooltip] = useState(false);
 
     const handleListarSemestres = async () => {
         if (isViewing) {
@@ -35,20 +49,53 @@ export default function Semestres() {
         setIsCreatingFormVisible(!isCreatingFormVisible);
     };
 
-    const handleShowPopup = (semestre) => {
-        setSemestreToDelete(semestre);
+    const handleShowDeletePopup = (semestre) => {
+        setSemestreToUpdate(semestre);
         setPopupVisible(true);
     };
 
-    const handleClosePopup = () => {
+    const handleCloseDeletePopup = () => {
         setPopupVisible(false);
-        setSemestreToDelete(null);
+        setSemestreToUpdate(null);
+    };
+
+    const handleShowUpdatePopup = (semestre) => {
+        setInitialData(semestre);
+        setSemestreToUpdate(semestre);
+        setUpdatePopupVisible(true);
+
+        const otroActivo = semestresActivos.some(
+            (s) => s.id !== semestre.id && s.estado === true
+        );
+        setExisteOtroActivo(otroActivo);
+    };
+
+    const handleCloseUpdatePopup = () => {
+        setUpdatePopupVisible(false);
+        setSemestreToUpdate(null);
     };
 
     const handleConfirmDelete = async () => {
-        if (semestreToDelete) {
-            await handleDelete(semestreToDelete.id);
-            handleClosePopup();
+        if (semestreToUpdate) {
+            await handleDelete(semestreToUpdate.id);
+            handleCloseDeletePopup();
+        }
+    };
+
+    const handleConfirmUpdate = async () => {
+        if (semestreToUpdate) {
+            await handleUpdate(semestreToUpdate.id);
+            handleCloseUpdatePopup();
+        }
+    };
+
+    const handleCheckboxClick = (e) => {
+        if (existeOtroActivo && !semestreData.estado) {
+            e.preventDefault();
+            setMostrarTooltip(true);
+            setTimeout(() => setMostrarTooltip(false), 3000);
+        } else {
+            handleUpdateChange(e);
         }
     };
 
@@ -129,8 +176,14 @@ export default function Semestres() {
                             {semestresActivos.map((semestre) => (
                                 <li key={semestre.id} className="semestre-item">
                                     <button
+                                        className="update-button"
+                                        onClick={() => handleShowUpdatePopup(semestre)}
+                                    >
+                                        ✎
+                                    </button>
+                                    <button
                                         className="delete-button"
-                                        onClick={() => handleShowPopup(semestre)}
+                                        onClick={() => handleShowDeletePopup(semestre)}
                                     >
                                         X
                                     </button>
@@ -150,8 +203,14 @@ export default function Semestres() {
                             {semestresInactivos.map((semestre) => (
                                 <li key={semestre.id} className="semestre-item">
                                     <button
+                                        className="update-button"
+                                        onClick={() => handleShowUpdatePopup(semestre)}
+                                    >
+                                        ✎
+                                    </button>
+                                    <button
                                         className="delete-button"
-                                        onClick={() => handleShowPopup(semestre)}
+                                        onClick={() => handleShowDeletePopup(semestre)}
                                     >
                                         X
                                     </button>
@@ -169,9 +228,20 @@ export default function Semestres() {
             )}
             <DeleteSemestresPopup
                 show={popupVisible}
-                onClose={handleClosePopup}
+                onClose={handleCloseDeletePopup}
                 onConfirm={handleConfirmDelete}
-                nombre={semestreToDelete?.nombre || ""}
+                nombre={semestreToUpdate?.nombre || ""}
+            />
+            <UpdateSemestrePopup
+                show={updatePopupVisible}
+                onClose={handleCloseUpdatePopup}
+                onUpdate={handleConfirmUpdate}
+                semestreData={semestreData}
+                isLoading={isUpdating}
+                error={updateError}
+                handleChange={handleCheckboxClick}
+                existeOtroActivo={existeOtroActivo}
+                mostrarTooltip={mostrarTooltip}
             />
         </div>
     );
