@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
-import { getInventarioById, getInventarioCompleto } from "@services/inventario.service";
+import {
+  getInventarioById,
+  getInventarioCompleto,
+  deleteItem, 
+} from "@services/inventario.service";
 import { getLoggedUser } from "@services/user.service";
 import "@styles/popup-item.css";
 import { useAddItemPopup } from "../hooks/inventario/add-item";
-
+import { useDeleteItemPopup } from "../hooks/inventario/delete-item";
 
 function Popup({ inventario, onClose }) {
   return (
@@ -13,9 +17,15 @@ function Popup({ inventario, onClose }) {
         {inventario.items && inventario.items.length > 0 ? (
           <div className="grid-container">
             <div className="grid-header">
-              <div><strong>Nombre del Ítem</strong></div>
-              <div><strong>Cantidad</strong></div>
-              <div><strong>Códigos de Barra</strong></div>
+              <div>
+                <strong>Nombre del Ítem</strong>
+              </div>
+              <div>
+                <strong>Cantidad</strong>
+              </div>
+              <div>
+                <strong>Códigos de Barra</strong>
+              </div>
             </div>
             {inventario.items.map((item, index) => (
               <div className="grid-row" key={index}>
@@ -34,7 +44,9 @@ function Popup({ inventario, onClose }) {
         ) : (
           <p>No hay ítems en este inventario.</p>
         )}
-        <button onClick={onClose} className="close-button">Cerrar</button>
+        <button onClick={onClose} className="close-button">
+          Cerrar
+        </button>
       </div>
     </div>
   );
@@ -46,6 +58,7 @@ export default function Inventario() {
   const [error, setError] = useState(null);
   const [selectedInventario, setSelectedInventario] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
 
   const { AddItemPopup, openPopup, closePopup } = useAddItemPopup(inventarios, () => {
     fetchInventariosPorEncargado();
@@ -82,6 +95,35 @@ export default function Inventario() {
       setLoading(false);
     }
   };
+
+  const handleDeleteItem = async (codigoBarra) => {
+    try {
+      setLoading(true);
+      const response = await deleteItem(codigoBarra); 
+      if (response.error) {
+        alert(response.error);
+      } else {
+        alert("Unidad eliminada correctamente.");
+      }
+      fetchInventariosPorEncargado(); 
+      setShowDeletePopup(false);
+    } catch (error) {
+      console.error("Error al eliminar la unidad:", error);
+      alert("No se pudo eliminar la unidad.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOpenDeletePopup = (inventario) => {
+    setSelectedInventario(inventario);
+    setShowDeletePopup(true);
+  };
+
+  const { DeleteItemPopup, openPopup: openDeletePopup, closePopup: closeDeletePopup } =
+    useDeleteItemPopup(() => {
+      fetchInventariosPorEncargado();
+    });
 
   const handleInventarioClick = async (inventario) => {
     try {
@@ -141,6 +183,9 @@ export default function Inventario() {
                 >
                   Añadir Ítem
                 </button>
+                <button onClick={openDeletePopup}>Eliminar Ítem</button>
+
+                <DeleteItemPopup />
               </div>
             </li>
           ))}
@@ -155,6 +200,7 @@ export default function Inventario() {
           onClose={() => setShowPopup(false)}
         />
       )}
+
 
       <AddItemPopup />
     </div>

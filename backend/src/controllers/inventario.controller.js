@@ -92,7 +92,7 @@ import {
   
   export async function deleteInventarioController(req, res) {
     try {
-      const { id } = req.params;
+      const { cBarras } = req.params;
       const [inventarioEliminado, error] = await deleteInventarioService(id);
   
       if (error) {

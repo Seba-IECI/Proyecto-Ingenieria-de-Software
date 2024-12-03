@@ -54,6 +54,7 @@ export const useAddItemPopup = (inventarios, onItemAdded) => {
         return;
       }
     }
+
   
     try {
       const newItem = {
