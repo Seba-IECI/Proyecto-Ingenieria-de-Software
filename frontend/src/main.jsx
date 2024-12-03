@@ -9,7 +9,7 @@ import Register from '@pages/Register';
 import Error404 from '@pages/Error404';
 import Root from '@pages/Root';
 import ProtectedRoute from '@components/ProtectedRoute';
-import Materia from '@pages/Materia';
+import Materia from '@pages/materia';
 import DocumentosPractica from '@pages/DocumentosPractica';
 import Semestres from '@pages/Semestres';
 import '@styles/styles.css';

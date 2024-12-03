@@ -66,7 +66,7 @@
     gap: 10px;
 }
 
-.edit-button {
+.edit-button-documento {
     background-color: #007bff;
     color: white;
     padding: 5px 10px;
@@ -76,7 +76,7 @@
     font-size: 14px;
 }
 
-.delete-button {
+.delete-button-documento {
     background-color: #dc3545;
     color: white;
     padding: 5px 10px;
@@ -86,8 +86,8 @@
     font-size: 14px;
 }
 
-.edit-button:hover,
-.delete-button:hover {
+.edit-button-documento:hover,
+.delete-button-documento:hover {
     opacity: 0.9;
 }
 
