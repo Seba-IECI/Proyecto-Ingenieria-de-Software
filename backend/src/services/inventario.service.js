@@ -93,34 +93,40 @@ export async function createInventarioService(body) {
 }
 
 
-export async function getInventarioByIdService(query) {
+export async function getInventarioByIdService(query, user) {
   try {
-    const { id, nombre ,encargado } = query;
+    const { id, nombre } = query;
     const inventarioRepository = AppDataSource.getRepository(Inventario);
 
-   
+    // Construir las condiciones base
     const whereCondition = {};
     if (id) whereCondition.id = id;
     if (nombre) whereCondition.nombre = nombre;
-    if (encargado) whereCondition.encargado = encargado;
 
-   
-    const inventario = await inventarioRepository.createQueryBuilder("inventario")
-    .leftJoin("inventario.items", "item") 
-    .select([
-      "inventario.id AS id",
-      "inventario.nombre AS nombre",
-      "inventario.descripcion AS descripcion", 
-      "COUNT(item.id) AS itemCount",
-      "inventario.encargado AS encargado" 
-    ])
-    .groupBy("inventario.id") 
-    .addGroupBy("inventario.nombre") 
-    .addGroupBy("inventario.descripcion") 
-    .addGroupBy("inventario.encargado") 
-    .getRawMany(); 
+    // Si el usuario no es administrador, añadir la condición de filtrado por encargado
+    if (user?.rol !== "administrador") {
+      whereCondition.encargado = user.rut;
+    }
 
-    if (!inventario) return [null, "Inventario no encontrado"];
+    // Realizar la consulta con las condiciones aplicadas
+    const inventario = await inventarioRepository
+      .createQueryBuilder("inventario")
+      .leftJoin("inventario.items", "item") // Join con la tabla items
+      .select([
+        "inventario.id AS id",
+        "inventario.nombre AS nombre",
+        "inventario.descripcion AS descripcion",
+        "COUNT(item.id) AS itemCount",
+        "inventario.encargado AS encargado",
+      ])
+      .where(whereCondition) // Filtrar por las condiciones definidas
+      .groupBy("inventario.id")
+      .addGroupBy("inventario.nombre")
+      .addGroupBy("inventario.descripcion")
+      .addGroupBy("inventario.encargado")
+      .getRawMany(); // Obtener resultados como objetos planos
+
+    if (!inventario || inventario.length === 0) return [null, "Inventario no encontrado"];
 
     return [inventario, null];
   } catch (error) {
@@ -128,6 +134,7 @@ export async function getInventarioByIdService(query) {
     return [null, "Error interno del servidor"];
   }
 }
+
 
 
 export async function updateItemService(query, body, user) {
@@ -301,10 +308,10 @@ export async function updateInventarioService(id, data) {
   try {
     const inventarioRepository = AppDataSource.getRepository(Inventario);
 
-    console.log("ID recibido para actualizar:", id); // Depuración
-    console.log("Datos recibidos para actualizar:", data); // Depuración
+    console.log("ID recibido para actualizar:", id); 
+    console.log("Datos recibidos para actualizar:", data); 
 
-   
+    
     const inventario = await inventarioRepository.findOne({ where: { id } });
 
     if (!inventario) {
@@ -312,11 +319,13 @@ export async function updateInventarioService(id, data) {
     }
 
     
-    inventario.nombre = data.nombre || inventario.nombre;
-    inventario.descripcion = data.descripcion || inventario.descripcion;
-    inventario.updatedAt = new Date();
+    if (data.nombre !== undefined) inventario.nombre = data.nombre;
+    if (data.descripcion !== undefined) inventario.descripcion = data.descripcion;
+    if (data.encargado !== undefined) inventario.encargado = data.encargado; 
 
-    
+    inventario.updatedAt = new Date(); 
+
+ 
     const inventarioActualizado = await inventarioRepository.save(inventario);
 
     return [inventarioActualizado, null];
@@ -325,6 +334,7 @@ export async function updateInventarioService(id, data) {
     return [null, "Error interno del servidor"];
   }
 }
+
 
 export async function deleteInventarioService(id) {
   try {

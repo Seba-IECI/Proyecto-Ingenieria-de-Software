@@ -50,11 +50,14 @@ import {
   
   export async function getInventarioByIdController(req, res) {
     try {
-      
-      const { id, nombre , encargado } = req.query;
-      
-      
-      const [inventario, error] = await getInventarioByIdService({ id, nombre, encargado });
+      const { id, nombre } = req.query; 
+      const user = req.user; 
+  
+      if (!user) {
+        return res.status(401).json({ message: "Usuario no autenticado" });
+      }
+  
+      const [inventario, error] = await getInventarioByIdService({ id, nombre }, user);
   
       if (error) {
         return res.status(404).json({ message: error });
@@ -66,6 +69,7 @@ import {
       return res.status(500).json({ message: "Error interno del servidor" });
     }
   }
+  
   
   
  

@@ -1,4 +1,4 @@
-
+import React from "react";
 import "@styles/inventario.css";
 
 export default function EditInventarioPopup({
@@ -34,7 +34,7 @@ export default function EditInventarioPopup({
           <label>Encargado (RUT):</label>
           <input
             type="text"
-            name="encargadoRut"
+            name="encargado" 
             value={data.encargado}
             onChange={onChange}
             placeholder="RUT del encargado"
@@ -46,17 +46,13 @@ export default function EditInventarioPopup({
             <button
               type="button"
               className="delete-button"
-              onClick={() => {
-                console.log("Botón de eliminar presionado");
-                onDelete(); // Llama a la función `onDelete` pasada desde el componente padre
-              }}
+              onClick={onDelete}
             >
               Eliminar Inventario
             </button>
             <button type="button" onClick={() => setShow(false)}>
               Cancelar
             </button>
-            
           </div>
         </form>
       </div>
