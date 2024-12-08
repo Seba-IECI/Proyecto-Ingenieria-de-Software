@@ -107,14 +107,18 @@ export const useAddItemPopup = (inventarios, onItemAdded) => {
                 } else {
                   setIsNewItem(false);
                   const selectedItem = selectedInventario?.items?.find((item) => item.nombre === value);
-                  if (selectedItem) {
-                    setItemData({
-                      nombre: selectedItem.nombre,
-                      descripcion: selectedItem.descripcion || "",
-                      categoria: selectedItem.categoria || "",
-                      cBarras: "",
-                    });
-                  }
+
+if (selectedItem) {
+  console.log("Ítem seleccionado:", selectedItem);
+  setItemData({
+    nombre: selectedItem.nombre,
+    descripcion: selectedItem.descripcion || "",
+    categoria: selectedItem.categoria || "Sin Categoría", // Valor predeterminado si está vacío
+    cBarras: "",
+  });
+} else {
+  console.error("No se encontró el ítem seleccionado.");
+}
                 }
               }}
             >

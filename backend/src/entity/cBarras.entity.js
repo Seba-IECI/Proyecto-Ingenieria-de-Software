@@ -30,6 +30,16 @@ const CodigoBarrasSchema = new EntitySchema({
     item: {
       type: "many-to-one",
       target: "Item",
+      joinColumn: { name: "itemId" },
+      onDelete: "CASCADE",
+      nullable: true,
+    },
+    prestamo: {
+      type: "many-to-one",
+      target: "Prestamos", 
+      inverseSide: "codigosBarras", // Debe coincidir con el nombre en PrestamosSchema
+      joinColumn: { name: "prestamo_id" },
+      cascade : true,
       onDelete: "CASCADE",
     },
   },

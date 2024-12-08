@@ -13,6 +13,7 @@ import Materia from '@pages/materia';
 import DocumentosPractica from '@pages/DocumentosPractica';
 import Semestres from '@pages/Semestres';
 import Asistencias from '@pages/Asistencias';
+import Prestamos from '@pages/Prestamos';
 import '@styles/styles.css';
 
 const router = createBrowserRouter([
@@ -46,6 +47,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={['administrador','profesor']}>
             <Inventario />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/prestamos',
+        element: (
+          <ProtectedRoute allowedRoles={['administrador','profesor']}>
+            <Prestamos />
           </ProtectedRoute>
         ),
       },

@@ -186,9 +186,17 @@ export async function updateItemService(query, body, user) {
 export async function addItemService(data, user) {
   try {
     const { nombre, descripcion, categoria, cBarras, inventario } = data;
+
+    // Validar que todos los datos requeridos estén presentes
+    if (!nombre || !descripcion || !categoria || !cBarras || !inventario) {
+      return [null, "Todos los campos son obligatorios: nombre, descripcion, categoria, código de barras, inventario"];
+    }
+
     const itemRepository = AppDataSource.getRepository(Item);
     const inventarioRepository = AppDataSource.getRepository(Inventario);
     const codigoBarrasRepository = AppDataSource.getRepository(CodigoBarras);
+
+    console.log("Datos recibidos para añadir un artículo:", data);
 
     // Busca el inventario por nombre
     const inventarioactual = await inventarioRepository.findOne({ where: { nombre: inventario } });
@@ -197,60 +205,78 @@ export async function addItemService(data, user) {
     }
 
     // Verifica permisos del usuario
-    console.log("Permisos del usuario:", user.permisos);
     if (!user || !user.permisos.includes(inventarioactual.nombre)) {
       return [null, `No tienes permiso para realizar esta acción en el inventario: ${inventario}`];
     }
 
-    // Normaliza el nombre a minúsculas para comparación
     const nombreNormalizado = nombre.toLowerCase();
 
-    // Busca el ítem por nombre normalizado y el inventario asociado
-    let item = await itemRepository.findOne({
-      where: {
-        nombre: nombreNormalizado, // Normaliza el nombre en la búsqueda
-        inventario: { id: inventarioactual.id },
-      },
+    // Busca el ítem existente por nombre e inventario
+    const item = await itemRepository.findOne({
+      where: { nombre: nombreNormalizado, inventario: { id: inventarioactual.id } },
       relations: ["codigosBarras"],
     });
+    
+    if (!item) {
+      throw new Error("Ítem no encontrado");
+    }
+    
+    console.log("Ítem cargado:", item);
 
-    // Si el ítem existe, verifica el código de barras
     if (item) {
-      // Verifica si el código de barras ya existe en el ítem
+      // Si el ítem ya existe, verifica el código de barras
       const codigoExistente = item.codigosBarras.find((cb) => cb.codigo === cBarras);
       if (codigoExistente) {
         return [null, "El código de barras ya está asociado a este artículo"];
       }
 
-      // Si el código de barras no existe, agrégalo
-      const nuevoCodigoBarras = codigoBarrasRepository.create({ codigo: cBarras, item: { id: item.id } });
+      console.log("Datos del código de barras a crear:", {
+        codigo: cBarras,
+        item: { id: item.id },
+      });
+      
+      // Crear y asociar el nuevo código de barras al ítem existente
+      const nuevoCodigoBarras = codigoBarrasRepository.create({
+        codigo: cBarras,
+        item: { id: item.id }, // Pasando solo el ID del ítem
+      });
+      
+      // Guarda el código de barras con la relación correcta
       await codigoBarrasRepository.save(nuevoCodigoBarras);
-      item.codigosBarras.push(nuevoCodigoBarras);
+      
 
-      // Aumenta la cantidad del ítem después de confirmar el código de barras
+      console.log("Datos del nuevo código de barras:", {
+        codigo: cBarras,
+        itemId: item.id, // Asegúrate de que el ID del ítem esté presente
+      });
+      
+      
+      
+
+      // Incrementa la cantidad del ítem
       item.cantidad += 1;
+      await itemRepository.save(item);
 
-      // Devuelve un mensaje indicando que se añadió al ítem existente
-      return [item, `Ítem duplicado detectado. Se añadió como cantidad al ítem existente: ${item.nombre}`];
+      return [item, `Artículo actualizado correctamente. Se añadió el código de barras: ${cBarras}`];
     } else {
-      // Si el ítem no existe, crea uno nuevo
+      // Si el ítem no existe, crea uno nuevo con el código de barras
       item = itemRepository.create({
-        nombre: nombreNormalizado, // Guarda el nombre en minúsculas para consistencia
+        nombre: nombreNormalizado,
         descripcion,
         categoria,
         estado: 0,
         cantidad: 1,
         inventario: inventarioactual,
-        codigosBarras: [{ codigo: cBarras }],
+        codigosBarras: [{ codigo: cBarras }], // Crea y asocia el código de barras
       });
 
-      // Guarda el nuevo ítem
       await itemRepository.save(item);
-      return [item, "Nuevo ítem creado exitosamente"];
+
+      return [item, "Nuevo artículo creado exitosamente"];
     }
   } catch (error) {
-    console.error("Error al añadir un artículo al inventario:", error);
-    return [null, "Error interno del servidor"];
+    console.error("Error al añadir un artículo al inventario:", error.message || error);
+    return [null, error.message || "Error interno del servidor"];
   }
 }
 

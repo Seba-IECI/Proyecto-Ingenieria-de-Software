@@ -66,6 +66,7 @@ export const updateInventario = async (id, inventario) => {
 
   export async function addItem(data) {
     try {
+      console.log("Data enviada de añadir item", data);
         const response = await axios.post('inventario/add-item/', data);
         return response.data;
     } catch (error) {

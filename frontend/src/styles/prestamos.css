@@ -1,0 +1,183 @@
+.prestamos-container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .prestamos-title {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .crear-prestamo {
+    margin-bottom: 30px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    background: #f9f9f9;
+  }
+  
+  .crear-prestamo label {
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  .crear-prestamo input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .crear-prestamo button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .prestamos-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .prestamo-item {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: #f9f9f9;
+  }
+  
+  .cerrar-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .prestamos-empty {
+    text-align: center;
+    font-style: italic;
+    color: gray;
+  }
+  
+
+  .prestamos-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.prestamos-table th, .prestamos-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+.prestamos-table th {
+  background-color: #f5f5f5;
+  font-weight: bold;
+}
+
+.prestamos-table td {
+  vertical-align: middle;
+}
+
+.cerrar-button {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.cerrar-button:hover {
+  background-color: #e60000;
+}
+
+.popup-overlay {
+  position: fixed; /* Usa 'fixed' para centrarlo respecto a la pantalla */
+  width: 100vw; /* Asegúrate de que ocupe todo el ancho de la ventana */
+  height: 100vh; /* Asegúrate de que ocupe toda la altura */
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+
+.popup-content {
+  background: white;
+  width: 90%; /* Usa un porcentaje más alto si quieres que ocupe más espacio */
+  max-width: 900px; /* Define un ancho máximo en píxeles */
+  max-height: 80%; /* Ajusta el alto máximo */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+  overflow-y: auto; /* Activa el scroll vertical si el contenido supera el tamaño */
+}
+
+
+.popup-content h2 {
+  margin-top: 0px;
+}
+
+.popup-content table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.popup-content table th,
+.popup-content table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.popup-content table th {
+  background-color: #f4f4f4;
+}
+
+.popup-content input {
+  width: calc(100% - 20px);
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.popup-close-button {
+  position: sticky; /* Para posicionarlo en un lugar específico */
+  top: 10px; /* Ajusta la distancia desde la parte superior */
+  left: 750px; /* Ajusta la distancia desde la izquierda */
+  background: #007bff; /* Color del botón */
+  color: white;
+  width: 75px; /* Ajusta el ancho del botón */
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.popup-content button:hover {
+  background-color: #0056b3;
+}
+
+.popup-content .close-button {
+  margin-top: 15px;
+  background-color: #dc3545;
+}
+
+.popup-content .close-button:hover {
+  background-color: #a71d2a;
+}
+

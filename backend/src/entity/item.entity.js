@@ -23,7 +23,7 @@ const ItemSchema = new EntitySchema({
     categoria: {
       type: "varchar",
       length: 50,
-      nullable: false,
+      nullable: true,
     },
     estado: {
       type: "boolean", 
@@ -62,12 +62,12 @@ const ItemSchema = new EntitySchema({
     prestamos: {
       type: "one-to-many",
       target: "Prestamos",
-      inverseSide: "inventario",
+      inverseSide: "item",
     },
     codigosBarras: {
       type: "one-to-many",
       target: "CodigoBarras", // Nombre de la entidad de código de barras
-      inverseSide: "item",
+      inverseSide: "item", // Nombre de la relación en la entidad de código de      
       cascade: true,
       onDelete: "CASCADE",
     },

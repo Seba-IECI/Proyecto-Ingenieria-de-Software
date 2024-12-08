@@ -68,6 +68,7 @@ export default function Inventario() {
     try {
       const user = await getLoggedUser();
       const inventarios = await getInventarioById(user.rut);
+      console
 
       if (!Array.isArray(inventarios) || inventarios.length === 0) {
         setInventarios([]);

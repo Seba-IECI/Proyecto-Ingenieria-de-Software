@@ -27,6 +27,15 @@ const PrestamosSchema = new EntitySchema({
       default: 0,
       nullable: false,
     },
+    codigosAsociados: {
+      type: "text", // Usa "text" para almacenar JSON serializado
+      nullable: true,
+    },
+    // Nuevo campo: Ítems asociados al préstamo
+    itemsAsociados: {
+      type: "text", // Usa "text" para almacenar JSON serializado
+      nullable: true,
+    },
   },
   relations: {
     usuario: {
@@ -36,20 +45,15 @@ const PrestamosSchema = new EntitySchema({
       nullable: false,
       onDelete: "CASCADE",
     },
-    item: {
-      type: "many-to-one",
-      target: "Item",
-      joinColumn: { name: "item_id" },
-      nullable: false,
-      onDelete: "CASCADE",
-    },
-    codigoBarras: { 
-      type: "many-to-one",
+    
+    codigosBarras: {
+      type: "one-to-many",
       target: "CodigoBarras",
+      inverseSide: "prestamo",
       onDelete: "CASCADE",
-      joinColumn: true,
-    },
-  },
+    }
+    
+  },                   
 });
 
 export default PrestamosSchema;

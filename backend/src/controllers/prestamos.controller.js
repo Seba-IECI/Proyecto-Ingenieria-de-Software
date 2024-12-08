@@ -10,15 +10,13 @@ import { getUserService } from "../services/user.service.js";
 
 export async function getPrestamoController(req, res) {
   try {
-    
-   
     const [prestamoData, error] = await getPrestamoService(req.query);
 
     if (error) {
       return res.status(404).json({ message: error });
     }
 
-    return res.status(200).json(prestamoData);
+    return res.status(200).json(prestamoData); // Incluir todos los códigos asociados
   } catch (error) {
     console.error("Error en el controlador de préstamos:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
@@ -28,20 +26,42 @@ export async function getPrestamoController(req, res) {
 
 export async function createPrestamoController(req, res) {
   try {
-    const { rut, codigoBarras, diasPrestamo } = req.body;
-    const user = req.user;
-   
-    const [nuevoPrestamo, error] = await createPrestamoService({ rut, codigoBarras, diasPrestamo,user });
+    const { rut, codigosBarras, diasPrestamo } = req.body;
+
+    if (!rut || !Array.isArray(codigosBarras) || codigosBarras.length === 0 || !diasPrestamo) {
+      return res.status(400).json({
+        message: "Faltan datos necesarios para crear el préstamo.",
+        datosRecibidos: { rut, codigosBarras, diasPrestamo },
+      });
+    }
+
+    const [nuevoPrestamo, error] = await createPrestamoService({
+      rut,
+      codigosBarras,
+      diasPrestamo,
+    });
+
     if (error) {
-      return res.status(500).json({ message: error });
+      return res.status(400).json({ message: error });
+    }
+
+    // Eliminar datos sensibles del usuario antes de enviar la respuesta
+    if (nuevoPrestamo.usuario) {
+      delete nuevoPrestamo.usuario.password; // Eliminar la contraseña
+      delete nuevoPrestamo.usuario.email;    // Si no necesitas el email
+      delete nuevoPrestamo.usuario.permisos; // Si no necesitas los permisos
+      delete nuevoPrestamo.usuario.nivel;    // Elimina campos innecesarios
+      delete nuevoPrestamo.usuario.especialidad;
     }
 
     return res.status(201).json(nuevoPrestamo);
   } catch (error) {
-    console.error("Error en el controlador al crear el préstamo:", error);
-    return res.status(500).json({ message: "Error interno del servidor" });
+    console.error("Error al crear el préstamo:", error);
+    return res.status(500).json({ message: "Error interno del servidor." });
   }
 }
+
+
 
 /*
 export async function updatePrestamoController(req, res) {
@@ -68,33 +88,30 @@ export async function updatePrestamoController(req, res) {
 
 export async function cerrarPrestamoController(req, res) {
   try {
-    
-    const { id, cBarras, rut } = req.query;
-    
-    
-    const [prestamoData, errorGet] = await getPrestamoService({ id, cBarras, rut });
+    // Extrae el ID del parámetro de ruta
+    const { id } = req.query;
 
-    if (errorGet) {
-      return res.status(404).json({ message: errorGet });
+    if (!id) {
+      return res.status(400).json({ message: "ID no proporcionado en la URL" });
     }
 
-    
-    const prestamoId = prestamoData.id;
+    console.log("ID recibido en el controlador:", id); // Depuración
 
-   
-    const [prestamo, errorClose] = await cerrarPrestamoService(prestamoId);
+    // Llama al servicio para cerrar el préstamo
+    const [prestamo, errorClose] = await cerrarPrestamoService(id);
 
     if (errorClose) {
-      return res.status(404).json({ message: errorClose });
+      return res.status(400).json({ message: errorClose });
     }
 
-    
     return res.status(200).json(prestamo);
   } catch (error) {
     console.error("Error en el controlador al cerrar el préstamo:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
   }
 }
+
+
 
 export async function getPrestamosPorEstadoController(req, res) {
   try {
@@ -110,7 +127,7 @@ export async function getPrestamosPorEstadoController(req, res) {
       return res.status(404).json({ message: error });
     }
 
-    return res.status(200).json(prestamosData);
+    return res.status(200).json(prestamosData); // Incluir todos los códigos en cada préstamo
   } catch (error) {
     console.error("Error en el controlador al obtener los préstamos por estado:", error);
     return res.status(500).json({ message: "Error interno del servidor" });

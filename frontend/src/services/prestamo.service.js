@@ -12,24 +12,41 @@ export async function getPrestamos() {
 }
 
 
-export async function cerrarPrestamo(id){ ///uso interno
+
+export async function cerrarPrestamo(id) {
     try {
-        const { data } = await axios.patch(`inventario/names/${id}`);
-        return data;
+      const { data } = await axios.patch(`prestamos/cerrar?id=${id}`);
+      return data;
     } catch (error) {
-        return error.response.data;
+      console.error("Error al cerrar el préstamo:", error.response?.data || error.message);
+      throw error;
     }
-}
-
-
+  }
+  
+  
 export async function createPrestamo(data) {
+    // Validar que los datos requeridos estén presentes
+    if (!data.rut || !data.codigosBarras || !data.diasPrestamo) {
+        throw new Error("Faltan datos requeridos para crear el préstamo.");
+    }
+
     try {
-        const response = await axios.post('/prestamos/cerrar', data);
-        return response.data;
+        const response = await axios.post('/prestamos/', data); // Ruta al backend
+        return response.data; // Respuesta del backend
     } catch (error) {
-        return error.response.data;
+        if (error.response) {
+            // Errores enviados desde el backend
+            console.error("Error del servidor:", error.response.data);
+            return error.response.data;
+        } else {
+            // Errores de red u otros problemas
+            console.error("Error de red:", error.message);
+            throw new Error("No se pudo conectar con el servidor.");
+        }
     }
 }
+
+
 
 
 
