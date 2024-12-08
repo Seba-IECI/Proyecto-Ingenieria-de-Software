@@ -1,6 +1,7 @@
 import { useState } from "react";
 import useValidarAlumno from "@hooks/asistencias/useValidarAlumno";
 import ObtenerAsistenciaPopup from "@components/ObtenerAsistenciaPopup";
+import BuscarEntreFechasPopup from "@components/BuscarEntreFechasPopup";
 import "@styles/asistencias.css";
 
 const Asistencias = () => {
@@ -18,14 +19,12 @@ const Asistencias = () => {
         }
         validarAlumno(alumnoId.trim());
     };
-
     const resetSearchState = () => {
         setAlumnoId("");
         resetValidation();
         setShowBuscarId(false);
         setShowBuscarFechas(false);
     };
-
     const toggleSection = (sectionName) => {
         if (section === sectionName) {
             setSection(null);
@@ -51,7 +50,6 @@ const Asistencias = () => {
                     Mostrar asistencia general
                 </button>
             </div>
-
             {section === "buscarAlumno" && (
                 <div className="asistencias-section">
                     <h2>Buscar por Alumno</h2>
@@ -84,19 +82,17 @@ const Asistencias = () => {
                     )}
                 </div>
             )}
-
             {showBuscarId && (
                 <ObtenerAsistenciaPopup
                     alumnoId={alumnoId}
                     onClose={() => setShowBuscarId(false)}
                 />
             )}
-
             {showBuscarFechas && (
-                <div className="buscar-fechas">
-                    <p>Componente para buscar entre fechas (en desarrollo).</p>
-                    <button onClick={() => setShowBuscarFechas(false)}>Cerrar</button>
-                </div>
+                <BuscarEntreFechasPopup
+                    alumnoId={alumnoId}
+                    onClose={() => setShowBuscarFechas(false)}
+                />
             )}
 
             {section === "mostrarGeneral" && (

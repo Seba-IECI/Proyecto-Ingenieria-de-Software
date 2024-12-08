@@ -2,11 +2,6 @@ import axios from './root.service.js';
 
 export async function listarAsistencias({ semestreId, alumnoId, startDate, endDate }) {
     const profesorId = JSON.parse(sessionStorage.getItem('usuario'))?.id;
-
-    if (!profesorId) {
-        throw new Error("El profesorId es obligatorio para listar asistencias.");
-    }
-
     try {
         const response = await axios.get('/asistencia/listar', {
             params: { semestreId, alumnoId, startDate, endDate, profesorId },

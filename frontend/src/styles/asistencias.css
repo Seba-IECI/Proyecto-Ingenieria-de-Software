@@ -10,6 +10,125 @@
     margin-top: 20px;
 }
 
+.asistencias-resultados {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 10px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.asistencia-item {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #fdfdfd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.asistencias-resultados {
+    max-height: 250px;
+    overflow-y: auto;
+    margin-top: 1rem;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #e3e3e3;
+}
+
+.popup-content-small {
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    cursor: default;
+}
+
+.asistencias-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 15px;
+    padding: 10px 0;
+    border-top: 1px solid #ddd;
+}
+
+.asistencias-pagination button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    background-color: #ffc107;
+    color: #fff;
+    cursor: pointer;
+}
+
+.asistencias-pagination button:disabled {
+    background-color: #ddd;
+    cursor: not-allowed;
+}
+
+.asistencias-pagination-options {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+.asistencias-pagination-options label {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.asistencias-pagination-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.asistencias-pagination-controls button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    background-color: #ffc107;
+    color: #fff;
+    cursor: pointer;
+}
+
+.asistencias-pagination-controls button:disabled {
+    background-color: #ddd;
+    cursor: not-allowed;
+}
+
+.asistencias-pagination-controls button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    background-color: #ffc107;
+    color: #fff;
+    cursor: pointer;
+}
+
+.asistencias-pagination-controls button:disabled {
+    background-color: #ddd;
+    cursor: not-allowed;
+}
+.asistencias-pagination-controls select {
+    padding: 0.5rem;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+}
+
 .asistencias-buttons {
     display: flex;
     justify-content: center;
@@ -100,6 +219,21 @@
     transform: scale(1.05);
 }
 
+.popup-inputs label {
+    display: block;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.popup-inputs input {
+    margin-top: 5px;
+    padding: 10px;
+    width: 90%;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 .popup-container {
     position: fixed;
     top: 0;
@@ -115,23 +249,19 @@
 }
 
 .popup-content {
-    background-color: white;
-    padding: 30px;
-    border-radius: 12px;
-    text-align: center;
-    max-width: 500px;
-    width: 100%;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    cursor: default;
+    max-width: 450px;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 16px;
 }
 
-.popup-content input {
-    margin-bottom: 15px;
-    padding: 12px;
-    width: 85%;
+.popup-inputs input {
+    margin-top: 5px;
+    padding: 10px;
+    width: 90%;
     border: 1px solid #ddd;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #f7f7f7;
 }
 
 .popup-content button {
