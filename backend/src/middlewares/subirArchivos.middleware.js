@@ -3,6 +3,9 @@ import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 import { AppDataSource } from "../config/configDb.js";
 import DocumentosPractica from "../entity/documentosPractica.entity.js";
+import PeriodoPractica from "../entity/periodoPractica.entity.js";
+import { LessThanOrEqual, MoreThanOrEqual } from "typeorm";
+
 
 const uploadDir = "./src/upload/";
 
@@ -34,6 +37,31 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
+const verificarPeriodoActivo = async (req, res, next) => {
+    try {
+        const periodoRepository = AppDataSource.getRepository(PeriodoPractica);
+        const fechaActual = new Date();
+
+        const periodoActivo = await periodoRepository.findOne({
+            where: {
+                habilitado: true,
+                fechaInicio: LessThanOrEqual(fechaActual),
+                fechaFin: MoreThanOrEqual(fechaActual),
+            },
+        });
+
+        if (!periodoActivo) {
+            return res.status(403).json({ message: "No se puede realizar esta acción fuera del período habilitado." });
+        }
+
+        req.periodoPracticaId = periodoActivo.id;
+        next();
+    } catch (error) {
+        console.error("Error al verificar período activo:", error);
+        return res.status(500).json({ message: "Error al verificar período activo." });
+    }
+};
+
 const verificarDocumentoMiddleware = async (req, res, next) => {
     const documentoId = req.params.id;
     const user = req.user;
@@ -43,7 +71,7 @@ const verificarDocumentoMiddleware = async (req, res, next) => {
         const documento = await documentoRepository.findOne({
             where: [
                 { id: documentoId, alumnoId: user.id },
-                { id: documentoId, profesorId: user.id }
+                { id: documentoId, encargadoPracticasId: user.id }
             ]
         });
         if (!documento) {
@@ -60,7 +88,7 @@ const handleFileUpload = (req, res, next) => {
     const upload = multer({
         storage: storage,
         limits: { fileSize: 5 * 1024 * 1024 },
-        fileFilter: fileFilter
+        fileFilter: fileFilter,
     }).single("archivo");
     upload(req, res, function (err) {
         if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
@@ -75,17 +103,38 @@ const handleFileUpload = (req, res, next) => {
         }
         if (req.file) {
             req.file.path = `${req.protocol}://${req.get("host")}/${req.file.path.replace(/\\/g, "/")}`;
+            req.file.originalname = req.file.originalname;
+            req.originalname = req.file.originalname;
+            console.log("Nombre original del archivo en middleware:", req.originalname);
+            console.log("URL generada en el backend:", req.file.path);
         }
-        console.log("Archivo subido:", req.file.path);
+
         next();
     });
 };
+
 
 const uploadMiddleware = async (req, res, next) => {
     if (req.method === "PUT" && req.path.includes("modificarDocumento")) {
         await verificarDocumentoMiddleware(req, res, async (err) => {
             if (err) return res.status(400).json({ message: "Error en la verificación del documento" });
-            handleFileUpload(req, res, next);
+            await verificarPeriodoActivo(req, res, (err) => {
+                if (err) return res.status(403).json({ message: err.message });
+                handleFileUpload(req, res, next);
+            });
+        });
+    } else if (
+        (req.method === "POST" && req.path.includes("subirDocumento"))
+        || req.method === "DELETE" && req.path.includes("eliminarDocumento")
+    ) {
+        await verificarPeriodoActivo(req, res, (err) => {
+            if (err) return res.status(403).json(
+                { message: "No se puede realizar esta acción fuera del período habilitado" });
+            if (req.method === "POST") {
+                handleFileUpload(req, res, next);
+            } else {
+                next();
+            }
         });
     } else {
         handleFileUpload(req, res, next);

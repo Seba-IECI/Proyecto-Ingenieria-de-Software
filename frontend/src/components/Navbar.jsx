@@ -13,7 +13,7 @@ const Navbar = () => {
     const logoutSubmit = () => {
         try {
             logout();
-            navigate('/auth'); 
+            navigate('/auth');
         } catch (error) {
             console.error('Error al cerrar sesión:', error);
         }
@@ -59,18 +59,72 @@ const Navbar = () => {
                         </NavLink>
                     </li>
                     {userRole === 'administrador' && (
+                        <>
+                            <li>
+                                <NavLink
+                                    to="/users" 
+                                    onClick={() => { 
+                                        setMenuOpen(false); 
+                                        addActiveClass();
+                                    }}
+                                    activeClassName="active"
+                                >
+                                    Usuarios
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink
+                                    to="/inventarios"
+                                    onClick={() => {
+                                        setMenuOpen(false);
+                                        addActiveClass();
+                                    }}
+                                    activeClassName="active"
+                                >
+                                    Inventarios
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink
+                                    to="/semestres"
+                                    onClick={() => {
+                                        setMenuOpen(false);
+                                        addActiveClass();
+                                    }}
+                                    activeClassName="active"
+                                >
+                                    Semestres
+                                </NavLink>
+                            </li>
+                        </>
+                    )}
+                    {userRole === 'profesor' && (
                     <li>
                         <NavLink 
-                            to="/users" 
+                            to="/inventario" 
                             onClick={() => { 
                                 setMenuOpen(false); 
                                 addActiveClass();
                             }} 
                             activeClassName="active"
                         >
-                            Usuarios
+                            Inventario
                         </NavLink>
                     </li>
+                    )}
+                    {(userRole === 'usuario' || userRole === 'encargadoPracticas') && (
+                        <li>
+                            <NavLink
+                                to="/documentos"
+                                onClick={() => {
+                                    setMenuOpen(false);
+                                    addActiveClass();
+                                }}
+                                activeClassName="active"
+                            >
+                                Documentos
+                            </NavLink>
+                        </li>
                     )}
                     <li>
                         <NavLink 

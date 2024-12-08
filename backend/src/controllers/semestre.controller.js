@@ -68,7 +68,6 @@ export async function obtenerSemestrePorId(req, res) {
     }
 }
 
-
 export async function actualizarSemestre(req, res) {
     try {
         const user = req.user;
@@ -96,7 +95,6 @@ export async function actualizarSemestre(req, res) {
         handleErrorServer(res, 500, "Error al actualizar el semestre.");
     }
 }
-
 
 export async function eliminarSemestre(req, res) {
     try {

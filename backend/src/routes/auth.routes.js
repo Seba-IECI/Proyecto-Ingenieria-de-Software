@@ -8,6 +8,7 @@ router
   .post("/login", login)
   .post("/register", register)
   .post("/logout", logout)
-  .put("/update", update)
+  .put("/update", update);
+
 
 export default router;

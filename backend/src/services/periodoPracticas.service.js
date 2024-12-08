@@ -18,7 +18,6 @@ export async function habilitarPeriodoPractica(fechaInicio, fechaFin, user) {
         fechaFin,
         habilitado: true,
     });
-
     await periodoRepository.save(nuevoPeriodo);
     return [nuevoPeriodo, null];
 }

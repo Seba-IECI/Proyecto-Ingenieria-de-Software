@@ -6,6 +6,12 @@ export async function crearTareaService(query){
     try{
         const { titulo, descripcion, fecha_entrega } = query;
         const tareaRepository = AppDataSource.getRepository(Tarea);
+
+        const tareaExistente = await tareaRepository.findOne({ where: { titulo } });
+        if (tareaExistente) {
+            return [null, "Ya existe una tarea con ese título"];
+        }
+    
         const nuevaTarea = tareaRepository.create({
             titulo,
             descripcion,
@@ -72,9 +78,9 @@ export async function getTareaService(query){
     }
 }
 
-export async function updateTareaService(query){
+export async function updateTareaService(query,body){
     try{
-        const { id, titulo, descripcion, fecha_entrega } = query;
+        const { id } = query;
         const tareaRepository = AppDataSource.getRepository(Tarea);
         const tareaFound = await tareaRepository.findOne({
             where: [{ id: id }],
@@ -82,15 +88,30 @@ export async function updateTareaService(query){
 
         if(!tareaFound) return [null, "Tarea no encontrada"];
 
-        await tareaRepository.update(id, {
-            titulo,
-            descripcion,
-            fecha_entrega,
-        });
-
-        return [await tareaRepository.findOne({ id }), null];
+        await tareaRepository.update(id, body);
+        return [await tareaRepository.findOne({ where: { id: id } }), null];
     } catch (error){
         console.error("Error al actualizar la tarea:", error);
         return [null, "Error interno del servidor"];
     }
+        
+}
+
+export async function deleteTareaService(query){
+    try{
+        const { id } = query;
+        const tareaRepository = AppDataSource.getRepository(Tarea);
+        const tareaFound = await tareaRepository.findOne({
+            where: [{ id: id }],
+        });
+
+        if(!tareaFound) return [null, "Tarea no encontrada"];
+
+        await tareaRepository.delete(id);
+        return [tareaFound, null];
+
+    } catch (error){
+        console.error("Error al eliminar la tarea:", error);
+        return [null, "Error interno del servidor"];
+    }   
 }

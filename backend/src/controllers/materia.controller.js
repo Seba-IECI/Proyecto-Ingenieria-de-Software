@@ -11,10 +11,16 @@ import {
     handleSuccess,
     } from "../handlers/responseHandlers.js";
 
+import { materiaQueryValidation } from "../validations/materia.validations.js";
+
     export async function subirMateria(req, res) {
     try {
-        
+
         const { titulo, descripcion, url } = req.body;
+
+        const { error: queryError } = materiaQueryValidation.validate(req.body);
+
+        if (queryError) return handleErrorClient(res, 400, queryError.message);
 
         
         const [material, errorMaterial] = await subirMaterialService({ titulo, descripcion, url });

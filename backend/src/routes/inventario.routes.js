@@ -6,11 +6,12 @@ import {
   deleteItemController,
   getInventarioByIdController,
   getInventariosController ,
+  getInventarioWithItemsController,
   getItemController,
- updateInventarioController
+  updateInventarioController
 } from "../controllers/inventario.controller.js";
 import { authenticateJwt } from "../middlewares/authentication.middleware.js";
-import { isAdmin ,isInventario } from "../middlewares/authorization.middleware.js";
+import { isAdmin ,isProfesor } from "../middlewares/authorization.middleware.js";
 
 const router = Router();
 router
@@ -19,21 +20,23 @@ router
 
 
 
-router.post("/",isInventario,createInventarioController);
+router.post("/",isAdmin,createInventarioController);//solo admin
 
-router.get("/",isInventario,getInventarioByIdController); 
+router.get("/:id",getInventarioByIdController); //usuario
 
-router.get("/names",isInventario,getInventariosController);
-router.put("/update/:id",isInventario,updateInventarioController);
+router.get("/names",getInventariosController);//inventario o admin
+router.patch("/update/:id",isAdmin,updateInventarioController); //admin
 
-router.delete("/borrar/:id",isInventario, deleteInventarioController);
+router.delete("/borrar/:id",isAdmin, deleteInventarioController); //amdin
 
-router.post("/add-item",isInventario, addItemController);
+router.post("/add-item",isProfesor, addItemController);///inventario y pedir user.permiso
 
 
 router.get("/item/", getItemController); 
 
-router.delete("/item/",isInventario,deleteItemController);
+router.delete("/item/",isProfesor,deleteItemController);//inventario y pedir user.permiso
+
+router.get("/full/:id",getInventarioWithItemsController); //usuario
 
 export default router;
 

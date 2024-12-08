@@ -129,17 +129,8 @@ export async function listarAsistenciasService(semestreId, alumnoId, startDate, 
     }
 }
 
-
-
-
-
-
-export async function obtenerAsistenciaPorIdService(id, user) {
+export async function obtenerAsistenciaPorIdService(id) {
     try {
-        if (!id || isNaN(id)) {
-            return [null, "ID de asistencia no válido"];
-        }
-
         const asistenciaRepository = AppDataSource.getRepository(AsistenciaSchema);
 
         const asistencia = await asistenciaRepository.findOne({
@@ -149,14 +140,6 @@ export async function obtenerAsistenciaPorIdService(id, user) {
 
         if (!asistencia) {
             return [null, "Asistencia no encontrada"];
-        }
-
-        const fechaAsistencia = new Date(asistencia.fecha);
-        const fechaInicioSemestre = new Date(asistencia.semestre.fechaInicio);
-        const fechaFinSemestre = new Date(asistencia.semestre.fechaFin);
-
-        if (fechaAsistencia < fechaInicioSemestre || fechaAsistencia > fechaFinSemestre) {
-            return [null, "La fecha de la asistencia está fuera del rango del semestre"];
         }
 
         const cleanedAsistencia = {
@@ -193,17 +176,31 @@ export async function obtenerAsistenciaPorIdService(id, user) {
     }
 }
 
-
 export async function calcularPorcentajeAsistenciaService(alumnoId, semestreId) {
     try {
         const asistenciaRepository = AppDataSource.getRepository(AsistenciaSchema);
+        const semestreRepository = AppDataSource.getRepository(SemestreSchema);
+        const userRepository = AppDataSource.getRepository(User);
 
-        if (!alumnoId || !semestreId) {
-            return [null, "El alumnoId y semestreId son obligatorios"];
+        const alumno = await userRepository.findOneBy({ id: alumnoId });
+        if (!alumno || alumno.rol !== "usuario") {
+            return [null, "El alumno no existe o no tiene el rol correcto"];
+        }
+
+        const semestre = await semestreRepository.findOneBy({ id: semestreId });
+        if (!semestre) {
+            return [null, "El semestre no existe"];
+        }
+
+        if (!semestre.estado) {
+            return [null, "El semestre no está activo"];
         }
 
         const asistencias = await asistenciaRepository.find({
-            where: { alumno: { id: alumnoId }, semestre: { id: semestreId } },
+            where: {
+                alumno: { id: alumnoId },
+                semestre: { id: semestreId },
+            },
         });
 
         if (!asistencias.length) {
@@ -219,5 +216,54 @@ export async function calcularPorcentajeAsistenciaService(alumnoId, semestreId) 
     } catch (error) {
         console.error("Error en calcularPorcentajeAsistenciaService:", error);
         return [null, "Error al calcular el porcentaje de asistencia"];
+    }
+}
+
+export async function actualizarAsistenciaService(id, presente) {
+    try {
+        const asistenciaRepository = AppDataSource.getRepository(AsistenciaSchema);
+        if (typeof presente !== "boolean") {
+            return [null, "El valor de 'presente' debe ser booleano"];
+        }
+
+        const asistencia = await asistenciaRepository.findOne({
+            where: { id },
+            relations: ["alumno", "semestre", "profesor"],
+        });
+
+        if (!asistencia) {
+            return [null, "Asistencia no encontrada"];
+        }
+
+        if (asistencia.presente === presente) {
+            return [null, "No se realizaron cambios, el estado ya es el mismo"];
+        }
+
+        asistencia.presente = presente;
+        await asistenciaRepository.save(asistencia);
+
+        const updatedAsistencia = {
+            id: asistencia.id,
+            fecha: asistencia.fecha,
+            presente: asistencia.presente,
+            alumno: {
+                id: asistencia.alumno.id,
+                nombreCompleto: asistencia.alumno.nombreCompleto,
+                email: asistencia.alumno.email,
+            },
+            semestre: {
+                id: asistencia.semestre.id,
+                nombre: asistencia.semestre.nombre,
+            },
+            profesor: {
+                id: asistencia.profesor.id,
+                nombreCompleto: asistencia.profesor.nombreCompleto,
+            },
+        };
+
+        return [updatedAsistencia, null];
+    } catch (error) {
+        console.error("Error en actualizarAsistenciaService:", error);
+        return [null, "Error al actualizar la asistencia"];
     }
 }

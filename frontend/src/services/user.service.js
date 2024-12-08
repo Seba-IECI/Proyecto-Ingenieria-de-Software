@@ -30,3 +30,30 @@ export async function deleteUser(rut) {
         return error.response.data;
     }
 }
+
+export async function getLoggedUser() {
+    try {
+        const response = await axios.get(`user/me/`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`, // Token JWT
+            },
+        });
+
+        console.log("Respuesta completa del backend:", response.data);
+
+        // Verifica si 'data' contiene el objeto usuario esperado
+        const user = response.data.data;
+
+        if (!user || !user.rut) {
+            throw new Error("El usuario logueado no tiene un RUT asociado.");
+        }
+
+        // Guarda el usuario completo en localStorage si es necesario
+        localStorage.setItem('loggedUser', JSON.stringify(user));
+
+        return user; // Devuelve el objeto usuario completo
+    } catch (error) {
+        console.error("Error obteniendo los datos del usuario logueado:", error);
+        throw error;
+    }
+}
