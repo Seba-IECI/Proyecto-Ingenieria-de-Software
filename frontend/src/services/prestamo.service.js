@@ -25,21 +25,21 @@ export async function cerrarPrestamo(id) {
   
   
 export async function createPrestamo(data) {
-    // Validar que los datos requeridos estén presentes
+    
     if (!data.rut || !data.codigosBarras || !data.diasPrestamo) {
         throw new Error("Faltan datos requeridos para crear el préstamo.");
     }
 
     try {
-        const response = await axios.post('/prestamos/', data); // Ruta al backend
-        return response.data; // Respuesta del backend
+        const response = await axios.post('/prestamos/', data);
+        return response.data; 
     } catch (error) {
         if (error.response) {
-            // Errores enviados desde el backend
+            
             console.error("Error del servidor:", error.response.data);
             return error.response.data;
         } else {
-            // Errores de red u otros problemas
+            
             console.error("Error de red:", error.message);
             throw new Error("No se pudo conectar con el servidor.");
         }

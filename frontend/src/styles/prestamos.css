@@ -104,9 +104,9 @@
 }
 
 .popup-overlay {
-  position: fixed; /* Usa 'fixed' para centrarlo respecto a la pantalla */
-  width: 100vw; /* Asegúrate de que ocupe todo el ancho de la ventana */
-  height: 100vh; /* Asegúrate de que ocupe toda la altura */
+  position: fixed; 
+  width: 100vw;
+  height: 100vh; 
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
@@ -117,13 +117,13 @@
 
 .popup-content {
   background: white;
-  width: 90%; /* Usa un porcentaje más alto si quieres que ocupe más espacio */
-  max-width: 900px; /* Define un ancho máximo en píxeles */
-  max-height: 80%; /* Ajusta el alto máximo */
+  width: 90%; 
+  max-width: 900px; 
+  max-height: 80%; 
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
-  overflow-y: auto; /* Activa el scroll vertical si el contenido supera el tamaño */
+  overflow-y: auto; 
 }
 
 
@@ -156,12 +156,12 @@
 }
 
 .popup-close-button {
-  position: sticky; /* Para posicionarlo en un lugar específico */
-  top: 10px; /* Ajusta la distancia desde la parte superior */
-  left: 750px; /* Ajusta la distancia desde la izquierda */
-  background: #007bff; /* Color del botón */
+  position: sticky; 
+  top: 10px; 
+  left: 750px; 
+  background: #007bff;
   color: white;
-  width: 75px; /* Ajusta el ancho del botón */
+  width: 75px; 
   border: none;
   padding: 8px 16px;
   border-radius: 4px;

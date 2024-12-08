@@ -16,13 +16,11 @@ import {
     try {
       
       const [inventarios, error] = await getInventariosService();
-  
-      
+   
       if (error) {
         return res.status(404).json({ message: error });
       }
   
-      
       return res.status(200).json(inventarios);
     } catch (error) {
       console.error("Error en el controlador al obtener nombres y conteo de items:", error);
@@ -46,8 +44,6 @@ import {
     }
   }
   
-    
-  
   export async function getInventarioByIdController(req, res) {
     try {
       const { id, nombre } = req.query; 
@@ -70,9 +66,6 @@ import {
     }
   }
   
-  
-  
- 
   export async function updateInventarioController(req, res) {
     try {
       const { id } = req.params;
@@ -144,10 +137,6 @@ export async function getItemController(req, res) {
   }
 }
 
-
-
-
-
 export async function deleteItemController(req, res) {
   try {
     
@@ -191,9 +180,6 @@ export async function updateItemController(req, res) {
     return res.status(500).json({ message: "Error interno del servidor" });
   }
 }
-
-
-
 
 export async function getInventarioWithItemsController(req, res) {
   try {

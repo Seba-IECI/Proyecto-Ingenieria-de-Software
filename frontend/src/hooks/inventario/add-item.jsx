@@ -113,7 +113,7 @@ if (selectedItem) {
   setItemData({
     nombre: selectedItem.nombre,
     descripcion: selectedItem.descripcion || "",
-    categoria: selectedItem.categoria || "Sin Categoría", // Valor predeterminado si está vacío
+    categoria: selectedItem.categoria || "Sin Categoría", 
     cBarras: "",
   });
 } else {

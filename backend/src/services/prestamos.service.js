@@ -42,7 +42,7 @@ export async function createPrestamoService(data) {
       return [null, "El usuario ya tiene un préstamo activo y no puede solicitar otro"];
     }
 
-    // Validar y obtener las entidades de códigos de barras
+    
     const itemsAsociados = [];
     const codigosBarrasEntities = [];
 
@@ -90,7 +90,6 @@ export async function createPrestamoService(data) {
       codigosAsociados: JSON.stringify(codigosBarras),
     });
 
-    // Marcar los códigos de barras como no disponibles y disminuir la cantidad de ítems
     for (const codigoBarrasEntity of codigosBarrasEntities) {
       codigoBarrasEntity.disponible = false;
       codigoBarrasEntity.prestamo = nuevoPrestamo;
@@ -124,9 +123,6 @@ export async function createPrestamoService(data) {
 }
 
 
-
-
-
 export async function getPrestamoInterno(query) {
   try {
     const { id, cBarras, rut } = query;
@@ -150,8 +146,6 @@ export async function getPrestamoInterno(query) {
 
     const prestamo = await qb.getOne();
 
-    
-
     if (!prestamo) {
       return [null, "Préstamo no encontrado"];
     }
@@ -173,7 +167,7 @@ export async function getPrestamoService(query) {
       .createQueryBuilder("prestamo")
       .leftJoinAndSelect("prestamo.usuario", "usuario")
       .leftJoinAndSelect("prestamo.codigosBarras", "codigosBarras")
-      .leftJoinAndSelect("codigosBarras.item", "item"); // Cargar la relación con los ítems a través de los códigos de barras
+      .leftJoinAndSelect("codigosBarras.item", "item"); 
 
     if (id) {
       qb.andWhere("prestamo.id = :id", { id });
@@ -233,13 +227,6 @@ export async function getPrestamoService(query) {
   }
 }
 
-
-
-
-
-
-
-
 export async function getPrestamosPorEstadoService(estado) {
   try {
     const prestamoRepository = AppDataSource.getRepository(Prestamos);
@@ -274,9 +261,6 @@ export async function getPrestamosPorEstadoService(estado) {
 }
 
 
-
-
-
 /*export async function updatePrestamoService(id, nuevoEstado) {
   try {
     const prestamoRepository = AppDataSource.getRepository(Prestamos);
@@ -300,10 +284,10 @@ export async function cerrarPrestamoService(id) {
     const codigoBarrasRepository = AppDataSource.getRepository(CodigoBarras);
     const itemRepository = AppDataSource.getRepository(Item);
 
-    // Buscar el préstamo junto con los códigos de barras relacionados
+    
     const prestamo = await prestamoRepository.findOne({
       where: { id },
-      relations: ["codigosBarras", "codigosBarras.item"], // Asegúrate de cargar correctamente las relaciones necesarias
+      relations: ["codigosBarras", "codigosBarras.item"], 
     });
     console.log("Prestamo encontrado:", prestamo);  
     console.log("codigos de prestamo:", prestamo.codigosAsociados);
@@ -331,22 +315,19 @@ export async function cerrarPrestamoService(id) {
       }
     };
 
-    // Marcar todos los códigos asociados como disponibles
     await marcarCodigosComoDisponibles(prestamo.codigosAsociados);
 
-
-    // Marcar el préstamo como cerrado
     prestamo.estado = 0;
     prestamo.fechaDevolucion = new Date();
 
 
     const aumentarCantidadItems = async (codigosAsociados) => {
-      const codigosBarras = JSON.parse(codigosAsociados); // Convierte la cadena JSON en un arreglo
+      const codigosBarras = JSON.parse(codigosAsociados); 
       for (const codigoValor of codigosBarras) {
-        // Busca el código de barras en la base de datos con su relación con Item
+        
         const codigoBarrasEntity = await codigoBarrasRepository.findOne({
           where: { codigo: codigoValor },
-          relations: ["item"], // Asegúrate de cargar la relación con Item
+          relations: ["item"], 
         });
     
         if (!codigoBarrasEntity || !codigoBarrasEntity.item) {
@@ -354,22 +335,15 @@ export async function cerrarPrestamoService(id) {
           continue;
         }
     
-        // Aumenta la cantidad del ítem asociado
         const item = codigoBarrasEntity.item;
         item.cantidad += 1;
     
-        // Guarda los cambios en el ítem
         await itemRepository.save(item);
         console.log(`Cantidad de ítems actualizada: ${item.nombre}`);
       }
     };
-    
-    // Aumentar la cantidad de ítems
     await aumentarCantidadItems(prestamo.codigosAsociados);
 
-    
-
-    // Guardar los cambios en el préstamo
     await prestamoRepository.save(prestamo);
 
     return [prestamo, null];

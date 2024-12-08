@@ -133,7 +133,6 @@ export default function Prestamos() {
 
       {error && <p className="error">{error}</p>}
 
-      {/* Crear Préstamo */}
       <div className="crear-prestamo">
         <h2>Crear Préstamo</h2>
         <form onSubmit={(e) => e.preventDefault()}>
@@ -189,14 +188,12 @@ export default function Prestamos() {
         </form>
       </div>
 
-      {/* Botones para abrir los popups */}
-      <div className="popup-buttons">
+        <div className="popup-buttons">
         <button onClick={() => setPopupActivos(true)}>Ver Préstamos Activos</button>
         <button onClick={() => setPopupCerrados(true)}>Ver Préstamos Cerrados</button>
       </div>
 
-      {/* Popup de Préstamos Activos */}
-      
+          
       {popupActivos && (
         <div className="popup-overlay">
           <div className="popup-content">
@@ -248,8 +245,6 @@ export default function Prestamos() {
         </div>
       )}
       
-
-      {/* Popup de Préstamos Cerrados */}
       
       {popupCerrados && (
         <div className="popup-overlay">

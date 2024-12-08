@@ -16,9 +16,6 @@ export async function getItemService(query) {
     if (cBarras) whereCondition.cBarras = cBarras;
     if (nombre) whereCondition.nombre = nombre;
 
-    console.log("Condición de búsqueda:", whereCondition); 
-
-   
     const itemFound = await itemRepository.findOne({
       where: whereCondition,
       relations: ["codigosBarras"], 
@@ -42,7 +39,6 @@ export async function createInventarioService(body) {
 
     const { nombre, descripcion, encargadoRut } = body;
 
-    
     const duplicateInventario = await inventarioRepository.findOne({
       where: { nombre },
     });
@@ -62,9 +58,7 @@ export async function createInventarioService(body) {
     if (!encargadoRut || typeof encargadoRut !== "string" || encargadoRut.length > 20) {
       return [null, "RUT del encargado no válido"];
     }
-    
-
-    
+   
     const nuevoInventario = inventarioRepository.create({
       nombre,
       descripcion,
@@ -98,20 +92,19 @@ export async function getInventarioByIdService(query, user) {
     const { id, nombre } = query;
     const inventarioRepository = AppDataSource.getRepository(Inventario);
 
-    // Construir las condiciones base
     const whereCondition = {};
     if (id) whereCondition.id = id;
     if (nombre) whereCondition.nombre = nombre;
 
-    // Si el usuario no es administrador, añadir la condición de filtrado por encargado
+    
     if (user?.rol !== "administrador") {
       whereCondition.encargado = user.rut;
     }
 
-    // Realizar la consulta con las condiciones aplicadas
+    
     const inventario = await inventarioRepository
       .createQueryBuilder("inventario")
-      .leftJoin("inventario.items", "item") // Join con la tabla items
+      .leftJoin("inventario.items", "item") 
       .select([
         "inventario.id AS id",
         "inventario.nombre AS nombre",
@@ -119,12 +112,12 @@ export async function getInventarioByIdService(query, user) {
         "COUNT(item.id) AS itemCount",
         "inventario.encargado AS encargado",
       ])
-      .where(whereCondition) // Filtrar por las condiciones definidas
+      .where(whereCondition) 
       .groupBy("inventario.id")
       .addGroupBy("inventario.nombre")
       .addGroupBy("inventario.descripcion")
       .addGroupBy("inventario.encargado")
-      .getRawMany(); // Obtener resultados como objetos planos
+      .getRawMany(); 
 
     if (!inventario || inventario.length === 0) return [null, "Inventario no encontrado"];
 
@@ -135,8 +128,6 @@ export async function getInventarioByIdService(query, user) {
   }
 }
 
-
-
 export async function updateItemService(query, body, user) {
   try {
     const { id, cBarras, descripcion } = query;
@@ -146,7 +137,6 @@ export async function updateItemService(query, body, user) {
       return [null, `No tienes permiso para modificar este ítem en el inventario: ${inventario.nombre}`];
     }
 
-    
     const itemFound = await itemRepository.findOne({
       where: [{ id }, { cBarras }, { descripcion }],
     });
@@ -162,7 +152,6 @@ export async function updateItemService(query, body, user) {
       return [null, "Ya existe un artículo con el mismo código de barras"];
     }
 
-   
     const dataItemUpdate = {
       descripcion: body.descripcion,
       categoria: body.categoria,
@@ -187,7 +176,6 @@ export async function addItemService(data, user) {
   try {
     const { nombre, descripcion, categoria, cBarras, inventario } = data;
 
-    // Validar que todos los datos requeridos estén presentes
     if (!nombre || !descripcion || !categoria || !cBarras || !inventario) {
       return [null, "Todos los campos son obligatorios: nombre, descripcion, categoria, código de barras, inventario"];
     }
@@ -198,20 +186,17 @@ export async function addItemService(data, user) {
 
     console.log("Datos recibidos para añadir un artículo:", data);
 
-    // Busca el inventario por nombre
     const inventarioactual = await inventarioRepository.findOne({ where: { nombre: inventario } });
     if (!inventarioactual) {
       return [null, "Inventario no encontrado"];
     }
 
-    // Verifica permisos del usuario
     if (!user || !user.permisos.includes(inventarioactual.nombre)) {
       return [null, `No tienes permiso para realizar esta acción en el inventario: ${inventario}`];
     }
 
     const nombreNormalizado = nombre.toLowerCase();
 
-    // Busca el ítem existente por nombre e inventario
     const item = await itemRepository.findOne({
       where: { nombre: nombreNormalizado, inventario: { id: inventarioactual.id } },
       relations: ["codigosBarras"],
@@ -224,7 +209,7 @@ export async function addItemService(data, user) {
     console.log("Ítem cargado:", item);
 
     if (item) {
-      // Si el ítem ya existe, verifica el código de barras
+      
       const codigoExistente = item.codigosBarras.find((cb) => cb.codigo === cBarras);
       if (codigoExistente) {
         return [null, "El código de barras ya está asociado a este artículo"];
@@ -235,31 +220,27 @@ export async function addItemService(data, user) {
         item: { id: item.id },
       });
       
-      // Crear y asociar el nuevo código de barras al ítem existente
+      
       const nuevoCodigoBarras = codigoBarrasRepository.create({
         codigo: cBarras,
-        item: { id: item.id }, // Pasando solo el ID del ítem
+        item: { id: item.id }, 
       });
       
-      // Guarda el código de barras con la relación correcta
+      
       await codigoBarrasRepository.save(nuevoCodigoBarras);
       
 
       console.log("Datos del nuevo código de barras:", {
         codigo: cBarras,
-        itemId: item.id, // Asegúrate de que el ID del ítem esté presente
+        itemId: item.id, 
       });
-      
-      
-      
-
-      // Incrementa la cantidad del ítem
+     
       item.cantidad += 1;
       await itemRepository.save(item);
 
       return [item, `Artículo actualizado correctamente. Se añadió el código de barras: ${cBarras}`];
     } else {
-      // Si el ítem no existe, crea uno nuevo con el código de barras
+      
       item = itemRepository.create({
         nombre: nombreNormalizado,
         descripcion,
@@ -267,7 +248,7 @@ export async function addItemService(data, user) {
         estado: 0,
         cantidad: 1,
         inventario: inventarioactual,
-        codigosBarras: [{ codigo: cBarras }], // Crea y asocia el código de barras
+        codigosBarras: [{ codigo: cBarras }], 
       });
 
       await itemRepository.save(item);
@@ -280,18 +261,12 @@ export async function addItemService(data, user) {
   }
 }
 
-
-
-
 export async function deleteItemService(query,user) {
   try {
     const { cBarras } = query;
     const itemRepository = AppDataSource.getRepository(Item);
     const codigoBarrasRepository = AppDataSource.getRepository(CodigoBarras);
-
-    
-
-    
+ 
     const codigoBarras = await codigoBarrasRepository.findOne({
       where: { codigo: cBarras },
       relations: ["item", "item.inventario"],
@@ -308,10 +283,8 @@ export async function deleteItemService(query,user) {
       return [null, `No tienes permiso para realizar esta acción en el inventario: ${inventario.nombre}`];
     }
 
-    
     await codigoBarrasRepository.remove(codigoBarras);
 
-    
     if (item.cantidad > 0) {
       item.cantidad -= 1;
     }
@@ -327,17 +300,10 @@ export async function deleteItemService(query,user) {
 }
 
 
-
-
-
 export async function updateInventarioService(id, data) {
   try {
     const inventarioRepository = AppDataSource.getRepository(Inventario);
 
-    console.log("ID recibido para actualizar:", id); 
-    console.log("Datos recibidos para actualizar:", data); 
-
-    
     const inventario = await inventarioRepository.findOne({ where: { id } });
 
     if (!inventario) {
@@ -413,8 +379,6 @@ export async function getInventariosService() {
     return [null, "Error interno del servidor"];
   }
 }
-
-
 
 export async function getInventarioWithItemsService(query) {
   try {

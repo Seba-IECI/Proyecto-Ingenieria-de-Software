@@ -28,12 +28,12 @@ const PrestamosSchema = new EntitySchema({
       nullable: false,
     },
     codigosAsociados: {
-      type: "text", // Usa "text" para almacenar JSON serializado
+      type: "text", 
       nullable: true,
     },
-    // Nuevo campo: Ítems asociados al préstamo
+    
     itemsAsociados: {
-      type: "text", // Usa "text" para almacenar JSON serializado
+      type: "text", 
       nullable: true,
     },
   },

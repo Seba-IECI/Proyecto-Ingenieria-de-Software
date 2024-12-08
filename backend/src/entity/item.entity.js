@@ -49,16 +49,16 @@ const ItemSchema = new EntitySchema({
   },
 
   relations: {
-    // Relación con la tabla Inventario
+    
     inventario: {
       type: "many-to-one",
       target: "Inventario",
-      joinColumn: true, // Crea la columna de clave foránea en Item
-      nullable: false,  // Asegura que cada Item esté asociado a un Inventario
-      onDelete: "CASCADE", // Elimina el item si el inventario es eliminado
+      joinColumn: true, 
+      nullable: false,  
+      onDelete: "CASCADE", 
     },
 
-    // Relación con la tabla Prestamos
+   
     prestamos: {
       type: "one-to-many",
       target: "Prestamos",
@@ -66,8 +66,8 @@ const ItemSchema = new EntitySchema({
     },
     codigosBarras: {
       type: "one-to-many",
-      target: "CodigoBarras", // Nombre de la entidad de código de barras
-      inverseSide: "item", // Nombre de la relación en la entidad de código de      
+      target: "CodigoBarras", 
+      inverseSide: "item",      
       cascade: true,
       onDelete: "CASCADE",
     },
