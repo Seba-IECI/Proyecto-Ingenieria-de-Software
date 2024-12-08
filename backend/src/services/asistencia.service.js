@@ -67,11 +67,12 @@ export async function registrarAsistenciaService(user, alumnoId, semestreId, fec
     }
 }
 
-export async function listarAsistenciasService(semestreId, alumnoId, startDate, endDate) {
+export async function listarAsistenciasService(semestreId, alumnoId, startDate, endDate, profesorId) {
     try {
         const asistenciaRepository = AppDataSource.getRepository(AsistenciaSchema);
 
-        const whereClause = {};
+        const whereClause = { profesor: { id: profesorId } };
+
         if (semestreId) whereClause.semestre = { id: semestreId };
         if (alumnoId) whereClause.alumno = { id: alumnoId };
 
@@ -129,17 +130,21 @@ export async function listarAsistenciasService(semestreId, alumnoId, startDate, 
     }
 }
 
-export async function obtenerAsistenciaPorIdService(id) {
+export async function obtenerAsistenciaPorIdService(asistenciaId, profesorId, alumnoId = null) {
     try {
-        const asistenciaRepository = AppDataSource.getRepository(AsistenciaSchema);
+        const whereClause = { id: asistenciaId, profesor: { id: profesorId } };
 
-        const asistencia = await asistenciaRepository.findOne({
-            where: { id },
+        if (alumnoId) {
+            whereClause.alumno = { id: alumnoId };
+        }
+
+        const asistencia = await AppDataSource.getRepository(AsistenciaSchema).findOne({
+            where: whereClause,
             relations: ["alumno", "semestre", "profesor"],
         });
 
         if (!asistencia) {
-            return [null, "Asistencia no encontrada"];
+            return [null, "Asistencia no encontrada o no pertenece al alumno/profesor solicitado"];
         }
 
         const cleanedAsistencia = {
@@ -173,6 +178,25 @@ export async function obtenerAsistenciaPorIdService(id) {
     } catch (error) {
         console.error("Error en obtenerAsistenciaPorIdService:", error);
         return [null, "Error al obtener la asistencia"];
+    }
+}
+
+export async function validarAlumnoPorProfesorService(alumnoId, profesorId) {
+    try {
+        const asistenciaRepository = AppDataSource.getRepository(AsistenciaSchema);
+        const asistencia = await asistenciaRepository.findOne({
+            where: { alumno: { id: alumnoId }, profesor: { id: profesorId } },
+            relations: ["alumno", "profesor"],
+        });
+
+        if (!asistencia) {
+            return [null, "El alumno no está asociado al profesor actual"];
+        }
+
+        return [true, null];
+    } catch (error) {
+        console.error("Error en validarAlumnoPorProfesorService:", error);
+        return [null, "Error al validar la relación profesor-alumno"];
     }
 }
 

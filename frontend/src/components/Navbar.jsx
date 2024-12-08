@@ -99,18 +99,46 @@ const Navbar = () => {
                         </>
                     )}
                     {userRole === 'profesor' && (
-                    <li>
-                        <NavLink 
-                            to="/inventario" 
-                            onClick={() => { 
-                                setMenuOpen(false); 
-                                addActiveClass();
-                            }} 
-                            activeClassName="active"
-                        >
-                            Inventario
-                        </NavLink>
-                    </li>
+                        <>
+                            <li>
+                                <NavLink
+                                    to="/inventario"
+                                    onClick={() => {
+                                        setMenuOpen(false);
+                                        addActiveClass();
+                                    }}
+                                    activeClassName="active"
+                                >
+                                    Inventario
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink
+                                    to="/asistencias"
+                                    onClick={() => {
+                                        setMenuOpen(false);
+                                        addActiveClass();
+                                    }}
+                                    activeClassName="active"
+                                >
+                                    Asistencias
+                                </NavLink>
+                            </li>
+                        </>
+                    )}
+                    {userRole === 'usuario' && (
+                        <li>
+                            <NavLink
+                                to="/asistencias"
+                                onClick={() => {
+                                    setMenuOpen(false);
+                                    addActiveClass();
+                                }}
+                                activeClassName="active"
+                            >
+                                Mi Asistencia
+                            </NavLink>
+                        </li>
                     )}
                     {(userRole === 'usuario' || userRole === 'encargadoPracticas') && (
                         <li>

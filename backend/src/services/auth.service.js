@@ -118,30 +118,3 @@ export async function registerService(user) {
     return [null, "Error interno del servidor"];
   }
 }
-
-export async function updateRol (email, newRole) {
-  try {
-    const userRepository = AppDataSource.getRepository(User);
-    
-    const userFound = await userRepository.findOne({
-      where: { email },
-    });
-
-    if (!userFound) {
-      return [null, "Usuario no encontrado"];
-    }
-
-    const validRoles = ["administrador", "estudiante", "profesor", "encargadoPracticas", "usuario"];
-    if (!validRoles.includes(newRole)) {
-      return [null, "Rol no válido"];
-    }
-
-    userFound.rol = newRole;
-    await userRepository.save(userFound);
-
-    return [userFound, null];
-  } catch (error) {
-    console.error("Error al modificar el rol del usuario:", error);
-    return [null, "Error interno del servidor"];
-  }
-}

@@ -5,7 +5,8 @@ import {
     calcularPorcentajeAsistenciaService,
     listarAsistenciasService,
     obtenerAsistenciaPorIdService,
-    registrarAsistenciaService
+    registrarAsistenciaService,
+    validarAlumnoPorProfesorService
 } from "../services/asistencia.service.js";
 import { handleErrorClient, handleErrorServer, handleSuccess } from "../handlers/responseHandlers.js";
 
@@ -38,9 +39,21 @@ export async function listarAsistencias(req, res) {
 
         const { semestreId, alumnoId, startDate, endDate } = req.query;
 
-        const [asistencias, error] = await listarAsistenciasService(semestreId, alumnoId, startDate, endDate);
+        if (!semestreId || isNaN(parseInt(semestreId, 10))) {
+            return handleErrorClient(res, 400, "El ID del semestre es obligatorio y debe ser un número válido");
+        }
 
-        if (error) return handleErrorClient(res, 404, error);
+        const [asistencias, error] = await listarAsistenciasService(
+            parseInt(semestreId, 10),
+            alumnoId ? parseInt(alumnoId, 10) : null,
+            startDate,
+            endDate,
+            user.id
+        );
+
+        if (error) {
+            return handleErrorClient(res, 404, error);
+        }
 
         handleSuccess(res, 200, "Asistencias obtenidas correctamente", asistencias);
     } catch (error) {
@@ -58,13 +71,20 @@ export async function obtenerAsistenciaPorId(req, res) {
         }
 
         const { id } = req.params;
+        const { alumnoId } = req.query;
+
         if (!id || isNaN(parseInt(id, 10))) {
             return handleErrorClient(res, 400, "ID de asistencia no válido");
         }
 
-        const asistenciaId = parseInt(id, 10);
+        if (alumnoId && isNaN(parseInt(alumnoId, 10))) {
+            return handleErrorClient(res, 400, "ID de alumno no válido");
+        }
 
-        const [asistencia, error] = await obtenerAsistenciaPorIdService(asistenciaId);
+        const asistenciaId = parseInt(id, 10);
+        const validAlumnoId = alumnoId ? parseInt(alumnoId, 10) : null;
+
+        const [asistencia, error] = await obtenerAsistenciaPorIdService(asistenciaId, user.id, validAlumnoId);
 
         if (error) {
             return handleErrorClient(res, 404, error);
@@ -74,6 +94,38 @@ export async function obtenerAsistenciaPorId(req, res) {
     } catch (error) {
         console.error("Error en obtenerAsistenciaPorId:", error);
         handleErrorServer(res, 500, "Error al obtener la asistencia");
+    }
+}
+
+
+
+
+
+
+export async function validarAlumnoPorProfesor(req, res) {
+    try {
+        const user = req.user;
+        if (user.rol !== "profesor") {
+            return handleErrorClient(res, 403, "Acceso denegado");
+        }
+
+        const { id } = req.params;
+        if (!id || isNaN(parseInt(id, 10))) {
+            return handleErrorClient(res, 400, "ID de alumno no válido");
+        }
+
+        const [alumnoValido, error] = await validarAlumnoPorProfesorService(
+            parseInt(id, 10), 
+        );
+
+        if (error) {
+            return handleErrorClient(res, 404, error);
+        }
+
+        handleSuccess(res, 200, "Alumno válido", alumnoValido);
+    } catch (error) {
+        console.error("Error en validarAlumnoPorProfesor:", error);
+        handleErrorServer(res, 500, "Error al validar alumno");
     }
 }
 

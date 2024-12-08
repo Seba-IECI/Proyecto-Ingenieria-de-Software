@@ -7,6 +7,7 @@ import {
     listarAsistencias,
     obtenerAsistenciaPorId,
     registrarAsistencia,
+    validarAlumnoPorProfesor,
 } from "../controllers/asistencia.controller.js";
 
 const router = Router();
@@ -16,7 +17,8 @@ router
     .get("/listar", authenticateJwt, listarAsistencias)
     .get("/obtenerAsistenciaPorId/:id", authenticateJwt, obtenerAsistenciaPorId)
     .get("/porcentaje", authenticateJwt, calcularPorcentajeAsistencia)
-    .put("/actualizar/:id", authenticateJwt, actualizarAsistencia);
+    .put("/actualizar/:id", authenticateJwt, actualizarAsistencia)
+    .get("/validarAlumnoPorProfesor/:id", authenticateJwt, validarAlumnoPorProfesor);
 
 
 export default router;
