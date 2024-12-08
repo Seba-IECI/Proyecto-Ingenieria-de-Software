@@ -2,15 +2,15 @@
 import Prestamos from "../entity/prestamos.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 import User from "../entity/user.entity.js"; 
-import CodigoBarras from "../entity/CBarras.entity.js";
+import CodigoBarras from "../entity/cBarras.entity.js";
 import Item from "../entity/item.entity.js";
+import Inventario from "../entity/inventario.entity.js";
 import { addAmonestacionService,getAmonestacionesService } from "./amonestaciones.service.js";
 
 export async function createPrestamoService(data) {
   try {
-    const { rut, codigoBarras, diasPrestamo } = data;
+    const { rut, codigoBarras, diasPrestamo, user } = data;
 
-    console.log("Datos recibidos:", data);
     if (!rut || !codigoBarras || !diasPrestamo) {
       return [null, "Faltan datos necesarios para crear el préstamo"];
     }
@@ -26,7 +26,6 @@ export async function createPrestamoService(data) {
     }
 
     const [amonestaciones, error] = await getAmonestacionesService(usuario.id);
-
     if (error) {
       return [null, error];
     }
@@ -36,10 +35,7 @@ export async function createPrestamoService(data) {
     }
 
     const prestamoActivoUsuario = await prestamoRepository.findOne({
-      where: {
-        usuario: { id: usuario.id },
-        estado: 1, 
-      },
+      where: { usuario: { id: usuario.id }, estado: 1 },
     });
 
     if (prestamoActivoUsuario) {
@@ -48,13 +44,26 @@ export async function createPrestamoService(data) {
 
     const codigoBarrasEntity = await codigoBarrasRepository.findOne({
       where: { codigo: codigoBarras },
-      relations: ["item"],
+      relations: ["item", "item.inventario"],
     });
-    if (!codigoBarrasEntity) {
-      return [null, "Código de barras no encontrado"];
+
+    if (!codigoBarrasEntity || !codigoBarrasEntity.item || !codigoBarrasEntity.item.inventario) {
+      return [null, "Código de barras o inventario no encontrado"];
     }
 
     const item = codigoBarrasEntity.item;
+    const inventario = item.inventario;
+
+    if (!inventario || !inventario.nombre) {
+      return [null, "Inventario no encontrado o no tiene un nombre válido"];
+    }
+
+    
+    
+    if (!user || !user.permisos.includes(inventario.nombre) ) {
+      return [null, "No tienes permiso para realizar esta acción en este inventario"];
+    }
+    
 
     if (!codigoBarrasEntity.disponible) {
       return [null, "Este código de barras ya está prestado"];
@@ -65,10 +74,7 @@ export async function createPrestamoService(data) {
     }
 
     const prestamoActivo = await prestamoRepository.findOne({
-      where: {
-        codigoBarras: codigoBarrasEntity,
-        estado: 1,
-      },
+      where: { codigoBarras: codigoBarrasEntity, estado: 1 },
     });
 
     if (prestamoActivo) {
@@ -80,12 +86,12 @@ export async function createPrestamoService(data) {
     fechaVencimiento.setDate(fechaPrestamo.getDate() + diasPrestamo);
 
     const nuevoPrestamo = prestamoRepository.create({
-      usuario: usuario,
-      item: item,
-      codigoBarras: codigoBarrasEntity, 
-      estado: 1, 
-      fechaPrestamo: fechaPrestamo,
-      fechaVencimiento: fechaVencimiento,
+      usuario,
+      item,
+      codigoBarras: codigoBarrasEntity,
+      estado: 1,
+      fechaPrestamo,
+      fechaVencimiento,
     });
 
     codigoBarrasEntity.disponible = false;
@@ -117,6 +123,7 @@ export async function createPrestamoService(data) {
     return [null, "Error interno del servidor"];
   }
 }
+
 
 
 export async function getPrestamoInterno(query) {

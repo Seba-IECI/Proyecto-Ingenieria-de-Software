@@ -9,3 +9,4 @@ router.post("/habilitar",authenticateJwt, habilitarPeriodo);
 router.patch("/deshabilitar/:id",authenticateJwt, deshabilitarPeriodo);
 
 export default router;
+

@@ -13,8 +13,8 @@ import { uploadMiddleware } from "../middlewares/subirArchivos.middleware.js";
 const router = Router();
 
 router
-    .post("/subir", authenticateJwt, uploadMiddleware, subirDocumentoPractica)
-    .delete("/eliminar/:id", authenticateJwt, eliminarDocumentoPractica)
+    .post("/subirDocumento", authenticateJwt, uploadMiddleware, subirDocumentoPractica)
+    .delete("/eliminarDocumento/:id", authenticateJwt, eliminarDocumentoPractica)
     .get("/obtenerTodos", authenticateJwt,  obtenerTodosDocumentos)
     .put("/modificarDocumento/:id", authenticateJwt, uploadMiddleware, modificarDocumentoPractica)
     .get("/verDocumentos", authenticateJwt, verDocumentos);

@@ -1,0 +1,91 @@
+/* Estilo para el fondo del popup */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro con transparencia */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* Asegura que esté sobre otros elementos */
+  }
+  
+  /* Estilo para el contenido del popup */
+  .popup-content {
+    background-color: #ffffff; /* Fondo blanco */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25); /* Sombra alrededor */
+    max-width: 500px;
+    width: 90%; /* Adaptativo para dispositivos pequeños */
+    position: relative;
+  }
+  
+  /* Título del popup */
+  .popup-content h2 {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    color: #333; /* Color oscuro para el texto */
+    text-align: center;
+  }
+  
+  /* Estilo para las etiquetas */
+  .popup-content label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #555; /* Texto ligeramente gris */
+  }
+  
+  /* Estilo para los inputs */
+  .popup-content input,
+  .popup-content select {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    box-sizing: border-box; /* Asegura que el padding no afecte el ancho */
+  }
+  
+  /* Cambiar borde cuando el input está enfocado */
+  .popup-content input:focus,
+  .popup-content select:focus {
+    outline: none;
+    border-color: #007BFF; /* Azul para indicar foco */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  
+  /* Estilo para los botones */
+  .popup-content button {
+    display: inline-block;
+    padding: 10px 15px;
+    font-size: 1em;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+    background-color: #007BFF; /* Azul principal */
+    color: #fff; /* Texto blanco */
+    transition: background-color 0.3s ease;
+  }
+  
+  /* Cambiar color del botón al pasar el cursor */
+  .popup-content button:hover {
+    background-color: #0056b3; /* Azul más oscuro */
+  }
+  
+  /* Botón de cancelar */
+  .popup-content .close-button {
+    background-color: #6c757d; /* Gris oscuro */
+  }
+  
+  .popup-content .close-button:hover {
+    background-color: #5a6268; /* Gris más oscuro */
+  }
+  
+  

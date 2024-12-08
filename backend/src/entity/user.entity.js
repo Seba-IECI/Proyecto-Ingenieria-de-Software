@@ -38,12 +38,17 @@ const UserSchema = new EntitySchema({
       nullable: true,
       default: null,
     },
-    permisos: {
-      type: "varchar", 
+    especialidad: {
+      type: "varchar",
       length: 50,
       nullable: true,
       default: null,
-  },
+    },
+    permisos: {
+      type: "simple-array",
+      nullable: true,
+      default: null,
+    },
     password: {
       type: "varchar",
       nullable: false,
@@ -59,11 +64,11 @@ const UserSchema = new EntitySchema({
       onUpdate: "CURRENT_TIMESTAMP",
       nullable: false,
     },
-    amonestacionesActivas: { 
+    amonestacionesActivas: {
       type: "int",
       default: 0,
     },
-    amonestacionesTotales: { 
+    amonestacionesTotales: {
       type: "int",
       default: 0,
       amonestacionesHistorical: []
@@ -86,19 +91,18 @@ const UserSchema = new EntitySchema({
       unique: true,
     },
   ],
-  relations: { 
+  relations: {
     prestamos: {
       type: "one-to-many",
       target: "Prestamos",
       inverseSide: "usuario"
     },
-     amonestaciones: { 
+    amonestaciones: {
       type: "one-to-many",
       target: "Amonestaciones",
-      inverseSide: "usuario", 
+      inverseSide: "usuario",
     },
   }
-}
-);
+});
 
 export default UserSchema;

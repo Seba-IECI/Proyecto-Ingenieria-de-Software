@@ -7,7 +7,8 @@ import {
     deshabilitarTarea,
     getTarea,
     habilitarTarea,
-    updateTarea
+    updateTarea,
+    deleteTarea
 } from "../controllers/tarea.controller.js";
 
 const router = Router();
@@ -20,6 +21,7 @@ router
     .get("/mostrar/:id", isProfesorOrEstudiante, getTarea)
     .patch("/actualizar/:id", isProfesor, updateTarea)
     .delete("/deshabilitar/:id", isProfesor, deshabilitarTarea)
-    .patch("/habilitar/:id", isProfesor, habilitarTarea);
+    .patch("/habilitar/:id", isProfesor, habilitarTarea)
+    .delete("/eliminar/:id", isProfesor, deleteTarea);
 
 export default router;

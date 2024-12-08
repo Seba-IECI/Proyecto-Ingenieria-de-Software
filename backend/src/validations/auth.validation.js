@@ -111,6 +111,13 @@ export const registerValidation = Joi.object({
       "string.base": "El nivel debe ser de tipo string.",
       "any.only": "El nivel debe ser '3ro' o '4to'.",
     }),
+  especialidad: Joi.string()
+    .optional()
+    .valid("Mecánica automotriz", "Electricidad", "Electrónica")
+    .messages({
+      "string.base": "La especialidad debe ser de tipo texto.",
+      "any.only": "La especialidad debe ser 'Mecánica automotriz', 'Electricidad' o 'Electrónica'.",
+    }),
 })
   .unknown(false)
   .messages({

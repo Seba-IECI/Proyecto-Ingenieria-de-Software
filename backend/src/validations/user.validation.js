@@ -124,6 +124,20 @@ export const userBodyValidation = Joi.object({
       "string.min": "El rol debe tener como mínimo 4 caracteres.",
       "string.max": "El rol debe tener como máximo 15 caracteres.",
     }),
+  nivel: Joi.string()
+    .optional()
+    .valid("3ro", "4to")
+    .messages({
+      "string.base": "El nivel debe ser de tipo string.",
+      "any.only": "El nivel debe ser '3ro' o '4to'.",
+    }),
+  especialidad: Joi.string()
+    .optional()
+    .valid("Mecánica automotriz", "Electricidad", "Electrónica")
+    .messages({
+      "string.base": "La especialidad debe ser de tipo texto.",
+      "any.only": "La especialidad debe ser 'Mecánica automotriz', 'Electricidad' o 'Electrónica'.",
+    }),
 })
   .or(
     "nombreCompleto",
@@ -131,11 +145,13 @@ export const userBodyValidation = Joi.object({
     "password",
     "newPassword",
     "rut",
-    "rol"
+    "rol",
+    "nivel",
+    "especialidad"
   )
   .unknown(false)
   .messages({
     "object.unknown": "No se permiten propiedades adicionales.",
     "object.missing":
-      "Debes proporcionar al menos un campo: nombreCompleto, email, password, newPassword, rut o rol.",
+      "Debes proporcionar al menos un campo: nombreCompleto, email, password, newPassword, rut, rol, nivel o especialidad.",
   });

@@ -7,6 +7,10 @@ export async function subirMaterialService(query) {
         const { titulo, descripcion, url } = query;
         const materiaRepository = AppDataSource.getRepository(Materia);
 
+        const materiaExistente = await materiaRepository.findOne({ where: { titulo } });
+        if (materiaExistente) {
+            return [null, "Ya existe una materia con ese título"];
+        }
         
         const nuevoMaterial = materiaRepository.create({
             titulo,
@@ -50,6 +54,13 @@ export async function updateMateriaService(query, body) {
 
         if (!materiaFound) return [null, "Materia no encontrada"];
 
+        const materiaConMismoTitulo = await materiaRepository.findOne({
+            where: { titulo },
+        });
+
+        if (materiaConMismoTitulo && materiaConMismoTitulo.id !== id) {
+            return [null, "Ya existe una materia con ese título"];
+        }
         
         await materiaRepository.update(id, body);
         return [await materiaRepository.findOneBy({ id }), null];

@@ -1,0 +1,240 @@
+.wrapper {
+    padding-top: 9vh; /* Ajusta el espacio según la altura de la navbar */
+  }
+
+
+/* Contenedor principal */
+.inventario-container {
+    position: fixed;
+    margin-top: 20px;
+    margin-left: 250px;
+    padding: 10px;
+  }
+  
+  /* Título */
+  .inventario-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .inventario-item {
+    margin: 10px 0;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.inventario-item p {
+    margin: 0;
+    color: #333;
+}
+
+.inventario-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.inventario-actions button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+  .inventario-actions .edit-button {
+    background-color: #007bff;
+    color: white;
+}
+
+
+ 
+.menu-lateral {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #003366;
+    width: 150px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .menu-lateral.mostrar {
+    transform: translateX(0); /* Mostrar el menú si es admin */
+  }
+  
+  .admin-button {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .admin-button:hover {
+    background-color: #218838;
+  }
+  
+  
+  /* Lista */
+  .inventario-list {
+    position: flex;
+    list-style-type: none;
+    width: 600px;
+    padding: 10;
+    margin: 0;
+  }
+  
+  .inventario-item {
+    margin-bottom: 10px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    line-height: 1.5;
+  }
+  
+  /* Texto cuando no hay inventarios */
+  .inventario-empty {
+    color: gray;
+    text-align: center;
+    font-style: italic;
+  }
+  
+  /* Sección de administración */
+  .admin-section {
+    margin-top: 30px;
+    text-align: center;
+  }
+  
+  /* Botón de administrador */
+  .admin-button {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .admin-button:hover {
+    background-color: #218838;
+  }
+  
+/*pop up styles*/
+  .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .popup-content {
+    background: #eef7ff;
+    padding: 20px;
+    border-radius: 10px;
+    width: 500px;
+    max-width: 90%;
+  }
+  
+  .popup-content h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .popup-content label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  .popup-content input,
+  .popup-content textarea {
+    width: 90%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 2px solid #003366;
+    border-radius: 5px;
+  }
+  
+  .popup-actions {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .popup-actions button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .popup-actions button:first-child {
+    background-color: #28a745;
+    color: white;
+  }
+  .delete-button {
+    color: white; /* Color del texto */
+    background-color: #f33e1e; /* Fondo rojo */
+    border: none; /* Sin bordes */
+    padding: 8px 12px; /* Espaciado interno */
+    border-radius: 5px; /* Bordes redondeados */
+    cursor: pointer; /* Cambia el cursor a un puntero */
+  }
+  .popup-actions button:last-child {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+
+  
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr; /* Configuración de columnas */
+  gap: 10px;
+}
+
+.grid-header {
+  display: contents; /* Actúa como parte del grid */
+  font-weight: bold;
+  border-bottom: 2px solid #ccc;
+  margin-bottom: 10px;
+}
+
+.grid-row {
+  display: contents; /* Cada fila se adapta al diseño del grid */
+}
+
+.grid-row div,
+.grid-header div {
+  padding: 5px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.grid-row div:last-child,
+.grid-header div:last-child {
+  word-break: break-word; /* Evita que los códigos de barra largos rompan el diseño */
+}
+
+
+

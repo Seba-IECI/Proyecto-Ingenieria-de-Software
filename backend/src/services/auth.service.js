@@ -34,6 +34,8 @@ export async function loginService(user) {
       email: userFound.email,
       rut: userFound.rut,
       rol: userFound.rol,
+      nivel: userFound.nivel,
+      especialidad: userFound.especialidad,
     };
 
     const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, {
@@ -47,12 +49,33 @@ export async function loginService(user) {
   }
 }
 
+export async function updateRol(email, newRole) {
+  try {
+    const userRepository = AppDataSource.getRepository(User);
+    const userFound = await userRepository.findOne({
+      where: { email },
+    });
+    if (!userFound) {
+      return [null, "Usuario no encontrado"];
+    }
+    const validRoles = ["administrador", "estudiante", "profesor", "encargadoPracticas", "usuario"];
+    if (!validRoles.includes(newRole)) {
+      return [null, "Rol no válido"];
+    }
+    userFound.rol = newRole;
+    await userRepository.save(userFound);
+    return [userFound, null];
+  } catch (error) {
+    console.error("Error al modificar el rol del usuario:", error);
+    return [null, "Error interno del servidor"];
+  }
+}
 
 export async function registerService(user) {
   try {
     const userRepository = AppDataSource.getRepository(User);
 
-    const { nombreCompleto, rut, email, nivel } = user;
+    const { nombreCompleto, rut, email, nivel, especialidad } = user;
 
     const createErrorMessage = (dataInfo, message) => ({
       dataInfo,
@@ -82,6 +105,7 @@ export async function registerService(user) {
       password: await encryptPassword(user.password),
       rol: "usuario",
       nivel,
+      especialidad,
     });
 
     await userRepository.save(newUser);

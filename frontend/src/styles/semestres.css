@@ -1,0 +1,178 @@
+.semestres-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.semestres-title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.semestres-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.semestres-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.semestres-list {
+    list-style: none;
+    padding: 0;
+}
+
+.semestre-item {
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    position: relative;
+}
+
+.semestres-empty {
+    text-align: center;
+    font-size: 16px;
+    color: #6c757d;
+}
+
+.semestres-error {
+    text-align: center;
+    color: #d9534f;
+    font-size: 16px;
+}
+
+.semestres-loading {
+    text-align: center;
+    font-size: 16px;
+    color: #0275d8;
+}
+
+.semestres-subtitle {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: #007bff;
+}
+
+.semestres-form {
+    margin: 20px 0;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.semestres-form-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #007bff;
+}
+
+.semestres-form label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.semestres-form input,
+.semestres-form textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+.semestres-form button {
+    margin-top: 15px;
+}
+
+.semestres-list {
+    margin-top: 20px;
+}
+
+.semestre-item {
+    margin-top: 10px;
+}
+
+.semestre-item {
+    position: relative;
+}
+
+.delete-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+}
+
+.update-button {
+    position: absolute;
+    top: 10px;
+    right: 45px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 17px;
+    padding: 0 15px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.update-button:hover {
+    background-color: #0056b3;
+}
+
+.checkbox-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.tooltip {
+    position: absolute;
+    top: -25px;
+    left: 70px;
+    background-color: #dc3545;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 10;
+}
