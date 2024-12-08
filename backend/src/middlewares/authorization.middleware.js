@@ -140,6 +140,7 @@ export async function isEstudiante(req, res, next) { // aca pueod agregar mas ro
                 );
             }
             }
+
         export async function isProfesorOrEstudiante(req, res, next) {
             try {
                 const userRepository = AppDataSource.getRepository(User);

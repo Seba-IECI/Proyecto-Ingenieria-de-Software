@@ -13,6 +13,7 @@ import asistenciaRoutes from "./asistencia.routes.js";
 import periodoPracticaRoutes from "./periodoPracticas.routes.js";
 import documentosTareaRoutes from "./documentosTarea.routes.js";
 
+
 const router = Router();
 
 router
@@ -28,5 +29,6 @@ router
     .use("/asistencia", asistenciaRoutes)
     .use("/documentosTarea", documentosTareaRoutes)
     .use("/periodoPractica", periodoPracticaRoutes);
+   
     
 export default router;

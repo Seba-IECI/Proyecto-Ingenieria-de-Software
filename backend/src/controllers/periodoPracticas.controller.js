@@ -1,7 +1,9 @@
 "use strict";
  import { habilitarPeriodoPractica, deshabilitarPeriodoPractica } from "../services/periodoPracticas.service.js";
+
 export async function habilitarPeriodo(req, res) {
     const { fechaInicio, fechaFin } = req.body;
+
     try {
         const [nuevoPeriodo, error] = await habilitarPeriodoPractica(fechaInicio, fechaFin, req.user);
         if (error) {
@@ -13,6 +15,7 @@ export async function habilitarPeriodo(req, res) {
         return res.status(500).json({ message: "Error al habilitar el periodo de práctica" });
     }
 }
+
 export async function deshabilitarPeriodo(req, res) {
     const { id } = req.params;
     const { deshabilitar } = req.body;
