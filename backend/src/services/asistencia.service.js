@@ -90,6 +90,9 @@ export async function listarAsistenciasService(semestreId, alumnoId, startDate, 
         const asistencias = await asistenciaRepository.find({
             where: whereClause,
             relations: ["alumno", "semestre", "profesor"],
+            order: {
+                fecha: "ASC",
+            },
         });
 
         if (!asistencias.length) {

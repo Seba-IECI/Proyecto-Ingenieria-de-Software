@@ -2,6 +2,7 @@ import { useState } from "react";
 import useValidarAlumno from "@hooks/asistencias/useValidarAlumno";
 import ObtenerAsistenciaPopup from "@components/ObtenerAsistenciaPopup";
 import BuscarEntreFechasPopup from "@components/BuscarEntreFechasPopup";
+import MostrarAsistenciaGeneralPopup from "@components/MostrarAsistenciaGeneralPopup";
 import "@styles/asistencias.css";
 
 const Asistencias = () => {
@@ -9,7 +10,7 @@ const Asistencias = () => {
     const [alumnoId, setAlumnoId] = useState("");
     const [showBuscarId, setShowBuscarId] = useState(false);
     const [showBuscarFechas, setShowBuscarFechas] = useState(false);
-
+    const [showGeneralPopup, setShowGeneralPopup] = useState(false);
     const { isAlumnoValido, loading, error, validarAlumno, resetValidation } = useValidarAlumno();
 
     const handleBuscarAlumno = () => {
@@ -25,6 +26,7 @@ const Asistencias = () => {
         setShowBuscarId(false);
         setShowBuscarFechas(false);
     };
+
     const toggleSection = (sectionName) => {
         if (section === sectionName) {
             setSection(null);
@@ -46,7 +48,7 @@ const Asistencias = () => {
                 <button onClick={() => toggleSection("buscarAlumno")}>
                     {section === "buscarAlumno" ? "Cerrar" : "Buscar por alumno"}
                 </button>
-                <button onClick={() => toggleSection("mostrarGeneral")}>
+                <button onClick={() => setShowGeneralPopup(true)}>
                     Mostrar asistencia general
                 </button>
             </div>
@@ -68,14 +70,10 @@ const Asistencias = () => {
                     {error && <p className="error-message">{error}</p>}
                     {isAlumnoValido && (
                         <div className="opciones-busqueda">
-                            <button
-                                onClick={() => setShowBuscarId(true)}
-                            >
+                            <button onClick={() => setShowBuscarId(true)}>
                                 Buscar por ID de asistencia
                             </button>
-                            <button
-                                onClick={() => setShowBuscarFechas(true)}
-                            >
+                            <button onClick={() => setShowBuscarFechas(true)}>
                                 Buscar entre fechas
                             </button>
                         </div>
@@ -94,12 +92,10 @@ const Asistencias = () => {
                     onClose={() => setShowBuscarFechas(false)}
                 />
             )}
-
-            {section === "mostrarGeneral" && (
-                <div className="asistencias-section">
-                    <h2>Mostrar Asistencia General</h2>
-                    <p>Selecciona un rango de fechas o filtros para ver la asistencia general.</p>
-                </div>
+            {showGeneralPopup && (
+                <MostrarAsistenciaGeneralPopup
+                    onClose={() => setShowGeneralPopup(false)}
+                />
             )}
         </div>
     );
