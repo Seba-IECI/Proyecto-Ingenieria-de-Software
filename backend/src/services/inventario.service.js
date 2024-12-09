@@ -197,15 +197,12 @@ export async function addItemService(data, user) {
 
     const nombreNormalizado = nombre.toLowerCase();
 
-    const item = await itemRepository.findOne({
+    let item = await itemRepository.findOne({
       where: { nombre: nombreNormalizado, inventario: { id: inventarioactual.id } },
       relations: ["codigosBarras"],
     });
     
-    if (!item) {
-      throw new Error("Ítem no encontrado");
-    }
-    
+        
     console.log("Ítem cargado:", item);
 
     if (item) {
@@ -221,7 +218,7 @@ export async function addItemService(data, user) {
       });
       
       
-      const nuevoCodigoBarras = codigoBarrasRepository.create({
+      let nuevoCodigoBarras = codigoBarrasRepository.create({
         codigo: cBarras,
         item: { id: item.id }, 
       });
