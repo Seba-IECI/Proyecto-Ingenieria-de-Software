@@ -69,3 +69,26 @@ export async function validarAlumnoPorProfesor(id) {
         throw new Error(error.response?.data?.message || "Error desconocido al validar alumno.");
     }
 }
+
+export async function registrarAsistencia({ alumnoId, semestreId, fecha, presente }) {
+    try {
+        const response = await axios.post(
+            "/asistencia/registrar",
+            { alumnoId, semestreId, fecha, presente },
+            {
+                headers: {
+                    Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+                },
+            }
+        );
+
+        if (response.data.status === "Success") {
+            return response.data.data;
+        } else {
+            throw new Error(response.data.message || "Error al registrar asistencia.");
+        }
+    } catch (error) {
+        console.error("Error en registrarAsistencia:", error);
+        throw new Error(error.response?.data?.message || "Error desconocido al registrar asistencia.");
+    }
+}

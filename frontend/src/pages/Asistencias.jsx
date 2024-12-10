@@ -3,6 +3,7 @@ import useValidarAlumno from "@hooks/asistencias/useValidarAlumno";
 import ObtenerAsistenciaPopup from "@components/ObtenerAsistenciaPopup";
 import BuscarEntreFechasPopup from "@components/BuscarEntreFechasPopup";
 import MostrarAsistenciaGeneralPopup from "@components/MostrarAsistenciaGeneralPopup";
+import RegistrarAsistenciaForm from "@components/RegistrarAsistenciaForm";
 import "@styles/asistencias.css";
 
 const Asistencias = () => {
@@ -10,7 +11,6 @@ const Asistencias = () => {
     const [alumnoId, setAlumnoId] = useState("");
     const [showBuscarId, setShowBuscarId] = useState(false);
     const [showBuscarFechas, setShowBuscarFechas] = useState(false);
-    const [showGeneralPopup, setShowGeneralPopup] = useState(false);
     const { isAlumnoValido, loading, error, validarAlumno, resetValidation } = useValidarAlumno();
 
     const handleBuscarAlumno = () => {
@@ -30,14 +30,10 @@ const Asistencias = () => {
     const toggleSection = (sectionName) => {
         if (section === sectionName) {
             setSection(null);
-            if (sectionName === "buscarAlumno") {
-                resetSearchState();
-            }
+            resetSearchState();
         } else {
             setSection(sectionName);
-            if (sectionName === "buscarAlumno") {
-                resetSearchState();
-            }
+            resetSearchState();
         }
     };
 
@@ -48,10 +44,14 @@ const Asistencias = () => {
                 <button onClick={() => toggleSection("buscarAlumno")}>
                     {section === "buscarAlumno" ? "Cerrar" : "Buscar por alumno"}
                 </button>
-                <button onClick={() => setShowGeneralPopup(true)}>
-                    Mostrar asistencia general
+                <button onClick={() => toggleSection("mostrarGeneral")}>
+                    {section === "mostrarGeneral" ? "Cerrar" : "Mostrar asistencia general"}
+                </button>
+                <button onClick={() => toggleSection("registrarAsistencia")}>
+                    {section === "registrarAsistencia" ? "Cerrar" : "Registrar asistencia"}
                 </button>
             </div>
+
             {section === "buscarAlumno" && (
                 <div className="asistencias-section">
                     <h2>Buscar por Alumno</h2>
@@ -80,6 +80,7 @@ const Asistencias = () => {
                     )}
                 </div>
             )}
+
             {showBuscarId && (
                 <ObtenerAsistenciaPopup
                     alumnoId={alumnoId}
@@ -92,9 +93,14 @@ const Asistencias = () => {
                     onClose={() => setShowBuscarFechas(false)}
                 />
             )}
-            {showGeneralPopup && (
+            {section === "mostrarGeneral" && (
                 <MostrarAsistenciaGeneralPopup
-                    onClose={() => setShowGeneralPopup(false)}
+                    onClose={() => toggleSection("mostrarGeneral")}
+                />
+            )}
+            {section === "registrarAsistencia" && (
+                <RegistrarAsistenciaForm
+                    onClose={() => toggleSection("registrarAsistencia")}
                 />
             )}
         </div>
