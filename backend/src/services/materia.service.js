@@ -29,17 +29,14 @@ export async function subirMaterialService(query) {
     }
 }
 
-export async function getMateriaService(query) {
+export async function getMateriaService() {
     try {
-        const { id } = query;
-        const materiaFound = await AppDataSource.getRepository(Materia).findOne({
-            where: [{ id: id }],
-        });
+        const materias = await AppDataSource.getRepository(Materia).find();
 
-        if (!materiaFound) return [null, "Materia no encontrada"];
-        return [materiaFound, null];
+        if (materias.length === 0) return [null, "No se encontraron materias"];
+        return [materias, null];
     } catch (error) {
-        console.error("Error al obtener la materia:", error);
+        console.error("Error al obtener las materias:", error);
         return [null, "Error interno del servidor"];
     }
 }

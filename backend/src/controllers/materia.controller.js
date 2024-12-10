@@ -35,15 +35,13 @@ import { materiaQueryValidation } from "../validations/materia.validations.js";
     }
 }
 
-export async function getMateria(req, res){
+export async function getMateria(req, res) {
     try {
-        const { id } = req.params;
-
-        const [materia, errorMateria] = await getMateriaService({ id });
+        const [materias, errorMateria] = await getMateriaService();
 
         if (errorMateria) return handleErrorClient(res, 404, errorMateria);
 
-        handleSuccess(res, 200, "Materia encontrada", materia);
+        handleSuccess(res, 200, "Materias encontradas", materias);
     } catch (error) {
         handleErrorServer(res, 500, error.message);
     }

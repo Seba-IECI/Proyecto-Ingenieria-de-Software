@@ -99,58 +99,16 @@ const Navbar = () => {
                         </>
                     )}
                     {userRole === 'profesor' && (
-                        <>
-                            <li>
-                                <NavLink
-                                    to="/inventario"
-                                    onClick={() => {
-                                        setMenuOpen(false);
-                                        addActiveClass();
-                                    }}
-                                    activeClassName="active"
-                                >
-                                    Inventario
-                                </NavLink>
-                            </li>
-                            <li>
-                                <NavLink
-                                    to="/asistencias"
-                                    onClick={() => {
-                                        setMenuOpen(false);
-                                        addActiveClass();
-                                    }}
-                                    activeClassName="active"
-                                >
-                                    Asistencias
-                                </NavLink>
-                            </li>
-                        </>
-                    )}
-                    {userRole === 'usuario' && (
-                        <li>
-                            <NavLink
-                                to="/asistencias"
-                                onClick={() => {
-                                    setMenuOpen(false);
-                                    addActiveClass();
-                                }}
-                                activeClassName="active"
-                            >
-                                Mi Asistencia
-                            </NavLink>
-                        </li>
-                    )}
-                    {userRole === 'profesor' && (
                     <li>
                         <NavLink 
-                            to="/prestamos" 
+                            to="/inventario" 
                             onClick={() => { 
                                 setMenuOpen(false); 
                                 addActiveClass();
                             }} 
                             activeClassName="active"
                         >
-                            Prestamos
+                            Inventario
                         </NavLink>
                     </li>
                     )}
@@ -167,6 +125,22 @@ const Navbar = () => {
                                 Documentos
                             </NavLink>
                         </li>
+                    )}
+                     {userRole === 'estudiante' && (
+                        <>
+                            <li>
+                                <NavLink
+                                    to="/materias"
+                                    onClick={() => {
+                                        setMenuOpen(false);
+                                        addActiveClass();
+                                    }}
+                                    activeClassName="active"
+                                >
+                                    Materias
+                                </NavLink>
+                            </li>
+                        </>
                     )}
                     <li>
                         <NavLink 

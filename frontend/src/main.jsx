@@ -10,6 +10,7 @@ import Error404 from '@pages/Error404';
 import Root from '@pages/Root';
 import ProtectedRoute from '@components/ProtectedRoute';
 import Materia from '@pages/materia';
+import Materias from '@pages/materias';
 import DocumentosPractica from '@pages/DocumentosPractica';
 import Semestres from '@pages/Semestres';
 import Asistencias from '@pages/Asistencias';
@@ -63,6 +64,13 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={['profesor']}>
             <Materia />
+          </ProtectedRoute>
+        ),
+      }, {
+        path: '/materias',
+        element: (
+          <ProtectedRoute allowedRoles={['estudiante']}>
+            <Materias />
           </ProtectedRoute>
         ),
       },

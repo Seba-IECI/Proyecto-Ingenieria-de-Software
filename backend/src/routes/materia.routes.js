@@ -18,7 +18,7 @@ router
 
 router
     .post("/sub", isProfesor,subirMateria)
-    .get("/mos/:id",isProfesorOrEstudiante, getMateria)
+    .get("/mos",isProfesorOrEstudiante, getMateria)
     .patch("/up/:id", isProfesor,updateMateria)
     .delete("/del/:id",isProfesor, deleteMateria);
     
