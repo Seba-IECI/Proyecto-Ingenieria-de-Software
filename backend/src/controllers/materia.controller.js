@@ -52,6 +52,10 @@ export async function updateMateria(req, res) {
         const { id } = req.params;
         const { body } = req;
 
+        const { error: queryError } = materiaQueryValidation.validate(body);
+        
+        if (queryError) return handleErrorClient(res, 400, queryError.message);
+
         const [materia, errorMateria] = await updateMateriaService({ id }, body);
 
         if (errorMateria) {
