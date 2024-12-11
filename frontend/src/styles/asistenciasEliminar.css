@@ -1,0 +1,188 @@
+.asistencia-eliminar-button {
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    background-color: #ff5c5c;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 8px rgba(255, 92, 92, 0.4);
+}
+
+.asistencia-eliminar-button:hover {
+    background-color: #e63946;
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(230, 57, 70, 0.5);
+}
+
+.asistencia-eliminar-button:disabled {
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.asistencia-eliminar-messages {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.asistencia-eliminar-success {
+    color: #2a9d8f;
+    font-weight: bold;
+    background-color: #e9f6f5;
+    border: 1px solid #2a9d8f;
+    border-radius: 8px;
+    padding: 12px;
+    animation: fadeIn 0.4s ease-in-out;
+    box-shadow: 0 4px 8px rgba(42, 157, 143, 0.3);
+}
+
+.asistencia-eliminar-error {
+    color: #e63946;
+    font-weight: bold;
+    background-color: #fde9e9;
+    border: 1px solid #e63946;
+    border-radius: 8px;
+    padding: 12px;
+    animation: fadeIn 0.4s ease-in-out;
+    box-shadow: 0 4px 8px rgba(230, 57, 70, 0.3);
+}
+
+.asistencia-item {
+    position: relative;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #e3e3e3;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+}
+
+.asistencia-item:hover {
+    transform: scale(1.02);
+}
+
+.asistencia-eliminar-button-entreFechas {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    background-color: #ff5c5c;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(255, 92, 92, 0.4);
+    transition: all 0.3s ease-in-out;
+}
+
+.asistencia-eliminar-button-entreFechas:hover {
+    background-color: #e63946;
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(230, 57, 70, 0.5);
+}
+
+.asistencia-eliminar-button-entreFechas:disabled {
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.asistencia-eliminar-button-general {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    background-color: #ff5c5c;
+    /* Rojo vibrante */
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(255, 92, 92, 0.4);
+    /* Sombra suave */
+    transition: all 0.3s ease-in-out;
+}
+
+.asistencia-eliminar-button-general:hover {
+    background-color: #e63946;
+    /* Rojo más oscuro */
+    transform: scale(1.1);
+    /* Ampliación ligera */
+    box-shadow: 0 6px 12px rgba(230, 57, 70, 0.5);
+}
+
+.asistencia-eliminar-button-general:disabled {
+    background-color: #cccccc;
+    /* Gris para estado deshabilitado */
+    color: #666666;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.popup-content-small {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.confirm-button {
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    background-color: #28a745;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.4);
+}
+
+.confirm-button:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+}
+
+.cancel-button {
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    background-color: #dc3545;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.4);
+}
+
+.cancel-button:hover {
+    background-color: #c82333;
+    transform: scale(1.05);
+}

@@ -47,12 +47,12 @@ const Navbar = () => {
             <div className={`nav-menu ${menuOpen ? 'activado' : ''}`}>
                 <ul>
                     <li>
-                        <NavLink 
-                            to="/home" 
-                            onClick={() => { 
-                                setMenuOpen(false); 
+                        <NavLink
+                            to="/home"
+                            onClick={() => {
+                                setMenuOpen(false);
                                 addActiveClass();
-                            }} 
+                            }}
                             activeClassName="active"
                         >
                             Inicio
@@ -62,9 +62,9 @@ const Navbar = () => {
                         <>
                             <li>
                                 <NavLink
-                                    to="/users" 
-                                    onClick={() => { 
-                                        setMenuOpen(false); 
+                                    to="/users"
+                                    onClick={() => {
+                                        setMenuOpen(false);
                                         addActiveClass();
                                     }}
                                     activeClassName="active"
@@ -99,32 +99,58 @@ const Navbar = () => {
                         </>
                     )}
                     {userRole === 'profesor' && (
-                    <>
-                    <li>
-                        <NavLink 
-                            to="/inventario" 
-                            onClick={() => { 
-                                setMenuOpen(false); 
-                                addActiveClass();
-                            }} 
-                            activeClassName="active"
-                        >
-                            Inventario
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink 
-                            to="/materia" 
-                            onClick={() => { 
-                                setMenuOpen(false); 
-                                addActiveClass();
-                            }} 
-                            activeClassName="active"
-                        >
-                            Materia
-                        </NavLink>
-                    </li>
-                    </>
+                        <>
+                            <li>
+                                <NavLink
+                                    to="/inventario"
+                                    onClick={() => {
+                                        setMenuOpen(false);
+                                        addActiveClass();
+                                    }}
+                                    activeClassName="active"
+                                >
+                                    Inventario
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink
+                                    to="/materia"
+                                    onClick={() => {
+                                        setMenuOpen(false);
+                                        addActiveClass();
+                                    }}
+                                    activeClassName="active"
+                                >
+                                    Materia
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink
+                                    to="/asistencias"
+                                    onClick={() => {
+                                        setMenuOpen(false);
+                                        addActiveClass();
+                                    }}
+                                    activeClassName="active"
+                                >
+                                    Asistencias
+                                </NavLink>
+                            </li>
+                        </>
+                    )}
+                    {userRole === 'usuario' && (
+                        <li>
+                            <NavLink
+                                to="/asistencias"
+                                onClick={() => {
+                                    setMenuOpen(false);
+                                    addActiveClass();
+                                }}
+                                activeClassName="active"
+                            >
+                                Asistencias
+                            </NavLink>
+                        </li>
                     )}
                     {(userRole === 'usuario' || userRole === 'encargadoPracticas') && (
                         <li>
@@ -140,7 +166,7 @@ const Navbar = () => {
                             </NavLink>
                         </li>
                     )}
-                     {userRole === 'estudiante' && (
+                    {userRole === 'estudiante' && (
                         <>
                             <li>
                                 <NavLink
@@ -157,12 +183,12 @@ const Navbar = () => {
                         </>
                     )}
                     <li>
-                        <NavLink 
-                            to="/auth" 
-                            onClick={() => { 
-                                logoutSubmit(); 
-                                setMenuOpen(false); 
-                            }} 
+                        <NavLink
+                            to="/auth"
+                            onClick={() => {
+                                logoutSubmit();
+                                setMenuOpen(false);
+                            }}
                             activeClassName="active"
                         >
                             Cerrar sesión

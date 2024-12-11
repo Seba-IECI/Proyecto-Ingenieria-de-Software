@@ -1,5 +1,8 @@
 import { useState } from "react";
 import useListarAsistenciasGenerales from "@hooks/asistencias/useListarAsistenciasGenerales";
+import useEliminarAsistencia from "@hooks/asistencias/useEliminarAsistencia";
+import ConfirmPopup from "@components/ConfirmPopup";
+import "@styles/asistenciasEliminar.css";
 
 const MostrarAsistenciaGeneralPopup = ({ onClose }) => {
     const [semestreId, setSemestreId] = useState("");
@@ -7,8 +10,20 @@ const MostrarAsistenciaGeneralPopup = ({ onClose }) => {
     const [endDate, setEndDate] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [hasSearched, setHasSearched] = useState(false); // Nuevo estado para controlar si se ha buscado
 
-    const { asistencias, loading, error, fetchAsistenciasGenerales } = useListarAsistenciasGenerales();
+    const { asistencias, loading, error, fetchAsistenciasGenerales } =
+        useListarAsistenciasGenerales();
+    const {
+        eliminar,
+        loading: deleting,
+        error: deleteError,
+        successMessage,
+        resetState,
+    } = useEliminarAsistencia();
+
+    const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+    const [asistenciaToDelete, setAsistenciaToDelete] = useState(null);
 
     const handleBuscar = () => {
         if (!semestreId || !startDate || !endDate) {
@@ -17,6 +32,21 @@ const MostrarAsistenciaGeneralPopup = ({ onClose }) => {
         }
         fetchAsistenciasGenerales({ semestreId, startDate, endDate });
         setCurrentPage(1);
+        resetState();
+        setHasSearched(true); // Marcar que se realizó una búsqueda
+    };
+
+    const handleEliminar = async () => {
+        if (!asistenciaToDelete) return;
+        await eliminar(asistenciaToDelete);
+        setShowConfirmPopup(false);
+        setAsistenciaToDelete(null);
+        fetchAsistenciasGenerales({ semestreId, startDate, endDate }); // Actualiza la lista
+    };
+
+    const handleOpenConfirm = (id) => {
+        setAsistenciaToDelete(id);
+        setShowConfirmPopup(true);
     };
 
     const handleContainerClick = () => {
@@ -73,6 +103,11 @@ const MostrarAsistenciaGeneralPopup = ({ onClose }) => {
                 </div>
                 {loading && <p>Cargando asistencias...</p>}
                 {error && <p className="error-message">{error}</p>}
+                {successMessage && <p className="success-message">{successMessage}</p>}
+                {deleteError && <p className="error-message">{deleteError}</p>}
+                {!loading && hasSearched && currentItems.length === 0 && (
+                    <p>No hay asistencias disponibles.</p>
+                )}
                 {currentItems.length > 0 && (
                     <div className="asistencias-resultados">
                         <div className="asistencias-pagination">
@@ -81,7 +116,9 @@ const MostrarAsistenciaGeneralPopup = ({ onClose }) => {
                                     Paginación:
                                     <select
                                         value={itemsPerPage}
-                                        onChange={(e) => setItemsPerPage(parseInt(e.target.value, 10))}
+                                        onChange={(e) =>
+                                            setItemsPerPage(parseInt(e.target.value, 10))
+                                        }
                                     >
                                         <option value={5}>5</option>
                                         <option value={10}>10</option>
@@ -96,9 +133,23 @@ const MostrarAsistenciaGeneralPopup = ({ onClose }) => {
                         <ul>
                             {currentItems.map((asistencia) => (
                                 <li key={asistencia.id} className="asistencia-item">
-                                    <p><strong>Fecha:</strong> {asistencia.fecha}</p>
-                                    <p><strong>Alumno:</strong> {asistencia.alumno.nombreCompleto}</p>
-                                    <p><strong>Estado:</strong> {asistencia.presente ? "Presente" : "Ausente"}</p>
+                                    <button
+                                        className="asistencia-eliminar-button-general"
+                                        onClick={() => handleOpenConfirm(asistencia.id)}
+                                        disabled={deleting}
+                                    >
+                                        {deleting ? "..." : "Eliminar"}
+                                    </button>
+                                    <p>
+                                        <strong>Fecha:</strong> {asistencia.fecha}
+                                    </p>
+                                    <p>
+                                        <strong>Alumno:</strong> {asistencia.alumno.nombreCompleto}
+                                    </p>
+                                    <p>
+                                        <strong>Estado:</strong>{" "}
+                                        {asistencia.presente ? "Presente" : "Ausente"}
+                                    </p>
                                 </li>
                             ))}
                         </ul>
@@ -120,6 +171,13 @@ const MostrarAsistenciaGeneralPopup = ({ onClose }) => {
                             </button>
                         </div>
                     </div>
+                )}
+                {showConfirmPopup && (
+                    <ConfirmPopup
+                        onConfirm={handleEliminar}
+                        onCancel={() => setShowConfirmPopup(false)}
+                        message="¿Estás seguro de que deseas eliminar esta asistencia?"
+                    />
                 )}
             </div>
         </div>

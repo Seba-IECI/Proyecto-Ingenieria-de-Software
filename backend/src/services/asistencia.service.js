@@ -6,6 +6,25 @@ import SemestreSchema from "../entity/semestre.entity.js";
 import User from "../entity/user.entity.js";
 import { Between } from "typeorm";
 
+export async function eliminarAsistenciaService(asistenciaId, profesorId) {
+    try {
+        const asistenciaRepository = AppDataSource.getRepository(AsistenciaSchema);
+        const asistencia = await asistenciaRepository.findOne({
+            where: { id: asistenciaId, profesor: { id: profesorId } },
+        });
+
+        if (!asistencia) {
+            return [null, "Asistencia no encontrada o no pertenece al profesor actual."];
+        }
+        await asistenciaRepository.remove(asistencia);
+
+        return [{ id: asistenciaId }, null];
+    } catch (error) {
+        return [null, "Error al eliminar la asistencia."];
+    }
+}
+
+
 export async function registrarAsistenciaService(user, alumnoId, semestreId, fecha, presente) {
     try {
         const asistenciaRepository = AppDataSource.getRepository(AsistenciaSchema);

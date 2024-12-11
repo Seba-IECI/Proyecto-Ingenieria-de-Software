@@ -21,6 +21,30 @@ export async function listarAsistencias({ semestreId, alumnoId, startDate, endDa
     }
 }
 
+export async function eliminarAsistencia(id) {
+    if (!id) {
+        throw new Error("El ID de asistencia es obligatorio para eliminar.");
+    }
+
+    try {
+        const response = await axios.delete(`/asistencia/eliminar/${id}`, {
+            headers: {
+                Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+            },
+        });
+
+        if (response.data.status === "Success") {
+            return response.data.message || "Asistencia eliminada correctamente.";
+        } else {
+            throw new Error(response.data.message || "Error al eliminar asistencia.");
+        }
+    } catch (error) {
+        console.error("Error completo en eliminarAsistencia:", error);
+        throw new Error(error.response?.data?.message || "Error desconocido al eliminar asistencia.");
+    }
+}
+
+
 export async function obtenerAsistenciaPorId(id, alumnoId = null) {
     if (!id) {
         throw new Error("El ID de asistencia es obligatorio.");

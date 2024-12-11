@@ -5,6 +5,7 @@ import BuscarEntreFechasPopup from "@components/BuscarEntreFechasPopup";
 import MostrarAsistenciaGeneralPopup from "@components/MostrarAsistenciaGeneralPopup";
 import RegistrarAsistenciaForm from "@components/RegistrarAsistenciaForm";
 import "@styles/asistencias.css";
+import "@styles/asistenciasEliminar.css"; 
 
 const Asistencias = () => {
     const [section, setSection] = useState(null);

@@ -3,12 +3,32 @@
 import {
     actualizarAsistenciaService,
     calcularPorcentajeAsistenciaService,
+    eliminarAsistenciaService,
     listarAsistenciasService,
     obtenerAsistenciaPorIdService,
     registrarAsistenciaService,
     validarAlumnoPorProfesorService
 } from "../services/asistencia.service.js";
 import { handleErrorClient, handleErrorServer, handleSuccess } from "../handlers/responseHandlers.js";
+
+export async function eliminarAsistencia(req, res) {
+    try {
+        const { rol, id: profesorId } = req.user;
+        console.log(`Usuario autenticado: ${rol}, ID Profesor: ${profesorId}`); 
+        const { id } = req.params;
+        if (rol !== "profesor") {
+            return handleErrorClient(res, 403, "Solo los profesores pueden eliminar asistencias.");
+        }
+        if (!id || isNaN(parseInt(id, 10))) {
+            return handleErrorClient(res, 400, "ID de asistencia no válido.");
+        }
+        const [resultado, error] = await eliminarAsistenciaService(parseInt(id, 10), profesorId);
+        if (error) return handleErrorClient(res, 404, error);
+        handleSuccess(res, 200, "Asistencia eliminada correctamente.", resultado);
+    } catch (error) {
+        handleErrorServer(res, 500, "Error al eliminar asistencia.");
+    }
+}
 
 export async function registrarAsistencia(req, res) {
     try {
