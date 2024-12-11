@@ -3,6 +3,7 @@ import useSubirMateria from '@hooks/materia/useSubirMateria';
 import useGetMateria from '@hooks/materia/useGetMateria';
 import useDelMateria from '@hooks/materia/useDelMateria';
 import useUpMateria from '@hooks/materia/useUpMateria';
+import "@styles/materia.css";
 
 const Materia = () => {
     const { handleClickCreate, handleCreate, isPopupOpen, dataMateria, setDataMateria } = useSubirMateria();
@@ -17,6 +18,9 @@ const Materia = () => {
     const [editData, setEditData] = useState({ titulo: '', descripcion: '', url: '' });
     const [editId, setEditId] = useState('');
 
+    useEffect(() => {
+        fetchGetMaterias(); // Cargar materias al inicio
+    }, [fetchGetMaterias]);
 
     const handleDeleteMateria = async (id) => {
         if (!id) {
@@ -49,21 +53,30 @@ const Materia = () => {
     };
 
     return (
-        <div>
+        <div className="materia-container">
             <h1>Gestión de Materias</h1>
 
             {/* Mostrar todas las materias */}
-            <div>
+            <div className="materia-list">
                 <h2>Lista de Materias</h2>
                 {materias.length > 0 ? (
                     <ul>
                         {materias.map((materia) => (
-                            <li key={materia.id}>
-                                <h3>{materia.nombre}</h3>
+                            <li key={materia.id} className="materia-item">
+                                <h3>{materia.titulo}</h3>
                                 <p>{materia.descripcion}</p>
                                 <a href={materia.url} target="_blank" rel="noopener noreferrer">
                                     Ver más
                                 </a>
+                                <button className="edit-button" onClick={() => {
+                                    setEditId(materia.id);
+                                    setEditData({ titulo: materia.titulo, descripcion: materia.descripcion, url: materia.url });
+                                }}>
+                                    ✏️
+                                </button>
+                                <button className="delete-button" onClick={() => handleDeleteMateria(materia.id)}>
+                                    Eliminar
+                                </button>
                             </li>
                         ))}
                     </ul>
@@ -73,7 +86,7 @@ const Materia = () => {
             </div>
 
             {/* Eliminar Materia */}
-            <div>
+            <div className="delete-section">
                 <h2>Eliminar Materia</h2>
                 <input
                     type="text"
@@ -81,18 +94,18 @@ const Materia = () => {
                     onChange={(e) => setDeleteId(e.target.value)}
                     placeholder="ID de la Materia a eliminar"
                 />
-                <button onClick={() => handleDeleteMateria(deleteId)}>
+                <button className="delete-button" onClick={() => handleDeleteMateria(deleteId)}>
                     Eliminar Materia
                 </button>
                 {deleteMessage && <p>{deleteMessage}</p>}
             </div>
 
             {/* Crear Nueva Materia */}
-            <div>
+            <div className="create-section">
                 <h2>Crear Nueva Materia</h2>
                 <button onClick={handleClickCreate}>Crear Materia</button>
                 {isPopupOpen && (
-                    <div>
+                    <div className="popup">
                         <input
                             type="text"
                             placeholder="Título"
@@ -126,7 +139,7 @@ const Materia = () => {
             </div>
 
             {/* Editar Materia */}
-            <div>
+            <div className="edit-section">
                 <h2>Editar Materia</h2>
                 <input
                     type="text"

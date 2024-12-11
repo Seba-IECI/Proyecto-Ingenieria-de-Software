@@ -1,0 +1,37 @@
+.materia-container {
+    padding: 20px;
+}
+
+.materia-list {
+    margin-bottom: 20px;
+}
+
+.materia-item {
+    margin-bottom: 10px;
+}
+
+.edit-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    color: blue;
+    margin-left: 10px;
+}
+
+.delete-button {
+    background-color: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.create-section, .edit-section, .delete-section {
+    margin-top: 20px;
+}
+
+.popup {
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
