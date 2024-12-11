@@ -1,15 +1,18 @@
 import { useState } from "react";
 import useObtenerAsistencia from "@hooks/asistencias/useObtenerAsistencia";
 import useEliminarAsistencia from "@hooks/asistencias/useEliminarAsistencia";
+import ModificarAsistenciaPopup from "@components/ModificarAsistenciaPopup";
 import ConfirmPopup from "@components/ConfirmPopup";
 import "@styles/asistenciasEliminar.css";
+import "@styles/confirm-popup.css";
 
 const ObtenerAsistenciaPopup = ({ alumnoId, onClose }) => {
     const [asistenciaId, setAsistenciaId] = useState("");
     const [showConfirm, setShowConfirm] = useState(false);
+    const [showModificarPopup, setShowModificarPopup] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
 
-    const { asistencia, loading, error, fetchAsistencia } = useObtenerAsistencia();
+    const { asistencia, setAsistencia, loading, error, fetchAsistencia } = useObtenerAsistencia();
     const {
         eliminar,
         loading: deleting,
@@ -41,6 +44,14 @@ const ObtenerAsistenciaPopup = ({ alumnoId, onClose }) => {
     const handleCancel = () => {
         setShowConfirm(false);
         setSelectedId(null);
+    };
+
+    const handleModificarSuccess = (updatedAsistencia) => {
+        setAsistencia((prev) => ({
+            ...prev,
+            presente: updatedAsistencia.presente,
+        }));
+        setShowModificarPopup(false);
     };
 
     const handleContainerClick = () => {
@@ -89,6 +100,12 @@ const ObtenerAsistenciaPopup = ({ alumnoId, onClose }) => {
                         </p>
                         <div className="asistencia-actions">
                             <button
+                                onClick={() => setShowModificarPopup(true)}
+                                className="asistencia-modificar-button"
+                            >
+                                Modificar
+                            </button>
+                            <button
                                 onClick={() => confirmEliminar(asistencia.id)}
                                 disabled={deleting}
                                 className="asistencia-eliminar-button"
@@ -104,6 +121,14 @@ const ObtenerAsistenciaPopup = ({ alumnoId, onClose }) => {
                     message="¿Estás seguro de que deseas eliminar esta asistencia?"
                     onConfirm={() => handleEliminar(selectedId)}
                     onCancel={handleCancel}
+                />
+            )}
+            {showModificarPopup && (
+                <ModificarAsistenciaPopup
+                    asistenciaId={asistencia.id}
+                    presenteActual={asistencia.presente}
+                    onClose={() => setShowModificarPopup(false)}
+                    onSuccess={handleModificarSuccess}
                 />
             )}
         </div>

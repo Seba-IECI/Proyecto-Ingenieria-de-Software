@@ -33,7 +33,7 @@ const useObtenerAsistencia = () => {
         }
     };
 
-    return { asistencia, loading, error, fetchAsistencia };
+    return { asistencia, setAsistencia, loading, error, fetchAsistencia };
 };
 
 export default useObtenerAsistencia;

@@ -21,6 +21,34 @@ export async function listarAsistencias({ semestreId, alumnoId, startDate, endDa
     }
 }
 
+export async function modificarAsistencia(id, presente) {
+    if (!id) {
+        throw new Error("El ID de asistencia es obligatorio para modificar.");
+    }
+
+    try {
+        const response = await axios.put(
+            `/asistencia/actualizar/${id}`,
+            { presente },
+            {
+                headers: {
+                    Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+                },
+            }
+        );
+
+        if (response.data.status === "Success") {
+            return response.data.data;
+        } else {
+            throw new Error(response.data.message || "Error al modificar asistencia.");
+        }
+    } catch (error) {
+        console.error("Error completo en modificarAsistencia:", error);
+        throw new Error(error.response?.data?.message || "Error desconocido al modificar asistencia.");
+    }
+}
+
+
 export async function eliminarAsistencia(id) {
     if (!id) {
         throw new Error("El ID de asistencia es obligatorio para eliminar.");

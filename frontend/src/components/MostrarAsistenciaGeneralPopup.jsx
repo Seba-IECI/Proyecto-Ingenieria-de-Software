@@ -1,8 +1,11 @@
 import { useState } from "react";
 import useListarAsistenciasGenerales from "@hooks/asistencias/useListarAsistenciasGenerales";
 import useEliminarAsistencia from "@hooks/asistencias/useEliminarAsistencia";
+import ModificarAsistenciaPopup from "@components/ModificarAsistenciaPopup";
 import ConfirmPopup from "@components/ConfirmPopup";
 import "@styles/asistenciasEliminar.css";
+import "@styles/asistenciasModificar.css";
+import "@styles/confirm-popup.css";
 
 const MostrarAsistenciaGeneralPopup = ({ onClose }) => {
     const [semestreId, setSemestreId] = useState("");
@@ -10,10 +13,12 @@ const MostrarAsistenciaGeneralPopup = ({ onClose }) => {
     const [endDate, setEndDate] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
-    const [hasSearched, setHasSearched] = useState(false); // Nuevo estado para controlar si se ha buscado
+    const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+    const [showModificarPopup, setShowModificarPopup] = useState(false);
+    const [selectedAsistencia, setSelectedAsistencia] = useState(null);
+    const [selectedId, setSelectedId] = useState(null);
 
-    const { asistencias, loading, error, fetchAsistenciasGenerales } =
-        useListarAsistenciasGenerales();
+    const { asistencias, loading, error, fetchAsistenciasGenerales } = useListarAsistenciasGenerales();
     const {
         eliminar,
         loading: deleting,
@@ -21,9 +26,6 @@ const MostrarAsistenciaGeneralPopup = ({ onClose }) => {
         successMessage,
         resetState,
     } = useEliminarAsistencia();
-
-    const [showConfirmPopup, setShowConfirmPopup] = useState(false);
-    const [asistenciaToDelete, setAsistenciaToDelete] = useState(null);
 
     const handleBuscar = () => {
         if (!semestreId || !startDate || !endDate) {
@@ -33,20 +35,29 @@ const MostrarAsistenciaGeneralPopup = ({ onClose }) => {
         fetchAsistenciasGenerales({ semestreId, startDate, endDate });
         setCurrentPage(1);
         resetState();
-        setHasSearched(true); // Marcar que se realizó una búsqueda
     };
 
     const handleEliminar = async () => {
-        if (!asistenciaToDelete) return;
-        await eliminar(asistenciaToDelete);
+        if (!selectedId) return;
+        await eliminar(selectedId);
         setShowConfirmPopup(false);
-        setAsistenciaToDelete(null);
-        fetchAsistenciasGenerales({ semestreId, startDate, endDate }); // Actualiza la lista
+        setSelectedId(null);
+        fetchAsistenciasGenerales({ semestreId, startDate, endDate });
     };
 
     const handleOpenConfirm = (id) => {
-        setAsistenciaToDelete(id);
+        setSelectedId(id);
         setShowConfirmPopup(true);
+    };
+
+    const handleOpenModificar = (asistencia) => {
+        setSelectedAsistencia(asistencia);
+        setShowModificarPopup(true);
+    };
+
+    const handleModificarSuccess = () => {
+        fetchAsistenciasGenerales({ semestreId, startDate, endDate });
+        setShowModificarPopup(false);
     };
 
     const handleContainerClick = () => {
@@ -105,41 +116,45 @@ const MostrarAsistenciaGeneralPopup = ({ onClose }) => {
                 {error && <p className="error-message">{error}</p>}
                 {successMessage && <p className="success-message">{successMessage}</p>}
                 {deleteError && <p className="error-message">{deleteError}</p>}
-                {!loading && hasSearched && currentItems.length === 0 && (
-                    <p>No hay asistencias disponibles.</p>
-                )}
-                {currentItems.length > 0 && (
+                {asistencias.length > 0 && (
                     <div className="asistencias-resultados">
-                        <div className="asistencias-pagination">
-                            <div className="asistencias-pagination-options">
-                                <label>
-                                    Paginación:
-                                    <select
-                                        value={itemsPerPage}
-                                        onChange={(e) =>
-                                            setItemsPerPage(parseInt(e.target.value, 10))
-                                        }
-                                    >
-                                        <option value={5}>5</option>
-                                        <option value={10}>10</option>
-                                        <option value={20}>20</option>
-                                        <option value={50}>50</option>
-                                        <option value={100}>100</option>
-                                    </select>
-                                </label>
-                            </div>
-                        </div>
                         <h3>Resultados:</h3>
+                        <div className="asistencias-pagination-options">
+                            <label>
+                                Paginación:
+                                <select
+                                    value={itemsPerPage}
+                                    onChange={(e) =>
+                                        setItemsPerPage(parseInt(e.target.value, 10))
+                                    }
+                                >
+                                    <option value={5}>5</option>
+                                    <option value={10}>10</option>
+                                    <option value={20}>20</option>
+                                    <option value={50}>50</option>
+                                    <option value={100}>100</option>
+                                </select>
+                            </label>
+                        </div>
+
                         <ul>
                             {currentItems.map((asistencia) => (
                                 <li key={asistencia.id} className="asistencia-item">
-                                    <button
-                                        className="asistencia-eliminar-button-general"
-                                        onClick={() => handleOpenConfirm(asistencia.id)}
-                                        disabled={deleting}
-                                    >
-                                        {deleting ? "..." : "Eliminar"}
-                                    </button>
+                                    <div className="asistencia-buttons-container">
+                                        <button
+                                            className="asistencia-entrefechas-modificar-button"
+                                            onClick={() => handleOpenModificar(asistencia)}
+                                        >
+                                            Modificar
+                                        </button>
+                                        <button
+                                            className="asistencia-entrefechas-eliminar-button"
+                                            onClick={() => handleOpenConfirm(asistencia.id)}
+                                            disabled={deleting}
+                                        >
+                                            {deleting ? "..." : "Eliminar"}
+                                        </button>
+                                    </div>
                                     <p>
                                         <strong>Fecha:</strong> {asistencia.fecha}
                                     </p>
@@ -147,8 +162,7 @@ const MostrarAsistenciaGeneralPopup = ({ onClose }) => {
                                         <strong>Alumno:</strong> {asistencia.alumno.nombreCompleto}
                                     </p>
                                     <p>
-                                        <strong>Estado:</strong>{" "}
-                                        {asistencia.presente ? "Presente" : "Ausente"}
+                                        <strong>Estado:</strong> {asistencia.presente ? "Presente" : "Ausente"}
                                     </p>
                                 </li>
                             ))}
@@ -174,9 +188,17 @@ const MostrarAsistenciaGeneralPopup = ({ onClose }) => {
                 )}
                 {showConfirmPopup && (
                     <ConfirmPopup
+                        message="¿Estás seguro de que deseas eliminar esta asistencia?"
                         onConfirm={handleEliminar}
                         onCancel={() => setShowConfirmPopup(false)}
-                        message="¿Estás seguro de que deseas eliminar esta asistencia?"
+                    />
+                )}
+                {showModificarPopup && selectedAsistencia && (
+                    <ModificarAsistenciaPopup
+                        asistenciaId={selectedAsistencia.id}
+                        presenteActual={selectedAsistencia.presente}
+                        onClose={() => setShowModificarPopup(false)}
+                        onSuccess={handleModificarSuccess}
                     />
                 )}
             </div>

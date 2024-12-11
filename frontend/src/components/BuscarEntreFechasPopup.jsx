@@ -1,8 +1,10 @@
 import { useState } from "react";
 import useListarAsistencias from "@hooks/asistencias/useListarAsistencias";
 import useEliminarAsistencia from "@hooks/asistencias/useEliminarAsistencia";
+import ModificarAsistenciaPopup from "@components/ModificarAsistenciaPopup";
 import ConfirmPopup from "@components/ConfirmPopup";
 import "@styles/asistenciasEliminar.css";
+import "@styles/confirm-popup.css";
 
 const BuscarEntreFechasPopup = ({ alumnoId, onClose }) => {
     const [semestreId, setSemestreId] = useState("");
@@ -14,7 +16,9 @@ const BuscarEntreFechasPopup = ({ alumnoId, onClose }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
     const [showConfirm, setShowConfirm] = useState(false);
+    const [showModificarPopup, setShowModificarPopup] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
+    const [selectedAsistencia, setSelectedAsistencia] = useState(null);
 
     const handleBuscar = () => {
         if (!semestreId || !startDate || !endDate) {
@@ -37,6 +41,16 @@ const BuscarEntreFechasPopup = ({ alumnoId, onClose }) => {
     const handleOpenConfirm = (id) => {
         setSelectedId(id);
         setShowConfirm(true);
+    };
+
+    const handleOpenModificar = (asistencia) => {
+        setSelectedAsistencia(asistencia);
+        setShowModificarPopup(true);
+    };
+
+    const handleModificarSuccess = () => {
+        fetchAsistencias({ semestreId, alumnoId, startDate, endDate });
+        setShowModificarPopup(false);
     };
 
     const handleContainerClick = () => {
@@ -93,9 +107,7 @@ const BuscarEntreFechasPopup = ({ alumnoId, onClose }) => {
                 </div>
                 {loading && <p>Cargando asistencias...</p>}
                 {error && <p className="error-message">{error}</p>}
-                {successMessage && (
-                    <p className="success-message">{successMessage}</p>
-                )}
+                {successMessage && <p className="success-message">{successMessage}</p>}
                 {deleteError && <p className="error-message">{deleteError}</p>}
                 {asistencias.length > 0 && (
                     <div className="asistencias-resultados">
@@ -106,9 +118,7 @@ const BuscarEntreFechasPopup = ({ alumnoId, onClose }) => {
                                 <select
                                     value={itemsPerPage}
                                     onChange={(e) =>
-                                        setItemsPerPage(
-                                            parseInt(e.target.value, 10)
-                                        )
+                                        setItemsPerPage(parseInt(e.target.value, 10))
                                     }
                                 >
                                     <option value={5}>5</option>
@@ -123,28 +133,29 @@ const BuscarEntreFechasPopup = ({ alumnoId, onClose }) => {
                         <ul>
                             {currentItems.map((asistencia) => (
                                 <li key={asistencia.id} className="asistencia-item">
-                                    <button
-                                        className="asistencia-eliminar-button-entreFechas"
-                                        onClick={() =>
-                                            handleOpenConfirm(asistencia.id)
-                                        }
-                                        disabled={deleting}
-                                    >
-                                        {deleting ? "..." : "Eliminar"}
-                                    </button>
+                                    <div className="asistencia-buttons-container">
+                                        <button
+                                            className="asistencia-entrefechas-modificar-button"
+                                            onClick={() => handleOpenModificar(asistencia)}
+                                        >
+                                            Modificar
+                                        </button>
+                                        <button
+                                            className="asistencia-entrefechas-eliminar-button"
+                                            onClick={() => handleOpenConfirm(asistencia.id)}
+                                            disabled={deleting}
+                                        >
+                                            {deleting ? "..." : "Eliminar"}
+                                        </button>
+                                    </div>
                                     <p>
-                                        <strong>Fecha:</strong>{" "}
-                                        {asistencia.fecha}
+                                        <strong>Fecha:</strong> {asistencia.fecha}
                                     </p>
                                     <p>
-                                        <strong>Alumno:</strong>{" "}
-                                        {asistencia.alumno.nombreCompleto}
+                                        <strong>Alumno:</strong> {asistencia.alumno.nombreCompleto}
                                     </p>
                                     <p>
-                                        <strong>Estado:</strong>{" "}
-                                        {asistencia.presente
-                                            ? "Presente"
-                                            : "Ausente"}
+                                        <strong>Estado:</strong> {asistencia.presente ? "Presente" : "Ausente"}
                                     </p>
                                 </li>
                             ))}
@@ -152,9 +163,7 @@ const BuscarEntreFechasPopup = ({ alumnoId, onClose }) => {
                         <div className="asistencias-pagination-controls">
                             <button
                                 disabled={currentPage === 1}
-                                onClick={() =>
-                                    setCurrentPage((prev) => prev - 1)
-                                }
+                                onClick={() => setCurrentPage((prev) => prev - 1)}
                             >
                                 Anterior
                             </button>
@@ -163,9 +172,7 @@ const BuscarEntreFechasPopup = ({ alumnoId, onClose }) => {
                             </span>
                             <button
                                 disabled={currentPage === totalPages}
-                                onClick={() =>
-                                    setCurrentPage((prev) => prev + 1)
-                                }
+                                onClick={() => setCurrentPage((prev) => prev + 1)}
                             >
                                 Siguiente
                             </button>
@@ -177,6 +184,14 @@ const BuscarEntreFechasPopup = ({ alumnoId, onClose }) => {
                         message="¿Estás seguro de que deseas eliminar esta asistencia?"
                         onConfirm={handleEliminar}
                         onCancel={() => setShowConfirm(false)}
+                    />
+                )}
+                {showModificarPopup && selectedAsistencia && (
+                    <ModificarAsistenciaPopup
+                        asistenciaId={selectedAsistencia.id}
+                        presenteActual={selectedAsistencia.presente}
+                        onClose={() => setShowModificarPopup(false)}
+                        onSuccess={handleModificarSuccess}
                     />
                 )}
             </div>

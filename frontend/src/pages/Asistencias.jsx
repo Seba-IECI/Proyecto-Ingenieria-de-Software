@@ -6,6 +6,8 @@ import MostrarAsistenciaGeneralPopup from "@components/MostrarAsistenciaGeneralP
 import RegistrarAsistenciaForm from "@components/RegistrarAsistenciaForm";
 import "@styles/asistencias.css";
 import "@styles/asistenciasEliminar.css"; 
+import "@styles/asistenciasModificar.css"; 
+import "@styles/confirm-popup.css";
 
 const Asistencias = () => {
     const [section, setSection] = useState(null);

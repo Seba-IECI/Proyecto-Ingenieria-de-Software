@@ -106,24 +106,19 @@
     border-radius: 8px;
     color: white;
     background-color: #ff5c5c;
-    /* Rojo vibrante */
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(255, 92, 92, 0.4);
-    /* Sombra suave */
     transition: all 0.3s ease-in-out;
 }
 
 .asistencia-eliminar-button-general:hover {
     background-color: #e63946;
-    /* Rojo más oscuro */
     transform: scale(1.1);
-    /* Ampliación ligera */
     box-shadow: 0 6px 12px rgba(230, 57, 70, 0.5);
 }
 
 .asistencia-eliminar-button-general:disabled {
     background-color: #cccccc;
-    /* Gris para estado deshabilitado */
     color: #666666;
     cursor: not-allowed;
     box-shadow: none;
@@ -185,4 +180,19 @@
 .cancel-button:hover {
     background-color: #c82333;
     transform: scale(1.05);
+}
+
+.asistencia-buttons-container .asistencia-entrefechas-eliminar-button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+}
+
+.asistencia-buttons-container .asistencia-entrefechas-eliminar-button:hover {
+    background-color: #e53935;
 }
