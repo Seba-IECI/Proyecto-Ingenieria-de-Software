@@ -44,9 +44,10 @@ export async function getMateriaService() {
 export async function updateMateriaService(query, body) {
     try {
         const { id } = query;
+        const { titulo } = body;
         const materiaRepository = AppDataSource.getRepository(Materia);
         const materiaFound = await materiaRepository.findOne({
-            where: [{ id: id }],
+            where: { id },
         });
 
         if (!materiaFound) return [null, "Materia no encontrada"];
