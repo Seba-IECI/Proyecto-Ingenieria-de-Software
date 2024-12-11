@@ -1,4 +1,3 @@
-// src/components/Materia.jsx
 import { useState } from 'react';
 import useGetMateria from '@hooks/materia/useGetMateria';
 import "@styles/materias.css";
@@ -9,7 +8,7 @@ const Materias = () => {
     return (
         <div className="materia-container">
             <header className="materia-header">
-                <h1>Gestión de Materias</h1>
+                <h1>Apartado de Materias</h1>
             </header>
 
             <main className="materia-content">

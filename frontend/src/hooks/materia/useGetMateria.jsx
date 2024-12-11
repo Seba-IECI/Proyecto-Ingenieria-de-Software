@@ -1,35 +1,34 @@
-import { useState,useEffect } from 'react';
-import { getMaterias } from '@services/materia.service';
+import { useState, useEffect, useCallback } from "react";
+import { getMaterias } from "@services/materia.service";
 
 const useGetMateria = () => {
-    const [materias, setMaterias] = useState({});
-    const [loading, setLoading] = useState(true);
+    const [materias, setMaterias] = useState([]); 
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [refresh, setRefresh] = useState(false);
-    
+
+    const fetchMaterias = useCallback(async () => {
+        setLoading(true);
+        setError(null); 
+        try {
+            const response = await getMaterias();
+            setMaterias(response.data || []); 
+        } catch (error) {
+            setError(error.message || "Error al cargar las materias");
+        } finally {
+            setLoading(false); 
+        }
+    }, []);
+
     useEffect(() => {
-        const fetchMaterias = async () => {
-            try {
-                const response = await getMaterias();
-                setMaterias(response.data);
-                setLoading(false);
-                } catch (error) {
-                    setError(error.message);
-                    setLoading(false);
-             }
-        };
-                    setRefresh(false);
-                    fetchMaterias();
-                    }
-        , [refresh]);
+        fetchMaterias();
+    }, [fetchMaterias]);
 
     return {
-        fetchGetMaterias: () => setRefresh(true),
+        fetchGetMaterias: fetchMaterias, 
         materias,
         loading,
-        error
+        error,
     };
-}
-    
+};
 
 export default useGetMateria;
