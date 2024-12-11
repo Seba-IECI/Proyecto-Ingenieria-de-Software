@@ -63,38 +63,42 @@ export async function deshabilitarTareaService(query) {
     }
 }
 
-export async function getTareaService(query){
+export async function getTareaService(){
     try{
-        const { id } = query;
-        const tareaFound = await AppDataSource.getRepository(Tarea).findOne({
-            where: [{ id: id }],
-        });
+        const tareas = await AppDataSource.getRepository(Tarea).find();
 
-        if(!tareaFound) return [null, "Tarea no encontrada"];
-        return [tareaFound, null];
+        if(tareas.length === 0) return [null, "No se encontraron tareas"];
+        return [tareas, null];
     } catch (error){
-        console.error("Error al obtener la tarea:", error);
+        console.error("Error al obtener las tareas:", error);
         return [null, "Error interno del servidor"];
     }
 }
 
-export async function updateTareaService(query,body){
-    try{
+export async function updateTareaService(query, body) {
+    try {
         const { id } = query;
+        const { titulo } = body;
         const tareaRepository = AppDataSource.getRepository(Tarea);
+
         const tareaFound = await tareaRepository.findOne({
-            where: [{ id: id }],
+            where: { id: id },
         });
 
-        if(!tareaFound) return [null, "Tarea no encontrada"];
+        if (!tareaFound) return [null, "Tarea no encontrada"];
+
+        const tareaWithSameTitle = await tareaRepository.findOne({
+            where: { titulo: titulo },
+        });
+
+        if (tareaWithSameTitle) return [null, "Ya existe una tarea con ese título"];
 
         await tareaRepository.update(id, body);
         return [await tareaRepository.findOne({ where: { id: id } }), null];
-    } catch (error){
+    } catch (error) {
         console.error("Error al actualizar la tarea:", error);
         return [null, "Error interno del servidor"];
     }
-        
 }
 
 export async function deleteTareaService(query){

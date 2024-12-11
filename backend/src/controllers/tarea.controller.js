@@ -62,15 +62,12 @@ export async function deshabilitarTarea(req, res) {
 
 export async function getTarea(req, res) {
     try {
-        const { id } = req.params;
+        const [tareas, errorTareas] = await getTareaService();
 
-        const [tarea, errorTarea] = await getTareaService({ id });
+        if (errorTareas) return handleErrorClient(res, 404, errorTareas);
 
-        if (errorTarea) return handleErrorClient(res, 404, errorTarea);
-
-        handleSuccess(res, 200, "Tarea encontrada", tarea);
-    }
-    catch (error) {
+        handleSuccess(res, 200, "Tareas obtenidas", tareas);
+    } catch (error) {
         handleErrorServer(res, 500, error.message);
     }
 }

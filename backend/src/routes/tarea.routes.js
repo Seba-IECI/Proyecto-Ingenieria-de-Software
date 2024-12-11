@@ -18,7 +18,7 @@ router
 
 router
     .post("/crear", isProfesor, crearTarea)
-    .get("/mostrar/:id", isProfesorOrEstudiante, getTarea)
+    .get("/mostrar", isProfesorOrEstudiante, getTarea)
     .patch("/actualizar/:id", isProfesor, updateTarea)
     .delete("/deshabilitar/:id", isProfesor, deshabilitarTarea)
     .patch("/habilitar/:id", isProfesor, habilitarTarea)
