@@ -1,0 +1,61 @@
+
+
+.materia-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: auto;
+    font-family: Arial, sans-serif;
+}
+
+.materia-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.materia-content {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.materia-list {
+    margin-top: 20px;
+}
+
+.materias {
+    list-style-type: none;
+    padding: 0;
+}
+
+.materia-item {
+    margin-bottom: 15px;
+}
+
+.materia-card {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    transition: box-shadow 0.3s;
+}
+
+.materia-card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.materia-link {
+    display: inline-block;
+    margin-top: 10px;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.materia-link:hover {
+    text-decoration: underline;
+}
+
+.loading, .error {
+    text-align: center;
+    color: #ff0000;
+}
