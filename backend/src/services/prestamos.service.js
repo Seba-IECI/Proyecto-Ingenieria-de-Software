@@ -30,8 +30,8 @@ export async function createPrestamoService(data) {
       return [null, error];
     }
 
-    if (amonestaciones.some((amonestacion) => amonestacion.activa)) {
-      return [null, "El usuario tiene amonestaciones activas y no puede solicitar un préstamo"];
+    if (usuario.amonestacionesActivas >= 3) {
+      return [null, "El usuario tiene mas de 3 amonestaciones y no puede solicitar un préstamo"];
     }
 
     const prestamoActivoUsuario = await prestamoRepository.findOne({
@@ -78,8 +78,10 @@ export async function createPrestamoService(data) {
     }
 
     const fechaPrestamo = new Date();
-    const fechaVencimiento = new Date(fechaPrestamo);
-    fechaVencimiento.setDate(fechaPrestamo.getDate() + diasPrestamo);
+const fechaVencimiento = new Date(fechaPrestamo.getTime()); 
+fechaVencimiento.setDate(fechaVencimiento.getDate() + parseInt(diasPrestamo, 10)); 
+
+
 
     const nuevoPrestamo = prestamoRepository.create({
       usuario,
@@ -88,6 +90,7 @@ export async function createPrestamoService(data) {
       fechaVencimiento,
       itemsAsociados: JSON.stringify(itemsAsociados),
       codigosAsociados: JSON.stringify(codigosBarras),
+      
     });
 
     for (const codigoBarrasEntity of codigosBarrasEntities) {
@@ -213,6 +216,7 @@ export async function getPrestamoService(query) {
         fechaDevolucion: prestamo.fechaDevolucion,
         nombreUsuario: prestamo.usuario?.nombreCompleto || "Usuario no disponible",
         rutUsuario: prestamo.usuario?.rut || "RUT no disponible",
+        userid : prestamo.user_id,
         estado: prestamo.estado,
         items: itemsAsociados.length > 0 ? itemsAsociados : ["Item no disponible"],
         codigosBarras: codigosAsociados.length > 0 ? codigosAsociados : ["Item no disponible"],
@@ -368,6 +372,7 @@ export async function prestamoVencidoService(id) {
       return [null, "El préstamo o el usuario asociado no se encuentran disponibles"];
     }
 
+
     const fechaActual = new Date();
     const fechaDevolucion = new Date(prestamo.fechaDevolucion);
 
@@ -391,6 +396,30 @@ export async function prestamoVencidoService(id) {
     return [{ message: "El préstamo no está vencido." }, null];
   } catch (error) {
     console.error("Error al verificar el préstamo:", error);
+    return [null, "Error interno del servidor"];
+  }
+}
+
+export async function actualizarComentarioPrestamo(id, comentario) {
+  try {
+    const prestamoRepository = AppDataSource.getRepository("Prestamos");
+
+    
+    const prestamo = await prestamoRepository.findOne({ where: { id, estado: 1 } }); // Estado 1: Activo
+    if (!prestamo) {
+      console.error(`Préstamo con ID ${id} no encontrado o no está activo.`);
+      return [null, "Préstamo no encontrado o no está activo"];
+    }
+
+    
+    prestamo.comentario = comentario;
+
+    
+    await prestamoRepository.save(prestamo);
+
+    return [prestamo, null];
+  } catch (error) {
+    console.error("Error al actualizar el comentario del préstamo:", error.message || error);
     return [null, "Error interno del servidor"];
   }
 }

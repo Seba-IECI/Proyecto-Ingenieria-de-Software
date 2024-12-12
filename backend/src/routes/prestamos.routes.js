@@ -1,6 +1,7 @@
 import { Router }from "express";
 import {
     cerrarPrestamoController,
+    comentarioPrestamoController,
     createPrestamoController,
     getPrestamoController,
     getPrestamosPorEstadoController
@@ -22,9 +23,11 @@ router.post("/",isProfesor, createPrestamoController);
 
 
 router.get("/estado", getPrestamosPorEstadoController);
-
+router.patch("/comentario",comentarioPrestamoController);
 
 
 router.patch("/cerrar",isProfesor, cerrarPrestamoController);
+
+
 
 export default router;

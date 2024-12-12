@@ -55,3 +55,40 @@ export async function getAmonestacionesService(userId) {
       return [null, "Error interno del servidor"];
     }
   }
+
+
+  export async function addAmonestacionRut(identifier) {
+    try {
+      const userRepository = AppDataSource.getRepository(User);
+  
+     
+      let user = await userRepository.findOne({ where: { rut: identifier } });
+  
+      if (!user) {
+        console.log("no encontro por rut, buscara por id")
+        user = await userRepository.findOne({ where: { id: identifier } });
+      }
+  
+      if (!user) {
+        console.error("Usuario no encontrado con RUT o ID:", identifier);
+        return [null, "Usuario no encontrado"];
+      }
+  
+      user.amonestacionesActivas += 1;
+      user.amonestacionesTotales += 1;
+  
+      await userRepository.save(user);
+  
+      return [
+        {
+          amonestacionesActivas: user.amonestacionesActivas,
+          amonestacionesTotales: user.amonestacionesTotales,
+        },
+        null,
+      ];
+    } catch (error) {
+      console.error("Error al añadir una amonestación:", error);
+      return [null, "Error interno del servidor"];
+    }
+  }
+  

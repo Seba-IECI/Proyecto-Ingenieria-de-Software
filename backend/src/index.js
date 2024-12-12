@@ -84,10 +84,10 @@ async function setupAPI() {
     console.log("Error en index.js -> setupAPI(), el error es: ", error);
   }
 
-  // Programación del cron job
+  
   
 }
-cron.schedule("0 0 * * *", () => { // Cambia el intervalo según tus necesidades
+cron.schedule("* * * * *", () => { 
   console.log("Cron job ejecutado");
   revisarPrestamos()
     .then(console.log)

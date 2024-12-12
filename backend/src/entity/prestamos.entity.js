@@ -36,6 +36,10 @@ const PrestamosSchema = new EntitySchema({
       type: "text", 
       nullable: true,
     },
+    comentario:{
+      type : "text",
+      nullable: true,
+    }
   },
   relations: {
     usuario: {
@@ -43,6 +47,13 @@ const PrestamosSchema = new EntitySchema({
       target: "User",
       joinColumn: { name: "user_id" },
       nullable: false,
+      onDelete: "CASCADE",
+    },
+    item: {
+      type: "many-to-one",
+      target: "Item",
+      joinColumn: { name: "item_id" },
+      nullable: true,
       onDelete: "CASCADE",
     },
     
