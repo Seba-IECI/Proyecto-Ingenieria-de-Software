@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { getPrestamos, cerrarPrestamo, createPrestamo } from "@services/prestamo.service";
+import {
+  getPrestamos,
+  cerrarPrestamo,
+  createPrestamo,
+  addAmonestacion,
+  addComentario,
+} from "@services/prestamo.service";
 import "@styles/prestamos.css";
 
 export default function Prestamos() {
@@ -18,6 +24,39 @@ export default function Prestamos() {
   const [searchTermCerrados, setSearchTermCerrados] = useState("");
   const [popupActivos, setPopupActivos] = useState(false);
   const [popupCerrados, setPopupCerrados] = useState(false);
+  const [popupAmonestacion, setPopupAmonestacion] = useState(false);
+  const [selectedUsuarioId, setSelectedUsuarioId] = useState(null);
+  const [selectedPrestamoId, setSelectedPrestamoId] = useState(null);
+  const [amonestacionDescripcion, setAmonestacionDescripcion] = useState("");
+
+ 
+
+  const handleAddAmonestacion = async (usuarioId) => {
+    try {
+      
+      await addAmonestacion(usuarioId);
+      console.log (" envio d ela id al servixcio de front")
+      window.alert("Amonestación añadida con éxito.");
+    } catch (error) {
+      console.error("Error al añadir amonestación:", error);
+      window.alert(`Error al añadir amonestación: ${error.message}`);
+    }
+  };
+
+  const handleAddComentario = async (prestamoId, comentario) => {
+    try {
+      if (!comentario.trim()) {
+        window.alert("Por favor, escribe un comentario válido.");
+        return;
+      }
+
+      await addComentario(prestamoId, comentario);
+      window.alert("Comentario añadido al préstamo con éxito.");
+    } catch (error) {
+      console.error("Error al añadir comentario:", error);
+      window.alert(`Error al añadir comentario: ${error.message}`);
+    }
+  };
 
   const fetchPrestamos = () => {
     setLoading(true);
@@ -48,34 +87,40 @@ export default function Prestamos() {
       });
   };
 
+   const openAmonestacionPopup = (usuarioId, prestamoId) => {
+    console.log("Usuario ID recibido:", usuarioId);
+    console.log("Préstamo ID recibido:", prestamoId);
+    setSelectedUsuarioId(usuarioId);
+    setSelectedPrestamoId(prestamoId);
+    setPopupAmonestacion(true);
+  };
+
   const handleCrearPrestamo = () => {
     if (!nuevoPrestamo.rut || nuevoPrestamo.codigosBarras.length === 0 || !nuevoPrestamo.diasPrestamo) {
-      console.error("Faltan datos para crear el préstamo:", nuevoPrestamo);
-      setError("Por favor, completa todos los campos antes de enviar.");
       window.alert("Por favor, completa todos los campos antes de enviar.");
       return;
     }
-
-    console.log("Datos preparados para enviar:", nuevoPrestamo);
-
+  
     createPrestamo(nuevoPrestamo)
       .then((response) => {
-        if (response?.error) {
-          setError(`Error: ${response.error}`);
-          window.alert(`Error al crear el préstamo: ${response.error}`);
-        } else {
-          console.log("Préstamo creado con éxito:", response);
-          window.alert(`Préstamo creado exitosamente: ${response.message || "Sin mensaje"}`);
-          fetchPrestamos();
-          setNuevoPrestamo({ rut: "", codigosBarras: [], diasPrestamo: "" });
+        if (response?.error || response?.message) {
+          console.error("Error en la creación del préstamo:", response.error || response.message);
+          window.alert(`Error al crear el préstamo: ${response.error || response.message}`);
+          return; 
         }
+  
+        
+        window.alert("Préstamo creado exitosamente.");
+        fetchPrestamos();
+        setNuevoPrestamo({ rut: "", codigosBarras: [], diasPrestamo: "" });
       })
       .catch((error) => {
         console.error("Error al crear el préstamo:", error);
-        setError("No se pudo crear el préstamo.");
         window.alert(`Error al crear el préstamo: ${error.response?.data?.message || error.message}`);
       });
   };
+  
+  
 
   const handleAddCodigoBarra = () => {
     if (codigoBarraInput.trim() === "") return;
@@ -84,7 +129,6 @@ export default function Prestamos() {
       ...prev,
       codigosBarras: [...prev.codigosBarras, codigoBarraInput.trim()],
     }));
-
     setCodigoBarraInput("");
   };
 
@@ -130,7 +174,6 @@ export default function Prestamos() {
   return (
     <div className="prestamos-container">
       <h1 className="prestamos-title">Préstamos</h1>
-
       {error && <p className="error">{error}</p>}
 
       <div className="crear-prestamo">
@@ -155,7 +198,7 @@ export default function Prestamos() {
                 onChange={(e) => setCodigoBarraInput(e.target.value)}
                 placeholder="Código de barra"
               />
-              <button type="button" onClick={handleAddCodigoBarra}>
+              <button type="button" onClick={() => handleAddCodigoBarra()}>
                 Añadir
               </button>
             </div>
@@ -176,24 +219,21 @@ export default function Prestamos() {
               type="number"
               name="diasPrestamo"
               value={nuevoPrestamo.diasPrestamo}
-              onChange={(e) =>
-                setNuevoPrestamo({ ...nuevoPrestamo, diasPrestamo: e.target.value })
-              }
+              onChange={(e) => setNuevoPrestamo({ ...nuevoPrestamo, diasPrestamo: e.target.value })}
               placeholder="Días"
             />
           </label>
-          <button type="button" onClick={handleCrearPrestamo}>
+          <button type="button" onClick={() => handleCrearPrestamo()}>
             Crear Préstamo
           </button>
         </form>
       </div>
 
-        <div className="popup-buttons">
+      <div className="popup-buttons">
         <button onClick={() => setPopupActivos(true)}>Ver Préstamos Activos</button>
         <button onClick={() => setPopupCerrados(true)}>Ver Préstamos Cerrados</button>
       </div>
 
-          
       {popupActivos && (
         <div className="popup-overlay">
           <div className="popup-content">
@@ -216,6 +256,8 @@ export default function Prestamos() {
               </thead>
               <tbody>
                 {filteredActivos.map((prestamo) => (
+                  
+                  
                   <tr key={prestamo.id}>
                     <td>{prestamo.nombreUsuario}</td>
                     <td>
@@ -235,6 +277,9 @@ export default function Prestamos() {
                     <td>{new Date(prestamo.fechaPrestamo).toLocaleString()}</td>
                     <td>
                       <button onClick={() => handleCerrarPrestamo(prestamo.id)}>Cerrar</button>
+                      <button onClick={() => openAmonestacionPopup(prestamo.rutUsuario, prestamo.id)}>
+                        Añadir Amonestación
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -244,14 +289,63 @@ export default function Prestamos() {
           </div>
         </div>
       )}
-      
-      
+
+      {popupAmonestacion && (
+        <div className="popup-overlay">
+          <div className="popup-content">
+            <h2>Añadir Amonestación</h2>
+            <form onSubmit={(e) => e.preventDefault()}>
+              <label>
+                Descripción del Comentario:
+                <textarea
+                  value={amonestacionDescripcion}
+                  onChange={(e) => setAmonestacionDescripcion(e.target.value)}
+                  placeholder="Escribe el comentario relacionado con el préstamo"
+                />
+              </label>
+              <button
+  onClick={async () => {
+    try {
+      if (!amonestacionDescripcion.trim()) {
+        window.alert("Por favor, escribe una descripción válida.");
+        return;
+      }
+
+      console.log ("id del suuario",selectedUsuarioId)
+
+      if (selectedUsuarioId) {
+        await handleAddAmonestacion(selectedUsuarioId);
+        console.log("Amonestación añadida con éxito.");
+      }
+
+      if (selectedPrestamoId) {
+        await handleAddComentario(selectedPrestamoId, amonestacionDescripcion);
+        console.log("Comentario añadido al préstamo con éxito.");
+      }
+
+      window.alert("Comentario y amonestación añadidos con éxito.");
+      setPopupAmonestacion(false); 
+    } catch (error) {
+      console.error("Error al procesar la solicitud:", error.message);
+      window.alert("Ocurrió un error. Por favor, inténtalo de nuevo.");
+    }
+  }}
+>
+  Confirmar
+</button>
+              <button onClick={() => setPopupAmonestacion(false)}>Cancelar</button>
+            </form>
+          </div>
+        </div>
+      )}
+
       {popupCerrados && (
         <div className="popup-overlay">
           <div className="popup-content">
-          <button className="popup-close-button" onClick={() => setPopupCerrados(false)}>Cerrar</button>
+            <button className="popup-close-button" onClick={() => setPopupCerrados(false)}>
+              Cerrar
+            </button>
             <h2>Préstamos Cerrados</h2>
-
             <input
               type="text"
               placeholder="Buscar en préstamos cerrados..."
@@ -290,11 +384,9 @@ export default function Prestamos() {
                 ))}
               </tbody>
             </table>
-            
           </div>
         </div>
       )}
-      
     </div>
   );
 }

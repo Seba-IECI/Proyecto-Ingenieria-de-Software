@@ -46,6 +46,37 @@ export async function createPrestamo(data) {
     }
 }
 
+export const addAmonestacion = async (identifier) => {
+    try {
+        console.log("se recibe id de usuario en sercvico de front")
+      const response = await axios.post(`amonestaciones/rut`, { identifier });
+      return response.data;
+    } catch (error) {
+      console.error("Error al añadir amonestación:", error);
+      throw new Error(error.response?.data?.message || "Error al añadir amonestación");
+    }
+  };
+
+
+  export const addComentario = async (id, comentario) => {
+    try {
+      
+      if (!id || comentario === undefined) {
+        throw new Error("Los campos 'id' y 'comentario' son obligatorios.");
+      }
+  
+      
+      const response = await axios.patch("/prestamos/comentario", {
+        id,
+        comentario,
+      });
+  
+      return response.data; 
+    } catch (error) {
+      console.error("Error al agregar comentario:", error.response?.data || error.message);
+      throw error; 
+    }
+  };
 
 
 

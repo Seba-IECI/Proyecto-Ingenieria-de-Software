@@ -114,6 +114,18 @@ const Navbar = () => {
                             </li>
                             <li>
                                 <NavLink
+                                    to="/prestamos"
+                                    onClick={() => {
+                                        setMenuOpen(false);
+                                        addActiveClass();
+                                    }}
+                                    activeClassName="active"
+                                >
+                                    Prestamos
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink
                                     to="/materia"
                                     onClick={() => {
                                         setMenuOpen(false);
