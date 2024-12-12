@@ -2,6 +2,7 @@
 import { Router } from "express";
 import userRoutes from "./user.routes.js";
 import authRoutes from "./auth.routes.js";
+import amonestacionesRoutes from "./amonestaciones.routes.js";
 import emailRoutes from "./email.routes.js";
 import inventarioRoutes from "./inventario.routes.js";
 import prestamosRoutes from "./prestamos.routes.js";
@@ -28,7 +29,8 @@ router
     .use("/semestres", semestreRoutes)
     .use("/asistencia", asistenciaRoutes)
     .use("/documentosTarea", documentosTareaRoutes)
-    .use("/periodoPractica", periodoPracticaRoutes);
+    .use("/periodoPractica", periodoPracticaRoutes)
+    .use("/amonestaciones",amonestacionesRoutes);
    
     
 export default router;
