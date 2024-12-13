@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { modificarDocumento } from "@services/documentosPractica.service";
 
-export default function useModificarDocumento(fetchDocumentos) {
+export default function useModificarDocumento(fetchDocumentos, userRole) {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [selectedDocumento, setSelectedDocumento] = useState(null);
     const [error, setError] = useState(null);
@@ -35,7 +35,10 @@ export default function useModificarDocumento(fetchDocumentos) {
 
         try {
             const formData = new FormData();
-            formData.append("especialidad", selectedDocumento.especialidad);
+            formData.append("nombre", selectedDocumento.nombre);
+            if (userRole === "encargadoPracticas") {
+                formData.append("especialidad", selectedDocumento.especialidad);
+            }
             formData.append("archivo", selectedDocumento.archivo);
 
             console.log("Enviando al backend:", selectedDocumento.id, formData);
@@ -50,6 +53,7 @@ export default function useModificarDocumento(fetchDocumentos) {
                         doc.id === updatedDocumento.id
                             ? {
                                 ...doc,
+                                nombre: updatedDocumento.nombre,
                                 especialidad: updatedDocumento.especialidad,
                                 url: updatedDocumento.documento,
                                 fechaSubida: new Date(updatedDocumento.updatedAt).toLocaleDateString("es-CL"),

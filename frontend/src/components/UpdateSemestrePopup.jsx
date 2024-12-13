@@ -17,7 +17,7 @@ export default function UpdateSemestrePopup({
     if (!show) return null;
 
     const handleCheckboxClick = (e) => {
-        if (existeOtroActivo && !semestreData.estado) {
+        if (e.target.checked && existeOtroActivo && !semestreData.estado) {
             e.preventDefault();
             setMostrarMensaje(true);
             setTimeout(() => setMostrarMensaje(false), 3000);

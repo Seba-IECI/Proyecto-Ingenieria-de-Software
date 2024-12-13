@@ -15,6 +15,7 @@ import DocumentosPractica from '@pages/DocumentosPractica';
 import Semestres from '@pages/Semestres';
 import Asistencias from '@pages/Asistencias';
 import Prestamos from '@pages/Prestamos';
+import PorcentajeAsistencia from '@pages/PorcentajeAsistencia';
 import '@styles/styles.css';
 
 const router = createBrowserRouter([
@@ -93,8 +94,16 @@ const router = createBrowserRouter([
       {
         path: '/asistencias',
         element: (
-          <ProtectedRoute allowedRoles={['profesor', 'usuario']}>
+          <ProtectedRoute allowedRoles={['profesor']}>
             <Asistencias />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/porcentaje',
+        element: (
+          <ProtectedRoute allowedRoles={['usuario']}>
+            <PorcentajeAsistencia />
           </ProtectedRoute>
         ),
       },

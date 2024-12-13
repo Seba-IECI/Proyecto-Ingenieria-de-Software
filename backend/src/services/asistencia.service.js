@@ -222,46 +222,43 @@ export async function validarAlumnoPorProfesorService(alumnoId, profesorId) {
     }
 }
 
-export async function calcularPorcentajeAsistenciaService(alumnoId, semestreId) {
+export async function calcularPorcentajeAsistenciaService(profesorId, startDate, endDate, alumnoId) {
     try {
         const asistenciaRepository = AppDataSource.getRepository(AsistenciaSchema);
-        const semestreRepository = AppDataSource.getRepository(SemestreSchema);
-        const userRepository = AppDataSource.getRepository(User);
 
-        const alumno = await userRepository.findOneBy({ id: alumnoId });
-        if (!alumno || alumno.rol !== "usuario") {
-            return [null, "El alumno no existe o no tiene el rol correcto"];
+        if (!profesorId || !alumnoId) {
+            return [null, "El ID del profesor y del alumno son obligatorios."];
         }
 
-        const semestre = await semestreRepository.findOneBy({ id: semestreId });
-        if (!semestre) {
-            return [null, "El semestre no existe"];
-        }
+        const start = new Date(startDate);
+        const end = new Date(endDate);
 
-        if (!semestre.estado) {
-            return [null, "El semestre no está activo"];
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+            return [null, "Las fechas proporcionadas no son válidas."];
         }
 
         const asistencias = await asistenciaRepository.find({
             where: {
                 alumno: { id: alumnoId },
-                semestre: { id: semestreId },
+                profesor: { id: profesorId },
+                fecha: Between(start, end),
             },
+            relations: ["alumno", "profesor"],
         });
 
         if (!asistencias.length) {
-            return [null, "No se encontraron registros de asistencia para este alumno en este semestre"];
+            return [null, "No se encontraron registros de asistencia para los criterios especificados."];
         }
 
         const asistenciasTotales = asistencias.length;
-        const asistenciasPresentes = asistencias.filter((asistencia) => asistencia.presente).length;
+        const asistenciasPresentes = asistencias.filter(asistencia => asistencia.presente).length;
 
-        const porcentaje = (asistenciasPresentes / asistenciasTotales) * 100;
+        const porcentaje = ((asistenciasPresentes / asistenciasTotales) * 100).toFixed(2);
 
-        return [porcentaje.toFixed(2), null];
+        return [{ porcentaje, asistidas: asistenciasPresentes, totales: asistenciasTotales }, null];
     } catch (error) {
         console.error("Error en calcularPorcentajeAsistenciaService:", error);
-        return [null, "Error al calcular el porcentaje de asistencia"];
+        return [null, "Error al calcular el porcentaje de asistencia."];
     }
 }
 

@@ -13,7 +13,7 @@ export default function Semestres() {
         formData,
         isLoading: isCreating,
         error: createError,
-        handleChange,
+        handleChange: handleCreateChange,
         handleSubmit,
     } = useCrearSemestre(fetchSemestres);
 
@@ -34,7 +34,6 @@ export default function Semestres() {
     const [updatePopupVisible, setUpdatePopupVisible] = useState(false);
     const [semestreToUpdate, setSemestreToUpdate] = useState(null);
     const [existeOtroActivo, setExisteOtroActivo] = useState(false);
-    const [mostrarTooltip, setMostrarTooltip] = useState(false);
 
     const handleListarSemestres = async () => {
         if (isViewing) {
@@ -45,8 +44,21 @@ export default function Semestres() {
         setIsViewing(true);
     };
 
-    const handleToggleCrearSemestre = () => {
-        setIsCreatingFormVisible(!isCreatingFormVisible);
+    const handleShowUpdatePopup = (semestre) => {
+        setInitialData(semestre);
+        setSemestreToUpdate(semestre);
+        setUpdatePopupVisible(true);
+
+        // Verificar si existe otro semestre activo, excluyendo el actual
+        const otroActivo = semestresActivos.some(
+            (s) => s.id !== semestre.id && s.estado === true
+        );
+        setExisteOtroActivo(otroActivo);
+    };
+
+    const handleCloseUpdatePopup = () => {
+        setUpdatePopupVisible(false);
+        setSemestreToUpdate(null);
     };
 
     const handleShowDeletePopup = (semestre) => {
@@ -56,22 +68,6 @@ export default function Semestres() {
 
     const handleCloseDeletePopup = () => {
         setPopupVisible(false);
-        setSemestreToUpdate(null);
-    };
-
-    const handleShowUpdatePopup = (semestre) => {
-        setInitialData(semestre);
-        setSemestreToUpdate(semestre);
-        setUpdatePopupVisible(true);
-
-        const otroActivo = semestresActivos.some(
-            (s) => s.id !== semestre.id && s.estado === true
-        );
-        setExisteOtroActivo(otroActivo);
-    };
-
-    const handleCloseUpdatePopup = () => {
-        setUpdatePopupVisible(false);
         setSemestreToUpdate(null);
     };
 
@@ -89,16 +85,6 @@ export default function Semestres() {
         }
     };
 
-    const handleCheckboxClick = (e) => {
-        if (existeOtroActivo && !semestreData.estado) {
-            e.preventDefault();
-            setMostrarTooltip(true);
-            setTimeout(() => setMostrarTooltip(false), 3000);
-        } else {
-            handleUpdateChange(e);
-        }
-    };
-
     return (
         <div className="semestres-container">
             <h1 className="semestres-title">Gestión de Semestres</h1>
@@ -106,7 +92,7 @@ export default function Semestres() {
                 <button onClick={handleListarSemestres} className="semestres-button">
                     {isViewing ? "Ocultar Semestres" : "Ver Semestres"}
                 </button>
-                <button onClick={handleToggleCrearSemestre} className="semestres-button">
+                <button onClick={() => setIsCreatingFormVisible(!isCreatingFormVisible)} className="semestres-button">
                     {isCreatingFormVisible ? "Ocultar Crear Semestre" : "Crear Semestre"}
                 </button>
             </div>
@@ -119,7 +105,7 @@ export default function Semestres() {
                             type="text"
                             name="nombre"
                             value={formData.nombre}
-                            onChange={handleChange}
+                            onChange={handleCreateChange}
                             required
                         />
                     </label>
@@ -129,7 +115,7 @@ export default function Semestres() {
                             type="date"
                             name="fechaInicio"
                             value={formData.fechaInicio}
-                            onChange={handleChange}
+                            onChange={handleCreateChange}
                             required
                         />
                     </label>
@@ -139,7 +125,7 @@ export default function Semestres() {
                             type="date"
                             name="fechaFin"
                             value={formData.fechaFin}
-                            onChange={handleChange}
+                            onChange={handleCreateChange}
                             required
                         />
                     </label>
@@ -149,7 +135,7 @@ export default function Semestres() {
                             type="checkbox"
                             name="estado"
                             checked={formData.estado}
-                            onChange={handleChange}
+                            onChange={handleCreateChange}
                         />
                     </label>
                     <label>
@@ -157,7 +143,7 @@ export default function Semestres() {
                         <textarea
                             name="descripcion"
                             value={formData.descripcion}
-                            onChange={handleChange}
+                            onChange={handleCreateChange}
                         />
                     </label>
                     <button type="submit" className="semestres-button" disabled={isCreating}>
@@ -239,9 +225,8 @@ export default function Semestres() {
                 semestreData={semestreData}
                 isLoading={isUpdating}
                 error={updateError}
-                handleChange={handleCheckboxClick}
+                handleChange={handleUpdateChange}
                 existeOtroActivo={existeOtroActivo}
-                mostrarTooltip={mostrarTooltip}
             />
         </div>
     );

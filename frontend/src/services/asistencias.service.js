@@ -144,3 +144,23 @@ export async function registrarAsistencia({ alumnoId, semestreId, fecha, present
         throw new Error(error.response?.data?.message || "Error desconocido al registrar asistencia.");
     }
 }
+
+export async function calcularPorcentajeAsistencia({ profesorId, startDate, endDate }) {
+    try {
+        const response = await axios.get('/asistencia/porcentaje', {
+            params: { profesorId, startDate, endDate },
+            headers: {
+                Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+            },
+        });
+
+        if (response.data.status === "Success") {
+            return response.data.data.porcentaje; // Asegúrate de que el backend retorna el porcentaje aquí
+        } else {
+            throw new Error(response.data.message || "Error al calcular el porcentaje de asistencia.");
+        }
+    } catch (error) {
+        console.error("Error en calcularPorcentajeAsistencia:", error);
+        throw new Error(error.response?.data?.message || "Error desconocido al calcular porcentaje de asistencia.");
+    }
+}

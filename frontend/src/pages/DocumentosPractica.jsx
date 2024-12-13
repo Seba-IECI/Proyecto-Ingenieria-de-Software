@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@context/AuthContext";
 import { verDocumentos } from "@services/documentosPractica.service";
 import useSubirDocumento from "@hooks/documentos/useSubirDocumento";
 import useEliminarDocumento from "@hooks/documentos/useEliminarDocumento";
@@ -8,16 +9,26 @@ import EditDocumentoPopup from "@components/EditDocumentoPopup";
 import "@styles/documentosPractica.css";
 
 export default function DocumentosPractica() {
+    const { user } = useAuth();
+    const userRole = user?.rol;
+
     const [documentos, setDocumentos] = useState([]);
     const [isViewing, setIsViewing] = useState(false);
+
+    useEffect(() => {
+        if (!userRole) {
+            console.error("El rol del usuario no se recibió correctamente en DocumentosPractica.");
+        } else {
+            console.log(`Rol recibido: ${userRole}`);
+        }
+    }, [userRole]);
 
     const {
         isPopupOpen: isCreatePopupOpen,
         handleClickCreate,
         handleClosePopup: handleCloseCreatePopup,
         handleCreate,
-        originalName,
-    } = useSubirDocumento(() => handleVerDocumentos());
+    } = useSubirDocumento(() => handleVerDocumentos(), userRole);
 
     const { handleDelete } = useEliminarDocumento(setDocumentos);
 
@@ -61,7 +72,7 @@ export default function DocumentosPractica() {
                     alumnoId: doc.alumnoId,
                     fechaSubida: fecha,
                     horaSubida: hora,
-                    nombre: doc.originalname || "Sin Nombre",
+                    nombre: doc.nombre || "Sin Nombre",
                     url: doc.documento,
                 };
             });
@@ -75,6 +86,9 @@ export default function DocumentosPractica() {
         }
     };
 
+    if (!userRole) {
+        return <p className="error-message">Error: No se pudo determinar el rol del usuario.</p>;
+    }
 
     return (
         <div className="documentos-container">
@@ -87,13 +101,6 @@ export default function DocumentosPractica() {
                     Subir Documento
                 </button>
             </div>
-
-            {originalName && (
-                <p className="documentos-name">
-                    <strong>Nombre del Último Archivo Subido:</strong> {originalName}
-                </p>
-            )}
-
             {isViewing && documentos.length > 0 ? (
                 <ul className="documentos-list">
                     {documentos.map((documento) => (
@@ -114,7 +121,9 @@ export default function DocumentosPractica() {
                             </div>
                             <div className="documento-info">
                                 <p><strong>ID Documento:</strong> {documento.id}</p>
-                                <p><strong>Especialidad:</strong> {documento.especialidad}</p>
+                                {userRole === "encargadoPracticas" && (
+                                    <p><strong>Especialidad:</strong> {documento.especialidad}</p>
+                                )}
                                 {documento.encargadoPracticasId ? (
                                     <p><strong>Encargado ID:</strong> {documento.encargadoPracticasId}</p>
                                 ) : (
@@ -143,6 +152,7 @@ export default function DocumentosPractica() {
                 show={isCreatePopupOpen}
                 setShow={handleCloseCreatePopup}
                 onCreate={handleCreate}
+                rol={userRole}
             />
             <EditDocumentoPopup
                 show={isEditPopupOpen}

@@ -11,6 +11,11 @@ const DocumentosPracticaSchema = new EntitySchema({
             primary: true,
             generated: true,
         },
+        nombre: {
+            type: "varchar",
+            length: 255,
+            nullable: false,
+        },
         alumnoId: {
             type: "int",
             nullable: true,

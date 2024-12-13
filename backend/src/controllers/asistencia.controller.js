@@ -151,20 +151,32 @@ export async function validarAlumnoPorProfesor(req, res) {
 
 export async function calcularPorcentajeAsistencia(req, res) {
     try {
-        const { alumnoId, semestreId } = req.query;
+        const { id: alumnoId, rol } = req.user;
+        const { profesorId, startDate, endDate } = req.query;
 
-        if (!alumnoId || !semestreId) {
-            return handleErrorClient(res, 400, "El alumnoId y semestreId son obligatorios");
+        if (rol !== "usuario") {
+            return handleErrorClient(res, 403,
+                "Acceso denegado. Solo los estudiantes pueden calcular su porcentaje de asistencia.");
         }
 
-        const [porcentaje, error] = await calcularPorcentajeAsistenciaService(alumnoId, semestreId);
+        if (!profesorId || !startDate || !endDate) {
+            return handleErrorClient(res, 400,
+                "Todos los parámetros (profesorId, startDate, endDate) son obligatorios.");
+        }
+
+        const [resultado, error] = await calcularPorcentajeAsistenciaService(
+            parseInt(profesorId, 10),
+            startDate,
+            endDate,
+            alumnoId
+        );
 
         if (error) return handleErrorClient(res, 404, error);
 
-        handleSuccess(res, 200, "Porcentaje de asistencia calculado correctamente", { porcentaje });
+        handleSuccess(res, 200, "Porcentaje de asistencia calculado correctamente.", resultado);
     } catch (error) {
         console.error("Error en calcularPorcentajeAsistencia:", error);
-        handleErrorServer(res, 500, "Error al calcular el porcentaje de asistencia");
+        handleErrorServer(res, 500, "Error al calcular el porcentaje de asistencia.");
     }
 }
 

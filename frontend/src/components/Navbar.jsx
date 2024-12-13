@@ -153,14 +153,14 @@ const Navbar = () => {
                     {userRole === 'usuario' && (
                         <li>
                             <NavLink
-                                to="/asistencias"
+                                to="/porcentaje"
                                 onClick={() => {
                                     setMenuOpen(false);
                                     addActiveClass();
                                 }}
                                 activeClassName="active"
                             >
-                                Asistencias
+                                Porcentaje Asistencia
                             </NavLink>
                         </li>
                     )}
