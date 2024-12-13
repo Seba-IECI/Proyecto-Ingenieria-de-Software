@@ -40,6 +40,7 @@ export async function createPrestamoController(req, res) {
       rut,
       codigosBarras,
       diasPrestamo,
+      encargadoRut: req.user.rut, // Se pasa el `rut` del usuario logueado
     });
 
     if (error) {

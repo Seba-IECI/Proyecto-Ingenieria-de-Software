@@ -9,7 +9,7 @@ import { addAmonestacionService,getAmonestacionesService } from "./amonestacione
 
 export async function createPrestamoService(data) {
   try {
-    const { rut, codigosBarras, diasPrestamo, user } = data;
+    const { rut, codigosBarras, diasPrestamo, user ,encargadoRut } = data;
 
     if (!rut || !codigosBarras || codigosBarras.length === 0 || !diasPrestamo) {
       return [null, "Faltan datos necesarios para crear el préstamo"];
@@ -19,6 +19,8 @@ export async function createPrestamoService(data) {
     const codigoBarrasRepository = AppDataSource.getRepository(CodigoBarras);
     const itemRepository = AppDataSource.getRepository(Item);
     const prestamoRepository = AppDataSource.getRepository(Prestamos);
+    const inventarioRepository = AppDataSource.getRepository(Inventario);
+    
 
     const usuario = await usuarioRepository.findOne({ where: { rut } });
     if (!usuario) {
@@ -49,33 +51,52 @@ export async function createPrestamoService(data) {
     for (const codigo of codigosBarras) {
       const codigoBarrasEntity = await codigoBarrasRepository.findOne({
         where: { codigo },
-        relations: ["item", "item.inventario"],
+        relations: ["item"],
       });
-
-      if (!codigoBarrasEntity || !codigoBarrasEntity.item || !codigoBarrasEntity.item.inventario) {
-        return [null, `Código de barras ${codigo} no encontrado o sin inventario`];
+    
+      if (!codigoBarrasEntity || !codigoBarrasEntity.item) {
+        return [null, `Código de barras ${codigo} no encontrado`];
       }
 
-      const item = codigoBarrasEntity.item;
-      const inventario = item.inventario;
-
-      if (!inventario || !inventario.nombre) {
-        return [null, `Inventario no encontrado para el código ${codigo}`];
-      }
-
+      console.log("codigo de barras entity:", codigoBarrasEntity.item.id);
       
+      
+    
+      const item = await itemRepository.findOne({
+        where: { id: codigoBarrasEntity.item.id },
+        relations: ["inventario"],
+      });
+    
+      if (!item || !item.inventario) {
+        return [null, `No se encontró el inventario asociado al ítem del código ${codigo}`];
+      }
+    
+      const inventarioDelItem = item.inventario;
 
+      console.log("inventario sel item:", item.inventario);
+    
+      console.log("Datos del inventario:", inventarioDelItem);
+      console.log("Encargado del inventario:", inventarioDelItem.encargado);
+      console.log("Rut del usuario logueado:", encargadoRut);
+    
+      if (inventarioDelItem.encargado !== encargadoRut) { 
+        return [null, `No puedes prestar el item de codigo ${codigo}, ya que no pertenece a este inventario`];
+      }
+    
       if (!codigoBarrasEntity.disponible) {
         return [null, `El código de barras ${codigo} ya está prestado`];
       }
-
+    
       if (item.cantidad <= 0) {
         return [null, `No hay unidades disponibles para el ítem asociado al código ${codigo}`];
       }
-
+    
       itemsAsociados.push(item.nombre);
       codigosBarrasEntities.push(codigoBarrasEntity);
     }
+    
+    
+    
 
     const fechaPrestamo = new Date();
 const fechaVencimiento = new Date(fechaPrestamo.getTime()); 
