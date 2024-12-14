@@ -1,0 +1,38 @@
+.tarea-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+  }
+  
+  .tarea-content {
+    flex-grow: 1;
+  }
+  
+  .button-group {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .edit-button,
+  .delete-button,
+  .toggle-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 18px;
+  }
+  
+  .delete-button {
+    color: red;
+  }
+  
+  .toggle-button {
+    color: green;
+  }
+  
