@@ -58,6 +58,10 @@ export async function createInventarioService(body) {
     if (!encargadoRut || typeof encargadoRut !== "string" || encargadoRut.length > 20) {
       return [null, "RUT del encargado no válido"];
     }
+
+    if (encargado.rol !== "profesor"){
+      return [null, "El encargado debe ser un profesor"];
+    }
    
     const nuevoInventario = inventarioRepository.create({
       nombre,
@@ -81,10 +85,13 @@ export async function createInventarioService(body) {
 
     return [nuevoInventario, null];
   } catch (error) {
-    console.error("Error al crear el inventario:", error);
-    return [null, "Error interno del servidor"];
-  }
-}
+    console.error("Error al crear inventario:", error);
+    const errorMessage = error.response?.data?.message || "Error inesperado";
+    setErrors((prev) => ({
+      ...prev,
+      serverError: errorMessage,
+    
+ } ))}};
 
 
 export async function getInventarioByIdService(query, user) {
