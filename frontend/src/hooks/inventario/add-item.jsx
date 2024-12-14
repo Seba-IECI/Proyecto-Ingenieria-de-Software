@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { addItem, getInventarioCompleto } from "@services/inventario.service";
+import { validations } from "@helpers/formatData";
 
 export const useAddItemPopup = (inventarios, onItemAdded) => {
   const [showPopup, setShowPopup] = useState(false);
@@ -44,17 +45,39 @@ export const useAddItemPopup = (inventarios, onItemAdded) => {
 
   const handleAddItem = async () => {
     if (isNewItem) {
-      if (!itemData.nombre || !itemData.descripcion || !itemData.categoria || !itemData.cBarras) {
-        alert("Por favor, completa todos los campos obligatorios para un nuevo ítem.");
+      
+      const errorNombre = validations.validateArticuloNombre(itemData.nombre);
+      if (errorNombre) {
+        alert(errorNombre);
+        return;
+      }
+
+      const errorDescripcion = validations.validateDescripcion(itemData.descripcion);
+      if (errorDescripcion) {
+        alert(errorDescripcion);
+        return;
+      }
+      
+  
+      const errorCategoria = validations.validateCategoria(itemData.categoria);
+      if (errorCategoria) {
+        alert(errorCategoria);
+        return;
+      }
+  
+      const errorCodigo = validations.validateCodigoBarras(itemData.cBarras);
+      if (errorCodigo) {
+        alert(errorCodigo);
         return;
       }
     } else {
-      if (!itemData.cBarras) {
-        alert("Por favor, ingresa el código de barra para el ítem seleccionado.");
+      
+      const errorCodigo = validations.validateCodigoBarras(itemData.cBarras);
+      if (errorCodigo) {
+        alert(errorCodigo);
         return;
       }
     }
-
   
     try {
       const newItem = {
@@ -67,13 +90,10 @@ export const useAddItemPopup = (inventarios, onItemAdded) => {
       const response = await addItem(newItem);
   
       if (response?.error) {
-       
         alert(`Error al añadir ítem: ${response.error}`);
       } else if (response?.message) {
-        
         alert(`Éxito: ${response.message}`);
       } else {
-        
         alert("Ocurrió un error desconocido.");
       }
   
@@ -87,6 +107,7 @@ export const useAddItemPopup = (inventarios, onItemAdded) => {
       alert("Error inesperado al añadir ítem.");
     }
   };
+  
   
 
   const AddItemPopup = () =>

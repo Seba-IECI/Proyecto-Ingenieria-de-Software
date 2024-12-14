@@ -72,7 +72,7 @@
   }
   
   .menu-lateral.mostrar {
-    transform: translateX(0); /* Mostrar el menú si es admin */
+    transform: translateX(0); 
   }
   
   .admin-button {
@@ -89,7 +89,7 @@
   }
   
   
-  /* Lista */
+  
   .inventario-list {
     position: flex;
     list-style-type: none;
@@ -107,20 +107,20 @@
     line-height: 1.5;
   }
   
-  /* Texto cuando no hay inventarios */
+  
   .inventario-empty {
     color: gray;
     text-align: center;
     font-style: italic;
   }
   
-  /* Sección de administración */
+  
   .admin-section {
     margin-top: 30px;
     text-align: center;
   }
   
-  /* Botón de administrador */
+  
   .admin-button {
     padding: 10px 20px;
     background-color: #28a745;
@@ -134,7 +134,7 @@
     background-color: #218838;
   }
   
-/*pop up styles*/
+
   .popup-overlay {
     position: fixed;
     top: 0;
@@ -194,12 +194,12 @@
     color: white;
   }
   .delete-button {
-    color: white; /* Color del texto */
-    background-color: #f33e1e; /* Fondo rojo */
-    border: none; /* Sin bordes */
-    padding: 8px 12px; /* Espaciado interno */
-    border-radius: 5px; /* Bordes redondeados */
-    cursor: pointer; /* Cambia el cursor a un puntero */
+    color: white; 
+    background-color: #f33e1e; 
+    border: none; 
+    padding: 8px 12px; 
+    border-radius: 5px; 
+    cursor: pointer; 
   }
   .popup-actions button:last-child {
     background-color: #dc3545;
@@ -210,19 +210,19 @@
   
 .grid-container {
   display: grid;
-  grid-template-columns: 1fr 1fr 2fr; /* Configuración de columnas */
+  grid-template-columns: 1fr 1fr 2fr;
   gap: 10px;
 }
 
 .grid-header {
-  display: contents; /* Actúa como parte del grid */
+  display: contents; 
   font-weight: bold;
   border-bottom: 2px solid #ccc;
   margin-bottom: 10px;
 }
 
 .grid-row {
-  display: contents; /* Cada fila se adapta al diseño del grid */
+  display: contents; 
 }
 
 .grid-row div,
@@ -233,7 +233,7 @@
 
 .grid-row div:last-child,
 .grid-header div:last-child {
-  word-break: break-word; /* Evita que los códigos de barra largos rompan el diseño */
+  word-break: break-word; 
 }
 
 

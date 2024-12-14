@@ -217,16 +217,12 @@ export async function addItemService(data, user) {
         item: { id: item.id },
       });
       
+      const nuevoCodigoBarras = codigoBarrasRepository.create({
+          codigo: cBarras,
+          item: item, 
+        });
+        await codigoBarrasRepository.save(nuevoCodigoBarras);
       
-      let nuevoCodigoBarras = codigoBarrasRepository.create({
-        codigo: cBarras,
-        item: { id: item.id }, 
-      });
-      
-      
-      await codigoBarrasRepository.save(nuevoCodigoBarras);
-      
-
       console.log("Datos del nuevo código de barras:", {
         codigo: cBarras,
         itemId: item.id, 
@@ -236,7 +232,8 @@ export async function addItemService(data, user) {
       await itemRepository.save(item);
 
       return [item, `Artículo actualizado correctamente. Se añadió el código de barras: ${cBarras}`];
-    } else {
+    } 
+    if (!item) {
       
       item = itemRepository.create({
         nombre: nombreNormalizado,

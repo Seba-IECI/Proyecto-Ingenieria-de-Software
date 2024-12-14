@@ -1,26 +1,62 @@
 import { useState, useRef } from "react";
 import { deleteItem } from "@services/inventario.service";
+import { validations } from "@helpers/formatData";
+
+const DeleteItemPopup = ({ showPopup, handleDeleteItem, closePopup }) => {
+  const inputRef = useRef();
+  const [error, setError] = useState(""); 
+
+  if (!showPopup) return null;
+
+  const handleInputChange = () => {
+    const value = inputRef.current.value;
+    setError(""); 
+  };
+
+  const handleSubmit = () => {
+    const codigoBarra = inputRef.current.value; 
+    const validationError = validations.validateCodigoBarras(codigoBarra);
+    if (validationError) {
+      setError(validationError); 
+    } else {
+      handleDeleteItem(codigoBarra); 
+    }
+  };
+
+  return (
+    <div className="popup-overlay">
+      <div className="popup-content">
+        <h2>Eliminar Ítem</h2>
+        <label>
+          Código de Barra:
+          <input
+            type="text"
+            ref={inputRef} 
+            onChange={handleInputChange} 
+            placeholder="Ingresa el código de barra del ítem"
+          />
+        </label>
+        {error && <p className="error-text">{error}</p>}
+        <button onClick={handleSubmit} className="delete-button">
+          Eliminar Ítem
+        </button>
+        <button onClick={closePopup} className="close-button">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  );
+};
+
 
 export const useDeleteItemPopup = (onItemDeleted) => {
   const [showPopup, setShowPopup] = useState(false);
-  const codigoBarraRef = useRef(""); 
 
-  const openPopup = () => {
-    setShowPopup(true);
-  };
+  const openPopup = () => setShowPopup(true);
 
-  const closePopup = () => {
-    setShowPopup(false);
-    codigoBarraRef.current = "";
-  };
+  const closePopup = () => setShowPopup(false);
 
-  const handleDeleteItem = async () => {
-    const codigoBarra = codigoBarraRef.current; 
-    if (!codigoBarra) {
-      alert("Por favor, ingresa un código de barras válido.");
-      return;
-    }
-
+  const handleDeleteItem = async (codigoBarra) => {
     try {
       console.log("Código de barras enviado al backend:", codigoBarra);
 
@@ -43,34 +79,14 @@ export const useDeleteItemPopup = (onItemDeleted) => {
     }
   };
 
-  const DeleteItemPopup = () =>
-    showPopup && (
-      <div className="popup-overlay">
-        <div className="popup-content">
-          <h2>Eliminar Ítem</h2>
-
-          <label>
-            Código de Barra:
-            <input
-              type="text"
-              defaultValue={codigoBarraRef.current}
-              onChange={(e) => (codigoBarraRef.current = e.target.value)} 
-              placeholder="Ingresa el código de barra del ítem"
-            />
-          </label>
-
-          <button onClick={handleDeleteItem} className="delete-button">
-            Eliminar Ítem
-          </button>
-          <button onClick={closePopup} className="close-button">
-            Cancelar
-          </button>
-        </div>
-      </div>
-    );
-
   return {
-    DeleteItemPopup,
+    DeleteItemPopup: () => (
+      <DeleteItemPopup
+        showPopup={showPopup}
+        handleDeleteItem={handleDeleteItem}
+        closePopup={closePopup}
+      />
+    ),
     openPopup,
     closePopup,
   };

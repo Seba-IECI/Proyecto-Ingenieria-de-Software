@@ -1,45 +1,45 @@
-/* Estilo para el fondo del popup */
+
 .popup-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro con transparencia */
+    background-color: rgba(0, 0, 0, 0.5); 
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000; /* Asegura que esté sobre otros elementos */
+    z-index: 1000; 
   }
   
-  /* Estilo para el contenido del popup */
+  
   .popup-content {
-    background-color: #ffffff; /* Fondo blanco */
+    background-color: #ffffff; 
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25); /* Sombra alrededor */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25); 
     max-width: 500px;
-    width: 90%; /* Adaptativo para dispositivos pequeños */
+    width: 90%; 
     position: relative;
   }
   
-  /* Título del popup */
+ 
   .popup-content h2 {
     font-size: 1.5em;
     margin-bottom: 20px;
-    color: #333; /* Color oscuro para el texto */
+    color: #333;
     text-align: center;
   }
   
-  /* Estilo para las etiquetas */
+  
   .popup-content label {
     display: block;
     margin-bottom: 10px;
     font-weight: bold;
-    color: #555; /* Texto ligeramente gris */
+    color: #555; 
   }
   
-  /* Estilo para los inputs */
+  
   .popup-content input,
   .popup-content select {
     display: block;
@@ -49,18 +49,18 @@
     border: 1px solid #ccc;
     border-radius: 4px;
     margin-bottom: 15px;
-    box-sizing: border-box; /* Asegura que el padding no afecte el ancho */
+    box-sizing: border-box; 
   }
   
-  /* Cambiar borde cuando el input está enfocado */
+  
   .popup-content input:focus,
   .popup-content select:focus {
     outline: none;
-    border-color: #007BFF; /* Azul para indicar foco */
+    border-color: #007BFF; 
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
   }
   
-  /* Estilo para los botones */
+  
   .popup-content button {
     display: inline-block;
     padding: 10px 15px;
@@ -69,23 +69,35 @@
     border-radius: 4px;
     cursor: pointer;
     margin-right: 10px;
-    background-color: #007BFF; /* Azul principal */
-    color: #fff; /* Texto blanco */
+    background-color: #007BFF; 
+    color: #fff; 
     transition: background-color 0.3s ease;
   }
   
-  /* Cambiar color del botón al pasar el cursor */
+ 
   .popup-content button:hover {
-    background-color: #0056b3; /* Azul más oscuro */
+    background-color: #0056b3; 
   }
   
-  /* Botón de cancelar */
+  
   .popup-content .close-button {
-    background-color: #6c757d; /* Gris oscuro */
+    background-color: #6c757d; 
   }
   
   .popup-content .close-button:hover {
-    background-color: #5a6268; /* Gris más oscuro */
+    background-color: #5a6268; 
   }
   
+  .export-button {
+    margin: 10px;
+    padding: 10px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
   
+  .export-button:hover {
+    background-color: #45a049;
+  }

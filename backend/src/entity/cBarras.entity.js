@@ -32,7 +32,7 @@ const CodigoBarrasSchema = new EntitySchema({
       target: "Item",
       joinColumn: { name: "itemId" },
       onDelete: "CASCADE",
-      nullable: true,
+      nullable: false
     },
     prestamo: {
       type: "many-to-one",

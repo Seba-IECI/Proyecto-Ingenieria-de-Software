@@ -8,8 +8,45 @@ import { getLoggedUser } from "@services/user.service";
 import "@styles/popup-item.css";
 import { useAddItemPopup } from "../hooks/inventario/add-item";
 import { useDeleteItemPopup } from "../hooks/inventario/delete-item";
+import { jsPDF } from "jspdf";
+import * as XLSX from "xlsx";
+import "jspdf-autotable";
 
 function Popup({ inventario, onClose }) {
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    doc.text(`Informe de Inventario: ${inventario.nombre}`, 10, 10);
+
+    const rows = inventario.items.map((item, index) => [
+      index + 1,
+      item.nombre,
+      item.codigosBarras.length,
+      item.codigosBarras.join(", "),
+    ]);
+
+    doc.autoTable({
+      head: [["#", "Nombre del Ítem", "Cantidad", "Códigos de Barra"]],
+      body: rows,
+    });
+
+    doc.save(`Informe_${inventario.nombre}.pdf`);
+  };
+
+  const exportToExcel = () => {
+    const data = inventario.items.map((item, index) => ({
+      "#": index + 1,
+      "Nombre del Ítem": item.nombre,
+      "Cantidad": item.codigosBarras.length,
+      "Códigos de Barra": item.codigosBarras.join(", "),
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Inventario");
+
+    XLSX.writeFile(workbook, `Informe_${inventario.nombre}.xlsx`);
+  };
   return (
     <div className="popup-overlay">
       <div className="popup-content">
@@ -46,6 +83,12 @@ function Popup({ inventario, onClose }) {
         )}
         <button onClick={onClose} className="close-button">
           Cerrar
+        </button>
+        <button onClick={exportToPDF} className="export-button">
+          Exportar a PDF
+        </button>
+        <button onClick={exportToExcel} className="export-button">
+          Exportar a Excel
         </button>
       </div>
     </div>
@@ -97,30 +140,9 @@ export default function Inventario() {
     }
   };
 
-  const handleDeleteItem = async (codigoBarra) => {
-    try {
-      setLoading(true);
-      const response = await deleteItem(codigoBarra); 
-      if (response.error) {
-        alert(response.error);
-      } else {
-        alert("Unidad eliminada correctamente.");
-      }
-      fetchInventariosPorEncargado(); 
-      setShowDeletePopup(false);
-    } catch (error) {
-      console.error("Error al eliminar la unidad:", error);
-      alert("No se pudo eliminar la unidad.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const handleOpenDeletePopup = (inventario) => {
-    setSelectedInventario(inventario);
-    setShowDeletePopup(true);
-  };
 
+ 
   const { DeleteItemPopup, openPopup: openDeletePopup, closePopup: closeDeletePopup } =
     useDeleteItemPopup(() => {
       fetchInventariosPorEncargado();

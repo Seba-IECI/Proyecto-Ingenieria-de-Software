@@ -7,6 +7,9 @@ import {
   addComentario,
 } from "@services/prestamo.service";
 import "@styles/prestamos.css";
+import { validations } from "@helpers/formatData";
+import { format as formatRut } from "rut.js";
+
 
 export default function Prestamos() {
   const [prestamos, setPrestamos] = useState([]);
@@ -45,13 +48,14 @@ export default function Prestamos() {
 
   const handleAddComentario = async (prestamoId, comentario) => {
     try {
-      if (!comentario.trim()) {
-        window.alert("Por favor, escribe un comentario válido.");
-        return;
-      }
+      const error = validations.validateDescripcion(comentario);
+    if (error) {
+      window.alert(error);
+      return;
+    }
 
       await addComentario(prestamoId, comentario);
-      window.alert("Comentario añadido al préstamo con éxito.");
+      
     } catch (error) {
       console.error("Error al añadir comentario:", error);
       window.alert(`Error al añadir comentario: ${error.message}`);
@@ -123,8 +127,12 @@ export default function Prestamos() {
   
 
   const handleAddCodigoBarra = () => {
-    if (codigoBarraInput.trim() === "") return;
-
+    const error = validations.validateCodigoBarras(codigoBarraInput);
+    if (error) {
+      window.alert(error); 
+      return;
+    }
+  
     setNuevoPrestamo((prev) => ({
       ...prev,
       codigosBarras: [...prev.codigosBarras, codigoBarraInput.trim()],
@@ -185,7 +193,18 @@ export default function Prestamos() {
               type="text"
               name="usuario"
               value={nuevoPrestamo.rut}
-              onChange={(e) => setNuevoPrestamo({ ...nuevoPrestamo, rut: e.target.value })}
+              onChange={(e) => {
+                
+                const formattedRut = formatRut(e.target.value); 
+                setNuevoPrestamo({ ...nuevoPrestamo, rut: formattedRut });
+              }}
+              onBlur={() => {
+                
+                const error = validations.validateRut(nuevoPrestamo.rut); 
+                if (error) {
+                  window.alert(error); 
+                }
+              }}
               placeholder="RUT del usuario"
             />
           </label>
@@ -216,12 +235,19 @@ export default function Prestamos() {
           <label>
             Días de Préstamo:
             <input
-              type="number"
-              name="diasPrestamo"
-              value={nuevoPrestamo.diasPrestamo}
-              onChange={(e) => setNuevoPrestamo({ ...nuevoPrestamo, diasPrestamo: e.target.value })}
-              placeholder="Días"
-            />
+            type="number"
+            name="diasPrestamo"
+            value={nuevoPrestamo.diasPrestamo}
+            onChange={(e) => {
+              const error = validations.validateDiasInventario(Number(e.target.value)); 
+              if (error) {
+                window.alert(error); 
+              } else {
+                setNuevoPrestamo({ ...nuevoPrestamo, diasPrestamo: e.target.value }); 
+              }
+            }}
+            placeholder="Días"
+          />
           </label>
           <button type="button" onClick={() => handleCrearPrestamo()}>
             Crear Préstamo
@@ -306,12 +332,14 @@ export default function Prestamos() {
               <button
   onClick={async () => {
     try {
-      if (!amonestacionDescripcion.trim()) {
-        window.alert("Por favor, escribe una descripción válida.");
-        return;
+      
+      const error = validations.validateDescripcion(amonestacionDescripcion);
+      if (error) {
+        window.alert(error);
+        return; 
       }
 
-      console.log ("id del suuario",selectedUsuarioId)
+      console.log("ID del usuario:", selectedUsuarioId);
 
       if (selectedUsuarioId) {
         await handleAddAmonestacion(selectedUsuarioId);
@@ -333,6 +361,7 @@ export default function Prestamos() {
 >
   Confirmar
 </button>
+
               <button onClick={() => setPopupAmonestacion(false)}>Cancelar</button>
             </form>
           </div>
@@ -359,6 +388,7 @@ export default function Prestamos() {
                   <th>Códigos de Barras</th>
                   <th>Items</th>
                   <th>Fecha de Préstamo</th>
+                  <th>Devolución</th>
                 </tr>
               </thead>
               <tbody>
@@ -380,6 +410,7 @@ export default function Prestamos() {
                       </ul>
                     </td>
                     <td>{new Date(prestamo.fechaPrestamo).toLocaleString()}</td>
+                    <td>{new Date(prestamo.fechaDevolucion).toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>

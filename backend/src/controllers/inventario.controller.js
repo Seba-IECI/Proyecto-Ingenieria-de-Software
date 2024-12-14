@@ -102,12 +102,9 @@ import {
   export async function addItemController(req, res) {
     try {
       const user = req.user;
-      const [nuevoItem, error] = await addItemService(req.body, user);
+      const [nuevoItem] = await addItemService(req.body, user);
   
-      if (error) {
-        return res.status(400).json({ message: error });
-      }
-  
+        
       return res.status(201).json(nuevoItem);
     } catch (error) {
       console.error("Error en el controlador al añadir un artículo:", error);
