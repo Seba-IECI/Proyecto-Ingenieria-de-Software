@@ -148,6 +148,18 @@ const Navbar = () => {
                                     Asistencias
                                 </NavLink>
                             </li>
+                            <li>
+                                <NavLink
+                                    to="/tarea"
+                                    onClick={() => {
+                                        setMenuOpen(false);
+                                        addActiveClass();
+                                    }}
+                                    activeClassName="active"
+                                >
+                                    Tarea
+                                </NavLink>
+                            </li>
                         </>
                     )}
                     {userRole === 'usuario' && (
@@ -190,6 +202,18 @@ const Navbar = () => {
                                     activeClassName="active"
                                 >
                                     Materias
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink
+                                    to="/tareaEstudiante"
+                                    onClick={() => {
+                                        setMenuOpen(false);
+                                        addActiveClass();
+                                    }}
+                                    activeClassName="active"
+                                >
+                                    Tarea
                                 </NavLink>
                             </li>
                         </>
