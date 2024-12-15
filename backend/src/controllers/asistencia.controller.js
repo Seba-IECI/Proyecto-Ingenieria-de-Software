@@ -183,14 +183,14 @@ export async function calcularPorcentajeAsistencia(req, res) {
 export async function actualizarAsistencia(req, res) {
     try {
         const { id } = req.params;
-        const { presente } = req.body;
+        const { presente, fecha } = req.body;
 
         if (!id || isNaN(id)) {
             return handleErrorClient(res, 400, "ID de asistencia no válido");
         }
 
         const asistenciaId = parseInt(id, 10);
-        const [asistenciaActualizada, error] = await actualizarAsistenciaService(asistenciaId, presente);
+        const [asistenciaActualizada, error] = await actualizarAsistenciaService(asistenciaId, presente, fecha);
 
         if (error) return handleErrorClient(res, 400, error);
 

@@ -4,9 +4,10 @@ import ConfirmPopup from "@components/ConfirmPopup";
 import "@styles/asistenciasModificar.css";
 import "@styles/confirm-popup.css";
 
-const ModificarAsistenciaPopup = ({ asistenciaId, presenteActual, onClose, onSuccess }) => {
+const ModificarAsistenciaPopup = ({ asistenciaId, presenteActual, fechaActual, onClose, onSuccess }) => {
     const { modificar, loading, successMessage, error, resetState } = useModificarAsistencia();
     const [presente, setPresente] = useState(presenteActual);
+    const [fecha, setFecha] = useState(fechaActual);
     const [showConfirm, setShowConfirm] = useState(false);
     const [fadeError, setFadeError] = useState(false);
 
@@ -22,12 +23,12 @@ const ModificarAsistenciaPopup = ({ asistenciaId, presenteActual, onClose, onSuc
         }
     }, [error, resetState]);
 
-    const handleModificar = async () => {
+    const handleModificar = () => {
         setShowConfirm(true);
     };
 
     const handleConfirm = async () => {
-        const updatedAsistencia = await modificar(asistenciaId, presente);
+        const updatedAsistencia = await modificar(asistenciaId, presente, fecha);
         if (!loading && !error && updatedAsistencia) {
             onSuccess(updatedAsistencia);
             setShowConfirm(false);
@@ -66,6 +67,16 @@ const ModificarAsistenciaPopup = ({ asistenciaId, presenteActual, onClose, onSuc
                         <option value="false">Ausente</option>
                     </select>
                 </label>
+                <label className="asistencia-modificar-label">
+                    Fecha:
+                    <input
+                        type="date"
+                        className="asistencia-modificar-date"
+                        value={fecha}
+                        onChange={(e) => setFecha(e.target.value)}
+                        disabled={loading}
+                    />
+                </label>
                 <div className="button-container">
                     <button
                         onClick={handleModificar}
@@ -85,7 +96,9 @@ const ModificarAsistenciaPopup = ({ asistenciaId, presenteActual, onClose, onSuc
                         {error}
                     </p>
                 )}
-                {successMessage && <p className="asistencia-modificar-success-message">{successMessage}</p>}
+                {successMessage && (
+                    <p className="asistencia-modificar-success-message">{successMessage}</p>
+                )}
             </div>
             {showConfirm && (
                 <ConfirmPopup

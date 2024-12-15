@@ -6,17 +6,16 @@ const useModificarAsistencia = () => {
     const [successMessage, setSuccessMessage] = useState("");
     const [error, setError] = useState(null);
 
-    const modificar = async (id, presente) => {
+    const modificar = async (id, presente, fecha) => {
         setLoading(true);
         setSuccessMessage("");
         setError(null);
 
         try {
-            const updatedAsistencia = await modificarAsistencia(id, presente);
+            const updatedAsistencia = await modificarAsistencia(id, presente, fecha);
             setSuccessMessage("Asistencia modificada correctamente.");
             return updatedAsistencia;
         } catch (err) {
-            console.error("Error en modificarAsistencia:", err.message);
             setError(err.message || "Error desconocido al modificar asistencia.");
             return null;
         } finally {

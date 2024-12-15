@@ -190,6 +190,7 @@ const BuscarEntreFechasPopup = ({ alumnoId, onClose }) => {
                     <ModificarAsistenciaPopup
                         asistenciaId={selectedAsistencia.id}
                         presenteActual={selectedAsistencia.presente}
+                        fechaActual={selectedAsistencia.fecha}
                         onClose={() => setShowModificarPopup(false)}
                         onSuccess={handleModificarSuccess}
                     />

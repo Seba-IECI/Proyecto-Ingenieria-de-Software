@@ -1,3 +1,12 @@
+.asistencia-modificar-date {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
 .asistencia-modificar-container {
     display: flex;
     justify-content: center;
@@ -121,7 +130,10 @@
 .asistencia-buttons-container {
     display: flex;
     justify-content: flex-end;
+    gap: 10px;
     margin-bottom: 5px;
+    align-items: flex-start;
+    margin-top: -5px;
 }
 
 .fade-out {
@@ -129,18 +141,34 @@
     transition: opacity 0.5s ease-out;
 }
 
-.asistencia-buttons-container .asistencia-entrefechas-modificar-button {
+.asistencia-buttons-container .asistencia-modificar-button-general {
     background-color: #4caf50;
     color: white;
     border: none;
-    padding: 10px 15px;
-    margin-right: 10px;
-    border-radius: 8px;
+    padding: 10px 20px;
+    margin-right: 110px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+}
+
+.asistencia-buttons-container .asistencia-modificar-button-general:hover {
+    background-color: #45a049;
+}
+
+.asistencia-buttons-container .asistencia-eliminar-button-general {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
     cursor: pointer;
     font-size: 0.9rem;
     transition: background-color 0.3s ease;
 }
 
-.asistencia-buttons-container .asistencia-entrefechas-modificar-button:hover {
-    background-color: #45a049;
+.asistencia-buttons-container .asistencia-eliminar-button-general:hover {
+    background-color: #e53935;
 }

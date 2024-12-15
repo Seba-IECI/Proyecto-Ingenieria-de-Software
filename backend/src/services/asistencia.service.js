@@ -262,27 +262,48 @@ export async function calcularPorcentajeAsistenciaService(profesorId, startDate,
     }
 }
 
-export async function actualizarAsistenciaService(id, presente) {
+export async function actualizarAsistenciaService(id, presente, fecha) {
     try {
         const asistenciaRepository = AppDataSource.getRepository(AsistenciaSchema);
+        const semestreRepository = AppDataSource.getRepository(SemestreSchema);
+
         if (typeof presente !== "boolean") {
             return [null, "El valor de 'presente' debe ser booleano"];
         }
 
+        if (!fecha || isNaN(Date.parse(fecha))) {
+            return [null, "La fecha proporcionada no es válida"];
+        }
+
         const asistencia = await asistenciaRepository.findOne({
             where: { id },
-            relations: ["alumno", "semestre", "profesor"],
+            relations: ["semestre"],
         });
 
         if (!asistencia) {
             return [null, "Asistencia no encontrada"];
         }
 
-        if (asistencia.presente === presente) {
-            return [null, "No se realizaron cambios, el estado ya es el mismo"];
+        const semestre = await semestreRepository.findOne({ where: { id: asistencia.semestre.id } });
+
+        if (!semestre) {
+            return [null, "Semestre no encontrado"];
+        }
+
+        const fechaAsistencia = new Date(fecha);
+        const fechaInicio = new Date(semestre.fechaInicio);
+        const fechaFin = new Date(semestre.fechaFin);
+
+        if (fechaAsistencia < fechaInicio || fechaAsistencia > fechaFin) {
+            return [null, "La fecha de asistencia está fuera del rango del semestre"];
+        }
+
+        if (fechaAsistencia.getDay() === 0) {
+            return [null, "No se permite registrar asistencias los domingos"];
         }
 
         asistencia.presente = presente;
+        asistencia.fecha = fechaAsistencia;
         await asistenciaRepository.save(asistencia);
 
         const updatedAsistencia = {
@@ -292,15 +313,10 @@ export async function actualizarAsistenciaService(id, presente) {
             alumno: {
                 id: asistencia.alumno.id,
                 nombreCompleto: asistencia.alumno.nombreCompleto,
-                email: asistencia.alumno.email,
             },
             semestre: {
                 id: asistencia.semestre.id,
                 nombre: asistencia.semestre.nombre,
-            },
-            profesor: {
-                id: asistencia.profesor.id,
-                nombreCompleto: asistencia.profesor.nombreCompleto,
             },
         };
 

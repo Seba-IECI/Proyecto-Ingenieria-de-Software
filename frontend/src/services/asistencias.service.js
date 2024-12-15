@@ -21,7 +21,7 @@ export async function listarAsistencias({ semestreId, alumnoId, startDate, endDa
     }
 }
 
-export async function modificarAsistencia(id, presente) {
+export async function modificarAsistencia(id, presente, fecha) {
     if (!id) {
         throw new Error("El ID de asistencia es obligatorio para modificar.");
     }
@@ -29,7 +29,7 @@ export async function modificarAsistencia(id, presente) {
     try {
         const response = await axios.put(
             `/asistencia/actualizar/${id}`,
-            { presente },
+            { presente, fecha },
             {
                 headers: {
                     Authorization: `Bearer ${sessionStorage.getItem("token")}`,

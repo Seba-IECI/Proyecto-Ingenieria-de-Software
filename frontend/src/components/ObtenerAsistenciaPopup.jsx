@@ -50,6 +50,7 @@ const ObtenerAsistenciaPopup = ({ alumnoId, onClose }) => {
         setAsistencia((prev) => ({
             ...prev,
             presente: updatedAsistencia.presente,
+            fecha: updatedAsistencia.fecha,
         }));
         setShowModificarPopup(false);
     };
@@ -127,6 +128,7 @@ const ObtenerAsistenciaPopup = ({ alumnoId, onClose }) => {
                 <ModificarAsistenciaPopup
                     asistenciaId={asistencia.id}
                     presenteActual={asistencia.presente}
+                    fechaActual={asistencia.fecha}
                     onClose={() => setShowModificarPopup(false)}
                     onSuccess={handleModificarSuccess}
                 />

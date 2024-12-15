@@ -142,13 +142,13 @@ const MostrarAsistenciaGeneralPopup = ({ onClose }) => {
                                 <li key={asistencia.id} className="asistencia-item">
                                     <div className="asistencia-buttons-container">
                                         <button
-                                            className="asistencia-entrefechas-modificar-button"
+                                            className="asistencia-modificar-button-general"
                                             onClick={() => handleOpenModificar(asistencia)}
                                         >
                                             Modificar
                                         </button>
                                         <button
-                                            className="asistencia-entrefechas-eliminar-button"
+                                            className="asistencia-eliminar-button-general"
                                             onClick={() => handleOpenConfirm(asistencia.id)}
                                             disabled={deleting}
                                         >
@@ -197,6 +197,7 @@ const MostrarAsistenciaGeneralPopup = ({ onClose }) => {
                     <ModificarAsistenciaPopup
                         asistenciaId={selectedAsistencia.id}
                         presenteActual={selectedAsistencia.presente}
+                        fechaActual={selectedAsistencia.fecha}
                         onClose={() => setShowModificarPopup(false)}
                         onSuccess={handleModificarSuccess}
                     />
