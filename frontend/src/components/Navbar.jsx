@@ -216,6 +216,18 @@ const Navbar = () => {
                                     Tarea
                                 </NavLink>
                             </li>
+                            <li>
+                                <NavLink
+                                    to="/subirTarea"
+                                    onClick={() => {
+                                        setMenuOpen(false);
+                                        addActiveClass();
+                                    }}
+                                    activeClassName="active"
+                                >
+                                    Subir-Tarea
+                                </NavLink>
+                            </li>
                         </>
                     )}
                     <li>
