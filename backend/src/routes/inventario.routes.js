@@ -20,9 +20,7 @@ router
 
 
 
-router.post("/",isAdmin,createInventarioController);//solo admin
 
-router.get("/:id",getInventarioByIdController); //usuario
 
 router.get("/names",getInventariosController);//inventario o admin
 router.patch("/update/:id",isAdmin,updateInventarioController); //admin
@@ -37,6 +35,9 @@ router.get("/item/", getItemController);
 router.delete("/item/",isProfesor,deleteItemController);//inventario y pedir user.permiso
 
 router.get("/full/:id",getInventarioWithItemsController); //usuario
+router.post("/",isAdmin,createInventarioController);//solo admin
+
+router.get("/:id",getInventarioByIdController); //usuario
 
 export default router;
 

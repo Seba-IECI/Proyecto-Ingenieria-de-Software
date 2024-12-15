@@ -40,7 +40,7 @@ import {
       return res.status(201).json(nuevoInventario);
     } catch (error) {
       console.error("Error en el controlador al crear el inventario:", error);
-      return res.status(500).json({ message: "Error interno del servidor" });
+      return res.status(400).json({ message: error.message });
     }
   }
   
@@ -78,7 +78,7 @@ import {
       return res.status(200).json(inventarioActualizado);
     } catch (error) {
       console.error("Error en el controlador al actualizar el inventario:", error);
-      return res.status(500).json({ message: "Error interno del servidor" });
+      return res.status(400).json({ message: error.message });
     }
   }
   
@@ -95,7 +95,7 @@ import {
       return res.status(200).json({ message: "Inventario eliminado exitosamente", inventarioEliminado });
     } catch (error) {
       console.error("Error en el controlador al eliminar el inventario:", error);
-      return res.status(500).json({ message: "Error interno del servidor" });
+      return res.status(400).json({ message: error.message });
     }
   }
   
@@ -108,7 +108,7 @@ import {
       return res.status(201).json(nuevoItem);
     } catch (error) {
       console.error("Error en el controlador al añadir un artículo:", error);
-      return res.status(500).json({ message: "Error interno del servidor" });
+      return res.status(400).json({ message: error.message });
     }
   }
   
@@ -154,7 +154,7 @@ export async function deleteItemController(req, res) {
     });
   } catch (error) {
     console.error("Error en el controlador al reducir la cantidad de un artículo de inventario:", error);
-    return res.status(500).json({ message: "Error interno del servidor" });
+    return res.status(400).json({ message: error.message });
   }
 }
 

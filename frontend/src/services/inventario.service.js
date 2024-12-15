@@ -25,13 +25,17 @@ export async function getInventarioById(rut){ ///uso interno
 
 
 export async function createInventario(data) {
-    try {
-        const response = await axios.post('/inventario/', data);
-        return response.data;
-    } catch (error) {
-        return error.response.data;
-    }
+  try {
+    const response = await axios.post('/inventario/', data);
+    return response.data;
+  } catch (error) {
+    console.error("Error detallado del backend:", error.response?.data); 
+    throw new Error(
+      error.response?.data?.message || "Error desconocido del servidor"
+    );
+  }
 }
+
 
 export const updateInventario = async (id, inventario) => {
     try {

@@ -5,12 +5,76 @@ import Item from "../entity/item.entity.js";
 import CodigoBarras from "../entity/cBarras.entity.js";
 import User from "../entity/user.entity.js";
 
+
+// Validaciones internas
+function validarId(id) {
+  if (!id) throw new Error("El ID es obligatorio.");
+  if (!/^\d+$/.test(id)) throw new Error("El ID debe ser un número válido sin espacios ni signos.");
+}
+
+function validarDescripcion(descripcion) {
+  if (!descripcion) throw new Error("El nombre es obligatorio.");
+  if (typeof descripcion !== "string" || descripcion.length > 100 || !/^[a-zA-Z0-9\s]+$/.test(descripcion)) {
+      throw new Error("El nombre debe tener máximo 100 caracteres y solo puede contener letras, números y espacios.");
+  }
+}
+function validarNombre(nombre) {
+  if (!nombre) throw new Error("El nombre es obligatorio.");
+  if (
+    typeof nombre !== "string" ||    nombre.length > 50 ||    !/^[a-zA-Z\s\-]+$/.test(nombre)
+  ) {
+    throw new Error(
+      "El nombre debe tener máximo 50 caracteres y solo puede contener letras, espacios y guiones."
+    );
+  }
+}
+
+function validarRut(rut) {
+  if (!rut) throw new Error("El RUT es obligatorio.");
+  const rutLimpio = rut.replace(/[^0-9kK]/g, "");
+  if (!/^[0-9]+[kK0-9]$/.test(rutLimpio)) throw new Error("El RUT tiene un formato inválido.");
+  const cuerpo = rutLimpio.slice(0, -1);
+  const digitoVerificador = rutLimpio.slice(-1).toUpperCase();
+  let suma = 0;
+  let multiplicador = 2;
+  for (let i = cuerpo.length - 1; i >= 0; i--) {
+      suma += parseInt(cuerpo[i], 10) * multiplicador;
+      multiplicador = multiplicador < 7 ? multiplicador + 1 : 2;
+  }
+  const dvCalculado = 11 - (suma % 11);
+  const dvFinal = dvCalculado === 11 ? "0" : dvCalculado === 10 ? "K" : String(dvCalculado);
+  if (digitoVerificador !== dvFinal) throw new Error("El RUT es inválido.");
+}
+
+function validarDias(dias) {
+  if (dias === undefined || dias === null) throw new Error("Los días son obligatorios.");
+  if (!Number.isInteger(dias) || dias < 0 || dias > 3) throw new Error("Los días deben ser un número entero entre 0 y 3.");
+}
+
+function validarCodigoBarras(codigo) {
+  if (!codigo) {
+      throw new Error("El código de barras es obligatorio.");
+  }
+  if (!/^[a-zA-Z0-9]+$/.test(codigo)) {
+      throw new Error("El código de barras solo puede contener letras y números.");
+  }
+  if (codigo.length !== 9) {
+      throw new Error("El código de barras debe tener exactamente 9 caracteres.");
+  }
+}
+
 export async function getItemService(query) {
   try {
     const { id, cBarras, nombre } = query;
     const itemRepository = AppDataSource.getRepository(Item);
 
-   
+    if (!id && !nombre && !cBarras) {
+      throw new Error("Debe proporcionar al menos uno de los siguientes identificadores: id, nombre o cBarras.");
+    }
+    if (id) validarId(id);
+    if (nombre) validarNombre(nombre);
+    if (cBarras) validarCodigoBarras(cBarras);
+
     const whereCondition = {};
     if (id) whereCondition.id = id;
     if (cBarras) whereCondition.cBarras = cBarras;
@@ -26,7 +90,7 @@ export async function getItemService(query) {
     return [itemFound, null];
   } catch (error) {
     console.error("Error al obtener el artículo de inventario:", error);
-    return [null, "Error interno del servidor"];
+    return [null, error.message || "Error interno del servidor"];
   }
 }
 
@@ -38,6 +102,10 @@ export async function createInventarioService(body) {
     const userRepository = AppDataSource.getRepository( User );
 
     const { nombre, descripcion, encargadoRut } = body;
+
+    validarNombre(nombre);
+    validarRut(encargadoRut);
+    validarDescripcion(descripcion);
 
     const duplicateInventario = await inventarioRepository.findOne({
       where: { nombre },
@@ -86,12 +154,9 @@ export async function createInventarioService(body) {
     return [nuevoInventario, null];
   } catch (error) {
     console.error("Error al crear inventario:", error);
-    const errorMessage = error.response?.data?.message || "Error inesperado";
-    setErrors((prev) => ({
-      ...prev,
-      serverError: errorMessage,
+    return [null, error.message || "Error interno del servidor"];
     
- } ))}};
+  }};
 
 
 export async function getInventarioByIdService(query, user) {
@@ -99,6 +164,7 @@ export async function getInventarioByIdService(query, user) {
     const { id, nombre } = query;
     const inventarioRepository = AppDataSource.getRepository(Inventario);
 
+    
     const whereCondition = {};
     if (id) whereCondition.id = id;
     if (nombre) whereCondition.nombre = nombre;
@@ -131,7 +197,7 @@ export async function getInventarioByIdService(query, user) {
     return [inventario, null];
   } catch (error) {
     console.error("Error al obtener el inventario:", error);
-    return [null, "Error interno del servidor"];
+    return [null, error.message || "Error interno del servidor"];
   }
 }
 
@@ -139,6 +205,9 @@ export async function updateItemService(query, body, user) {
   try {
     const { id, cBarras, descripcion } = query;
     const itemRepository = AppDataSource.getRepository(Item); 
+    validarDescripcion(body.descripcion);
+    validarId(id);
+    validarCodigoBarras(body.cBarras);
 
     if (!user || !user.permisos.includes(inventario.nombre)) {
       return [null, `No tienes permiso para modificar este ítem en el inventario: ${inventario.nombre}`];
@@ -175,7 +244,7 @@ export async function updateItemService(query, body, user) {
     return [updatedItem, null];
   } catch (error) {
     console.error("Error al modificar un artículo de inventario:", error);
-    return [null, "Error interno del servidor"];
+    return [null, error.message || "Error interno del servidor"];
   }
 }
 
@@ -183,9 +252,13 @@ export async function addItemService(data, user) {
   try {
     const { nombre, descripcion, categoria, cBarras, inventario } = data;
 
-    if (!nombre || !descripcion || !categoria || !cBarras || !inventario) {
-      return [null, "Todos los campos son obligatorios: nombre, descripcion, categoria, código de barras, inventario"];
-    }
+    
+
+    validarCodigoBarras(cBarras);
+    validarDescripcion(descripcion);
+    validarNombre(nombre);
+    validarNombre(categoria);
+    validarNombre(inventario);
 
     const itemRepository = AppDataSource.getRepository(Item);
     const inventarioRepository = AppDataSource.getRepository(Inventario);
@@ -258,13 +331,14 @@ export async function addItemService(data, user) {
     }
   } catch (error) {
     console.error("Error al añadir un artículo al inventario:", error.message || error);
-    return [null, error.message || "Error interno del servidor"];
+    throw new Error(error.message );
   }
 }
 
 export async function deleteItemService(query,user) {
   try {
     const { cBarras } = query;
+    validarCodigoBarras(cBarras);
     const itemRepository = AppDataSource.getRepository(Item);
     const codigoBarrasRepository = AppDataSource.getRepository(CodigoBarras);
  
@@ -296,7 +370,7 @@ export async function deleteItemService(query,user) {
     return [item, null];
   } catch (error) {
     console.error("Error al eliminar un artículo del inventario:", error);
-    return [null, "Error interno del servidor"];
+    throw new Error(error.message);
   }
 }
 
@@ -316,6 +390,11 @@ export async function updateInventarioService(id, data) {
     if (data.descripcion !== undefined) inventario.descripcion = data.descripcion;
     if (data.encargado !== undefined) inventario.encargado = data.encargado; 
 
+    validarDescripcion(data.descripcion);
+    validarNombre(data.nombre);
+    validarRut(data.encargado);
+
+
     inventario.updatedAt = new Date(); 
 
  
@@ -324,7 +403,7 @@ export async function updateInventarioService(id, data) {
     return [inventarioActualizado, null];
   } catch (error) {
     console.error("Error al actualizar el inventario:", error);
-    return [null, "Error interno del servidor"];
+    throw new Error(error.message);
   }
 }
 
@@ -333,7 +412,7 @@ export async function deleteInventarioService(id) {
   try {
     const inventarioRepository = AppDataSource.getRepository(Inventario);
 
-    
+    validarId(id);
     const inventario = await inventarioRepository.findOne({ where: { id } });
 
     if (!inventario) {
@@ -346,7 +425,7 @@ export async function deleteInventarioService(id) {
     return [inventario, null];
   } catch (error) {
     console.error("Error al eliminar el inventario:", error);
-    return [null, "Error interno del servidor"];
+    throw new Error(error.message);
   }
 }
 
@@ -385,6 +464,7 @@ export async function getInventarioWithItemsService(query) {
   try {
     const { id } = query;
     const inventarioRepository = AppDataSource.getRepository("Inventario");
+    
 
     
     if (!id) {

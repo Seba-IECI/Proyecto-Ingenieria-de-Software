@@ -8,11 +8,14 @@ import {
 import CreateInventarioPopup from "@components/CreateInventarioPopup";
 import EditInventarioPopup from "../components/EditInventarioPopup";
 import "@styles/inventario.css";
+import Swal from "sweetalert2";
 
 export default function Inventarios() {
   const [inventarios, setInventarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [message, setMessage] = useState(null);
+
   const [selectedInventario, setSelectedInventario] = useState(null);
   const [isCreatePopupOpen, setIsCreatePopupOpen] = useState(false); 
   const [isEditPopupOpen, setIsEditPopupOpen] = useState(false); 
@@ -53,24 +56,52 @@ export default function Inventarios() {
 
   const handleUpdateInventario = async () => {
     try {
-      await updateInventario(selectedInventario.id, selectedInventario); 
-      const response = await getInventarios(); 
+      await updateInventario(selectedInventario.id, selectedInventario);
+      const response = await getInventarios();
       setInventarios(response);
-      setIsEditPopupOpen(false); 
+      setIsEditPopupOpen(false);
+  
+      
+      Swal.fire({
+        icon: "success",
+        title: "Éxito",
+        text: "Inventario actualizado con éxito",
+      });
     } catch (error) {
-      console.error("Error al actualizar el inventario:", error);
+      const backendMessage =
+        error.response?.data?.message || "Error desconocido del servidor.";
+      console.error("Error recibido del backend:", backendMessage);
+  
+      
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: backendMessage,
+      });
     }
   };
+  
 
   
   const handleCreateInventario = async () => {
     try {
       await createInventario(newInventario);
-      await fetchInventarios();
+      await fetchInventarios(); 
       setIsCreatePopupOpen(false); 
+      Swal.fire({
+        title: 'Éxito',
+        text: 'Inventario creado con éxito',
+        icon: 'success',
+        confirmButtonText: 'Aceptar',
+      });
     } catch (error) {
-      console.error("Error al crear inventario:", error);
-      setError("No se pudo crear el inventario");
+      console.error('Error al crear el inventario:', error.message);
+      Swal.fire({
+        title: 'Error',
+        text: error.message,
+        icon: 'error',
+        confirmButtonText: 'Aceptar',
+      });
     }
   };
 
