@@ -160,6 +160,18 @@ const Navbar = () => {
                                     Tarea
                                 </NavLink>
                             </li>
+                            <li>
+                                <NavLink
+                                    to="/listarTareas"
+                                    onClick={() => {
+                                        setMenuOpen(false);
+                                        addActiveClass();
+                                    }}
+                                    activeClassName="active"
+                                >
+                                    Listar-Tareas
+                                </NavLink>
+                            </li>
                         </>
                     )}
                     {userRole === 'usuario' && (

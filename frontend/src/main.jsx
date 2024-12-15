@@ -19,6 +19,7 @@ import PorcentajeAsistencia from '@pages/PorcentajeAsistencia';
 import Tarea from '@pages/tarea';
 import TareaEs from '@pages/tareaEstudiante';
 import SubirTarea from '@pages/subirTarea';
+import ListarTareas from '@pages/listarTareas';
 import '@styles/styles.css';
 
 const router = createBrowserRouter([
@@ -131,6 +132,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={['estudiante']}>
             <SubirTarea />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/listarTareas',
+        element: (
+          <ProtectedRoute allowedRoles={['profesor']}>
+            <ListarTareas />
           </ProtectedRoute>
         ),
       }
