@@ -130,7 +130,7 @@ export async function getPrestamosPorEstadoController(req, res) {
     return res.status(200).json(prestamosData); 
   } catch (error) {
     console.error("Error en el controlador al obtener los préstamos por estado:", error);
-    return res.status(500).json({ message: "Error interno del servidor" });
+    return res.status(400).json({ message: error.message });
   }
 }
 
@@ -155,6 +155,6 @@ export async function comentarioPrestamoController(req, res) {
     });
   } catch (error) {
     console.error("Error en actualizarComentarioPrestamoController:", error.message);
-    return res.status(500).json({ error: "Error interno del servidor." });
+    return res.status(400).json({ message: error.message });
   }
 }

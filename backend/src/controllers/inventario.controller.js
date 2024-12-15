@@ -209,7 +209,7 @@ export async function getInventarioWithItemsController(req, res) {
     return res.status(200).json({ data: inventario });
   } catch (error) {
     console.error("Error en el controlador:", error);
-    return res.status(500).json({ message: "Error interno del servidor" });
+    return res.status(400).json({ message: error.message });
   }
 }
 

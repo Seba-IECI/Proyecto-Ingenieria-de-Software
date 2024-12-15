@@ -492,7 +492,7 @@ export async function getInventarioWithItemsService(query) {
   try {
     const { id } = query;
     const inventarioRepository = AppDataSource.getRepository("Inventario");
-    
+    validarId(id);
 
     
     if (!id) {
@@ -528,7 +528,7 @@ export async function getInventarioWithItemsService(query) {
     return [transformedInventario, null];
   } catch (error) {
     console.error("Error al obtener el inventario con ítems y códigos de barra:", error);
-    return [null, "Error interno del servidor"];
+    throw new Error(error.message);
   }
 }
 

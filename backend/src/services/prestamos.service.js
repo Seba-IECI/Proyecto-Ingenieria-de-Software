@@ -390,7 +390,7 @@ export async function getPrestamosPorEstadoService(estado) {
     return [prestamosData, null];
   } catch (error) {
     console.error("Error al obtener los préstamos por estado:", error);
-    return [null, "Error interno del servidor"];
+    throw new Error(error.message );
   }
 }
 
@@ -555,6 +555,6 @@ export async function actualizarComentarioPrestamo(id, comentario) {
     return [prestamo, null];
   } catch (error) {
     console.error("Error al actualizar el comentario del préstamo:", error.message || error);
-    return [null, "Error interno del servidor"];
+    throw new Error(error.message );
   }
 }
