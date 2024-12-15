@@ -13,18 +13,43 @@ function validarId(id) {
 }
 
 function validarDescripcion(descripcion) {
-  if (!descripcion) throw new Error("El nombre es obligatorio.");
-  if (typeof descripcion !== "string" || descripcion.length > 100 || !/^[a-zA-Z0-9\s]+$/.test(descripcion)) {
-      throw new Error("El nombre debe tener máximo 100 caracteres y solo puede contener letras, números y espacios.");
+  if (!descripcion) throw new Error("la descripcion es obligatorio.");
+  if (typeof descripcion !== "string" || descripcion.length > 100 || !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s]+$/
+.test(descripcion)) {
+      throw new Error("La descripcion debe tener máximo 100 caracteres y solo puede contener letras, números y espacios.");
   }
 }
+
 function validarNombre(nombre) {
   if (!nombre) throw new Error("El nombre es obligatorio.");
   if (
-    typeof nombre !== "string" ||    nombre.length > 50 ||    !/^[a-zA-Z\s\-]+$/.test(nombre)
+    typeof nombre !== "string" ||    nombre.length > 50 ||    !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s]+$/
+.test(nombre)
   ) {
     throw new Error(
       "El nombre debe tener máximo 50 caracteres y solo puede contener letras, espacios y guiones."
+    );
+  }
+}
+function validarCategoria(categoria) {
+  if (!categoria) throw new Error("La categoria es obligatorio.");
+  if (
+    typeof categoria !== "string" ||    categoria.length > 50 ||    !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s]+$/
+.test(categoria)
+  ) {
+    throw new Error(
+      "El categoria debe tener máximo 50 caracteres y solo puede contener letras, espacios y guiones."
+    );
+  }
+}
+function validarInventario(inventario) {
+  if (!inventario) throw new Error("El inventario es obligatorio.");
+  if (
+    typeof inventario !== "string" ||    inventario.length > 50 ||    !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s]+$/
+.test(inventario)
+  ) {
+    throw new Error(
+      "El inventario debe tener máximo 50 caracteres y solo puede contener letras, espacios y guiones."
     );
   }
 }
@@ -251,14 +276,15 @@ export async function updateItemService(query, body, user) {
 export async function addItemService(data, user) {
   try {
     const { nombre, descripcion, categoria, cBarras, inventario } = data;
+    console.log("Datos recibidos para añadir un artículo:", data);
 
     
 
     validarCodigoBarras(cBarras);
     validarDescripcion(descripcion);
     validarNombre(nombre);
-    validarNombre(categoria);
-    validarNombre(inventario);
+    validarCategoria(categoria);
+    validarInventario(inventario);
 
     const itemRepository = AppDataSource.getRepository(Item);
     const inventarioRepository = AppDataSource.getRepository(Inventario);
@@ -276,6 +302,8 @@ export async function addItemService(data, user) {
     }
 
     const nombreNormalizado = nombre.toLowerCase();
+
+    console
 
     let item = await itemRepository.findOne({
       where: { nombre: nombreNormalizado, inventario: { id: inventarioactual.id } },
