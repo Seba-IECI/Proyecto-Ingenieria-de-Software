@@ -1,6 +1,5 @@
 import cron from "node-cron";
 import { AppDataSource } from "../src/config/configDb.js";
-import Prestamos from "../src/entity/prestamos.entity.js";
 import { prestamoVencidoService } from "../src/services/prestamos.service.js";
 import { sendEmail } from "../src/services/email.service.js";
 import { addAmonestacionRut } from "../src/services/amonestaciones.service.js"; 
@@ -16,6 +15,12 @@ export async function revisarPrestamos() {
     const ayerFin = new Date(ayerInicio);
     ayerFin.setHours(23, 59, 59, 999); 
 
+    const mananaInicio = new Date(hoy);
+    mananaInicio.setDate(hoy.getDate() + 1); 
+    const mananaFin = new Date(mananaInicio);
+    mananaFin.setHours(23, 59, 59, 999); 
+
+    
     const prestamosVencidosAyer = await prestamoRepository
       .createQueryBuilder("prestamo")
       .leftJoinAndSelect("prestamo.usuario", "usuario")
@@ -29,12 +34,10 @@ export async function revisarPrestamos() {
         continue;
       }
 
-      
       const fechaVencimiento = new Date(prestamo.fechaVencimiento);
       const diasRetraso = Math.floor((hoy - fechaVencimiento) / (1000 * 60 * 60 * 24));
 
       if (diasRetraso >= 1) {
-        
         const amonestacionesAgregar = Math.floor(diasRetraso / 3);
 
         for (let i = 0; i < amonestacionesAgregar; i++) {
@@ -47,7 +50,6 @@ export async function revisarPrestamos() {
         }
       }
 
-     
       await sendEmail(
         prestamo.usuario.email,
         "Aviso: Préstamo Atrasado",
@@ -55,6 +57,32 @@ export async function revisarPrestamos() {
         `<p>Estimado ${prestamo.usuario.nombreCompleto},</p>
          <p>Le informamos que su préstamo con ID ${prestamo.id} tiene un retraso de ${diasRetraso} días. Por favor, devuélvalo a la brevedad posible.</p>`
       );
+    }
+
+   
+    const prestamosQueVencenManana = await prestamoRepository
+      .createQueryBuilder("prestamo")
+      .leftJoinAndSelect("prestamo.usuario", "usuario")
+      .where("prestamo.fechaVencimiento BETWEEN :mananaInicio AND :mananaFin", { 
+        mananaInicio,
+        mananaFin,
+      })
+      .andWhere("prestamo.estado = :estado", { estado: 1 })
+      .getMany();
+
+    for (let prestamo of prestamosQueVencenManana) {
+      if (prestamo.usuario) {
+        console.log(`Notificación: El préstamo de ${prestamo.usuario.nombreCompleto} vence mañana`);
+        await sendEmail(
+          prestamo.usuario.email,
+          "Recordatorio: Préstamo Próximo a Vencer",
+          `Estimado ${prestamo.usuario.nombreCompleto}, su préstamo con ID ${prestamo.id} vencerá mañana.`,
+          `<p>Estimado ${prestamo.usuario.nombreCompleto},</p>
+           <p>Le recordamos que su préstamo con ID ${prestamo.id} vencerá mañana. Por favor, tome las medidas necesarias para evitar inconvenientes.</p>`
+        );
+      } else {
+        console.warn(`Advertencia: El préstamo con ID ${prestamo.id} que vence mañana no tiene usuario asociado.`);
+      }
     }
 
     return "Revisión de préstamos completada";
