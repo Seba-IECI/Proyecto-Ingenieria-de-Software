@@ -9,6 +9,7 @@ import {
 import "@styles/prestamos.css";
 import { validations } from "@helpers/formatData";
 import { format as formatRut } from "rut.js";
+import Swal from "sweetalert2";
 
 
 export default function Prestamos() {
@@ -82,14 +83,32 @@ export default function Prestamos() {
   };
 
   const handleCerrarPrestamo = (id) => {
-    cerrarPrestamo(id)
-      .then(() => fetchPrestamos())
-      .catch((error) => {
-        console.error("Error al cerrar el préstamo:", error);
-        setError("No se pudo cerrar el préstamo.");
-        window.alert(`Error al cerrar el préstamo: ${error.message || error}`);
-      });
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "Una vez cerrado, no podrás reabrir este préstamo.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, cerrar préstamo",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        cerrarPrestamo(id)
+          .then(() => {
+            
+            Swal.fire("¡Éxito!", "El préstamo se cerró correctamente.", "success");
+            
+            fetchPrestamos();
+          })
+          .catch((error) => {
+            console.error("Error al cerrar el préstamo:", error);
+            setError("No se pudo cerrar el préstamo.");
+            Swal.fire("Error", `No se pudo cerrar el préstamo: ${error.message || error}`, "error");
+          });
+      }
+    });
   };
+  
+  
 
    const openAmonestacionPopup = (usuarioId, prestamoId) => {
     console.log("Usuario ID recibido:", usuarioId);
