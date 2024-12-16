@@ -1,0 +1,112 @@
+.periodo-practicas-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #f9f9f9; 
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.periodo-practicas-container h1 {
+    font-size: 28px;
+    color: #003366; 
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.habilitar-button {
+    background-color: #28a745; 
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.habilitar-button:hover {
+    background-color: #218838; 
+}
+
+.periodos-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.periodo-item {
+    background-color: #eef7ff; 
+    border: 1px solid #003366; 
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 10px;
+    transition: transform 0.2s;
+}
+
+.periodo-item:hover {
+    transform: scale(1.02); 
+}
+
+.deshabilitar-button {
+    background-color: #dc3545; 
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.deshabilitar-button:hover {
+    background-color: #c82333; 
+}
+
+.mensaje-popup {
+    background-color: #d4edda; 
+    color: #155724; 
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.mensaje-popup.error {
+    background-color: #f8d7da; 
+    color: #721c24; 
+}
+
+.popup {
+    background-color: #ffffff; 
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.popup h2 {
+    margin-top: 0;
+    color: #003366; 
+}
+
+.popup button {
+    margin-top: 10px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.popup button.confirm {
+    background-color: #28a745; 
+    color: white;
+}
+
+.popup button.cancel {
+    background-color: #dc3545; 
+    color: white;
+}
+
+.popup button:hover {
+    opacity: 0.9; 
+}
