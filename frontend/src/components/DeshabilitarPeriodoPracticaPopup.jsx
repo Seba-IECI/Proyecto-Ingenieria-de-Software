@@ -1,5 +1,5 @@
 import React from 'react';
-import '@styles/popup.css'; // Asegúrate de que la ruta sea correcta
+import '@styles/popup.css'; 
 
 const ConfirmarDeshabilitarPopup = ({ show, onClose, onConfirm, nombre }) => {
     if (!show) return null;

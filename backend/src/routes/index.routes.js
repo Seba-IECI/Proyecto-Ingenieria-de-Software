@@ -29,7 +29,7 @@ router
     .use("/semestres", semestreRoutes)
     .use("/asistencia", asistenciaRoutes)
     .use("/documentosTarea", documentosTareaRoutes)
-    .use("/periodoPractica", periodoPracticaRoutes)
+    .use("/periodoPracticas", periodoPracticaRoutes)
     .use("/amonestaciones",amonestacionesRoutes);
    
     
